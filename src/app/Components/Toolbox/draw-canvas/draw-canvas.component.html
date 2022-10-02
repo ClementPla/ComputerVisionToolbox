@@ -1,0 +1,14 @@
+<div class="canvas-container"
+  [style.cursor]="this.drawable? 'none': 'default'">
+  <p *ngIf="title" class="title">{{title}}</p>
+  <div #cursor class="cursor" *ngIf="this.drawable"
+  [style.top.px]="cursorPosition.y"
+  [style.left.px]="cursorPosition.x"
+  [style.width.px]="getCursorTransform()">
+    <div class="cursor-radius"
+    [style.border-color]="drawColor"></div>
+    <mat-icon>brush</mat-icon>
+  </div>
+
+  <canvas #canvas id="canvasVisu"></canvas>
+</div>

@@ -1,0 +1,89 @@
+<mat-toolbar>
+  <mat-toolbar-row>
+    <span>Colorspaces</span>
+  </mat-toolbar-row>
+</mat-toolbar>
+<mat-toolbar color="primary" class="options-bar">
+  <button mat-raised-button color="warn" (click)="drawingCanvas.clearCanvas()">
+    Clear
+  </button>
+  <button
+    type="button"
+    mat-raised-button
+    color="accent"
+    (click)="fileInput.click()"
+  >
+    Load image
+  </button>
+  <input
+    hidden
+    #fileInput
+    type="file"
+    (change)="loadSelectedFile($event)"
+    accept="images/*"
+  />
+  <span class="brush-slider"
+    >{{ brushSizeSlider.value }}
+    <mat-slider
+      #brushSizeSlider
+      [min]="1"
+      [max]="100"
+      [step]="1"
+      [value]="10"
+      thumbLabel
+      tickInterval="auto"
+    ></mat-slider>
+  </span>
+  <mat-form-field>
+    <input matInput [ngxMatColorPicker]="picker" [formControl]="colorCtr" />
+    <ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
+    <ngx-mat-color-picker #picker [color]="color"></ngx-mat-color-picker>
+  </mat-form-field>
+
+  <mat-form-field appearance="standard">
+    <mat-label>Choose a colorspace</mat-label>
+    <mat-select [(ngModel)]="colorspace" (selectionChange)="updateColorSpace()">
+      <mat-option value="RGB">RGB</mat-option>
+      <mat-option value="HSV">HSV</mat-option>
+      <mat-option value="LAB">LAB</mat-option>
+      <mat-option value="YCrCb">YCrCb</mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-toolbar>
+<div class="horizontal-flex center-content parent">
+  <app-draw-canvas
+    class="main-canvas"
+    [width]="512"
+    [drawColor]="colorCtr.value?.rgba"
+    #drawingCanvas
+    (drawingEnded)="updateColorSpace()"
+    [drawable]="true"
+    [brushRadius]="brushSizeSlider.value"
+    title="Canvas"
+  >
+  </app-draw-canvas>
+  <app-draw-canvas
+    #canvas1
+    [width]="512"
+    class="shrink"
+    class="grid-item"
+    title="One"
+    [drawable]="false"
+  ></app-draw-canvas>
+  <app-draw-canvas
+    #canvas2
+    [width]="512"
+    class="shrink"
+    class="grid-item"
+    title="Two"
+    [drawable]="false"
+  ></app-draw-canvas>
+  <app-draw-canvas
+    #canvas3
+    [width]="512"
+    class="shrink"
+    class="grid-item"
+    title="Three"
+    [drawable]="false"
+  ></app-draw-canvas>
+</div>

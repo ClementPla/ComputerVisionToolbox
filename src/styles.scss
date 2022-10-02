@@ -1,1 +1,67 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --clr-neutral-900: hsl(207, 19%, 9%);
+  --clr-neutral-400: hsl(207, 19%, 61%);
+  --clr-neutral-100: hsl(0,0%,100%);
+  --clr-accent-400: hsl(142, 90%, 61%);
+  --card-width:35ch;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.horizontal-flex{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.vertical-flex{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+mat-drawer-container{
+  height: calc(100vh - 2 * 64px) ; // We remove twice the side of the toolbar
+}
+
+.drawer{
+  padding: 0.5em;
+}
+
+.center-content{
+  align-items: center;
+  justify-content: center;
+}
+.drawer-content{
+  height: 100%;
+}
+
+
+mat-toolbar-row{
+  span{
+    width: 100%;
+    text-align: center;
+  }
+}
+
+
+hr {
+  display: block;
+  margin: 10px 0 10px 0;
+  border-top: 1px solid rgba(0, 0, 0, .12);
+  width: 100%
+}
+
+.center-content{
+  gap: 1em;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.center-content > *{
+  width: 30vw;
+  min-width: 45ch;
+}
+

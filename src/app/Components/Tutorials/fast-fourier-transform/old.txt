@@ -1,0 +1,63 @@
+updateFFT() {
+    var data = this.drawCanvas.getArray();
+    var width = this.drawCanvas.width;
+    var height = this.drawCanvas.height;
+
+    var h: Array<Number> = new Array(width * height * 2); // the h values
+
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        const i = row * (width * 4) + col * 4;
+        h[row * width + col] = data[i];
+        h[(row + 1) * width + col] = 0;
+      }
+    }
+    var fftData = FFTUtils.fft2DArray(h, width, height);
+    var amps: Array<number> = [];
+    let max_amp = 0;
+    var ftRows = height * 2;
+    var ftCols = width / 2 + 1;
+    for (let row = 0; row < ftRows; row += 2) {
+      for (let col = 0; col < ftCols; col++) {
+        {
+          var re = fftData[row * ftCols + col];
+          var im = fftData[(row + 1) * ftCols + col];
+          var amp = Math.sqrt(re * re + im * im) / (ftCols*ftCols);
+          if(this.magLog){
+            amp = Math.log(amp)
+          }
+          if (amp > max_amp) {
+            max_amp = amp;
+          }
+          amps.push(amp);
+        }
+      }
+    }
+    var ftRows = ftRows / 2;
+    var ftCols = ftCols * 2;
+    var spectrum = new Uint8ClampedArray(ftRows * ftCols * 4);
+    var halfCol = Math.floor(ftCols / 2);
+    var halfRow = Math.floor(ftRows / 2);
+    for (let row = 0; row < halfRow; row++) {
+      for (let col = 0; col < halfCol; col++) {
+        const index = row * halfCol + col;
+        var amplitude = 255 * amps[index]/max_amp;
+
+        // fftshift
+        const r = (row + halfRow) * ftCols * 4 + (col + halfCol) * 4;
+        const r1 = (halfRow - row - 1) * ftCols * 4 + (halfCol - col - 1) * 4;
+        const r2 = (halfRow - row - 1) * ftCols * 4 + (col + halfCol) * 4;
+        const r3 = (halfRow + row) * ftCols * 4 + (halfCol - col - 1) * 4;
+        let indexes = [r, r1, r2, r3];
+        indexes.forEach((i) => {
+          for (let c = 0; c < 3; c++) {
+            spectrum[i + c] = amplitude;
+            spectrum[i + c + 4] = amplitude;
+          }
+          spectrum[i + 3] = 255;
+          spectrum[i + 7] = 255;
+        });
+      }
+    }
+    this.fftCanvas.drawArray(spectrum, ftCols, ftRows, 0, 0);
+  }

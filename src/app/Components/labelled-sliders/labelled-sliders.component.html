@@ -1,0 +1,22 @@
+<div class="vertical-flex">
+  <mat-form-field appearance="fill">
+    <mat-label>{{ title }}</mat-label>
+    <input
+      matInput
+      type="text"
+      readonly="true"
+      [value]="brushSizeSlider.value"
+    />
+  </mat-form-field>
+  <mat-slider
+    #brushSizeSlider
+    [min]="min"
+    [max]="max"
+    [step]="step"
+    [(value)]="value"
+    thumbLabel
+    tickInterval="auto"
+    (change)="onChange($event)"
+    (input)="onInput($event)"
+  ></mat-slider>
+</div>

@@ -1,0 +1,19 @@
+.options-bar{
+  gap: 2em;
+  height: 96px;
+}
+
+.brush-slider{
+  font-size: small;
+}
+
+.grid-item{
+  max-width: 20vw;
+}
+
+.main-canvas{
+  border: solid 1px white;
+  margin: 1em 0;
+  border-radius: 0.25em;
+  overflow: hidden;
+}

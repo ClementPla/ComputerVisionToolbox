@@ -1,0 +1,33 @@
+<mat-expansion-panel [ngClass]="{'activated':kernel.active, 'deactivated':!kernel.active}">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <span class="horizontal-flex">
+      <button mat-mini-fab class="action-button" color='accent' (click)="toggleActive($event)">
+        <mat-icon *ngIf="kernel.active">visibility</mat-icon>
+        <mat-icon *ngIf="!kernel.active">visibility_off</mat-icon>
+      </button>
+      <span class="title-span">
+      {{ kernel.name }}
+    </span>
+
+      <button mat-mini-fab class="action-button" color='warn' (click)="delete($event)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </span>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <div class="vertical-flex center">
+    <div class="rounded-table" *ngFor="let mat of kernel.mat">
+      <table (mouseenter)="drawFilter(mat)">
+        <tr *ngFor="let _ of [].constructor(kernel.height); let row = index">
+          <td
+            *ngFor="let _ of [].constructor(kernel.width); let col = index"
+          >
+            {{ mat[row * kernel.width + col].toFixed(2) }}
+          </td>
+        </tr>
+      </table>
+    </div>
+    <canvas #canvas></canvas>
+  </div>
+</mat-expansion-panel>

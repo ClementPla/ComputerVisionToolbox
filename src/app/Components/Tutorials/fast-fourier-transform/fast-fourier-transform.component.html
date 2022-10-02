@@ -1,0 +1,176 @@
+<mat-toolbar>
+  <mat-toolbar-row>
+    <button
+      mat-icon-button
+      class="example-icon"
+      aria-label="Example icon-button with menu icon"
+      (click)="drawer.toggle()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <span>Fourier Transform</span>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<mat-drawer-container>
+  <mat-drawer #drawer mode="side" opened>
+    <div class="vertical-flex drawer">
+      <button mat-raised-button color="warn" (click)="drawingCanvas.clearCanvas()">
+        Clear
+      </button>
+
+      <hr>
+
+      <button type="button" mat-raised-button
+      color="accent"
+      (click)="fileInput.click()">
+        Load image
+      </button>
+      <input
+        hidden
+        #fileInput
+        type="file"
+        (change)="loadSelectedFile($event)"
+        accept="images/*"
+      />
+      <hr>
+      <app-labelled-sliders #brushSizeSlider title="Brush Size">
+      </app-labelled-sliders>
+      <hr />
+
+      <button mat-raised-button color="accent" (click)="drawGaussian()">
+        Draw Gaussian
+      </button>
+      <mat-slide-toggle
+        #toggleAxis
+        class="example-margin"
+        color="accent"
+        labelPosition="before"
+      >
+        Independant axis
+      </mat-slide-toggle>
+      <ng-container *ngIf="toggleAxis.checked; else singleGaussAxis">
+        <mat-form-field appearance="fill">
+          <mat-label>Gaussian STD X</mat-label>
+          <input
+            matInput
+            type="text"
+            readonly="true"
+            [value]="gaussXSlider.value"
+          />
+        </mat-form-field>
+        <mat-slider
+          #gaussXSlider
+          min="0"
+          max="128"
+          step="1"
+          [(value)]="this.gaussStdX"
+          thumbLabel
+          tickInterval="auto"
+          (change)="drawGaussian()"
+        ></mat-slider>
+        <mat-form-field appearance="fill">
+          <mat-label>Gaussian STD Y</mat-label>
+          <input
+            matInput
+            type="text"
+            readonly="true"
+            [value]="gaussYSlider.value"
+          />
+        </mat-form-field>
+        <mat-slider
+          #gaussYSlider
+          min="0"
+          max="128"
+          step="1"
+          [(value)]="this.gaussStdY"
+          thumbLabel
+          tickInterval="auto"
+          (change)="drawGaussian()"
+        ></mat-slider>
+      </ng-container>
+      <ng-template #singleGaussAxis>
+        <mat-form-field appearance="fill">
+          <mat-label>Gaussian STD</mat-label>
+          <input
+            matInput
+            type="text"
+            readonly="true"
+            [value]="gaussSlider.value"
+          />
+        </mat-form-field>
+        <mat-slider
+          #gaussSlider
+          min="0"
+          max="128"
+          step="1"
+          [(value)]="this.gaussStdX"
+          [(value)]="this.gaussStdY"
+          thumbLabel
+          tickInterval="auto"
+          (change)="drawGaussian()"
+        ></mat-slider>
+      </ng-template>
+
+      <hr />
+
+      <button mat-raised-button color="accent" (click)="drawSin()">
+        Draw sin(x)
+      </button>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Angle</mat-label>
+        <input
+          matInput
+          type="text"
+          readonly="true"
+          [value]="angleSlider.value"
+        />
+      </mat-form-field>
+      <mat-slider
+        #angleSlider
+        min="0"
+        max="90"
+        step="5"
+        [(value)]="this.angle"
+        thumbLabel
+        tickInterval="auto"
+        (change)="drawSin()"
+      ></mat-slider>
+      <mat-form-field appearance="fill">
+        <mat-label>Frequency</mat-label>
+        <input
+          matInput
+          type="text"
+          readonly="true"
+          [value]="frequencySlider.value"
+        />
+      </mat-form-field>
+      <mat-slider
+        #frequencySlider
+        min="0"
+        max="256"
+        step="1"
+        [(value)]="this.frequency"
+        thumbLabel
+        tickInterval="auto"
+        (change)="drawSin()"
+      ></mat-slider>
+    </div>
+  </mat-drawer>
+
+  <div class="center-content horizontal-flex drawer-content">
+    <app-draw-canvas
+      #drawingCanvas
+      [width]="256"
+      (drawingEnded)="updateFFT()"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      title="Canvas"
+    ></app-draw-canvas>
+
+    <app-draw-canvas #fftCanvas [drawable]="false"
+    title="Fourier Transform"> </app-draw-canvas>
+  </div>
+</mat-drawer-container>

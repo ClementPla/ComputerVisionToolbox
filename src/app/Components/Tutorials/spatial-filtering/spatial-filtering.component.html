@@ -1,0 +1,277 @@
+<mat-toolbar>
+  <mat-toolbar-row>
+    <button mat-icon-button class="example-icon" (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <span>Spatial filtering</span>
+
+    <button
+      mat-icon-button
+      class="example-icon"
+      (click)="drawerKernels.toggle()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<mat-drawer-container>
+  <mat-drawer #drawer mode="side" opened>
+    <div class="vertical-flex drawer">
+      <button
+        mat-raised-button
+        color="warn"
+        (click)="drawingCanvas.clearCanvas()"
+      >
+        Clear
+      </button>
+
+      <hr />
+
+      <button
+        type="button"
+        mat-raised-button
+        color="accent"
+        (click)="fileInput.click()"
+      >
+        Load image
+      </button>
+      <input
+        hidden
+        #fileInput
+        type="file"
+        (change)="loadSelectedFile($event)"
+        accept="images/*"
+      />
+      <app-labelled-sliders #brushSizeSlider title="Brush Size">
+      </app-labelled-sliders>
+      <hr />
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="filter-name">
+              <button
+                mat-mini-fab
+                class="action-button"
+                color="accent"
+                (click)="
+                  meanFilter(meanFilterSlider.value!); $event.stopPropagation()
+                "
+              >
+                <mat-icon> add </mat-icon>
+              </button>
+              Mean blur
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-labelled-sliders
+          #meanFilterSlider
+          title="Kernel size"
+          [max]="9"
+          [min]="3"
+          [value]="3"
+          [step]="2"
+        >
+        </app-labelled-sliders>
+        <button
+          mat-raised-button
+          class="add-button"
+          color="primary"
+          (click)="meanFilter(meanFilterSlider.value!)"
+        >
+          Add
+        </button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="filter-name">
+              <button
+                mat-mini-fab
+                class="action-button"
+                color="accent"
+                (click)="
+                  gaussianBlur(
+                    gaussSizeSlider.value!,
+                    gaussSTDSliderX.value!,
+                    gaussSDTSliderY.value!
+                  );
+                  $event.stopPropagation()
+                "
+              >
+                <mat-icon> add </mat-icon>
+              </button>
+              Gaussian blur
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-labelled-sliders
+          #gaussSizeSlider
+          title="Kernel size"
+          [max]="15"
+          [min]="3"
+          [value]="9"
+          [step]="2"
+        >
+        </app-labelled-sliders>
+        <app-labelled-sliders
+          #gaussSTDSliderX
+          title="STD X"
+          [max]="15"
+          [min]="0"
+          [value]="2"
+          [step]="0.5"
+        >
+        </app-labelled-sliders>
+        <app-labelled-sliders
+          #gaussSDTSliderY
+          title="STD Y"
+          [max]="15"
+          [min]="0"
+          [value]="2"
+          [step]="0.5"
+        >
+        </app-labelled-sliders>
+        <button
+          mat-raised-button
+          class="add-button"
+          color="primary"
+          (click)="
+            gaussianBlur(
+              gaussSizeSlider.value!,
+              gaussSTDSliderX.value!,
+              gaussSDTSliderY.value!
+            )
+          "
+        >
+          Add
+        </button>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="filter-name">
+              <button
+                mat-mini-fab
+                class="action-button"
+                color="accent"
+                (click)="prewittFilter(); $event.stopPropagation()"
+              >
+                <mat-icon> add </mat-icon>
+              </button>
+              Prewitt Filter
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button
+          class="add-button"
+          mat-raised-button
+          color="primary"
+          (click)="prewittFilter()"
+        >
+          Add
+        </button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="filter-name">
+              <button
+                mat-mini-fab
+                class="action-button"
+                color="accent"
+                (click)="sobelFilter(); $event.stopPropagation()"
+              >
+                <mat-icon> add </mat-icon>
+              </button>
+              Sobel Filter
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button
+          class="add-button"
+          mat-raised-button
+          color="primary"
+          (click)="sobelFilter()"
+        >
+          Add
+        </button>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="filter-name">
+              <button
+                mat-mini-fab
+                class="action-button"
+                color="accent"
+                (click)="laplacianFilter(); $event.stopPropagation()"
+              >
+                <mat-icon> add </mat-icon>
+              </button>
+              Laplacian Filter
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button
+          class="add-button"
+          mat-raised-button
+          color="primary"
+          (click)="sobelFilter()"
+        >
+          Add
+        </button>
+      </mat-expansion-panel>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer
+    class="filter-drawer"
+    #drawerKernels
+    mode="side"
+    opened
+    position="end"
+  >
+    <div class="vertical-flex drawer">
+      <h2>Active filters</h2>
+
+      <button
+        *ngIf="this.listKernels.length"
+        mat-raised-button
+        color="warn"
+        (click)="cleanFilterList()"
+      >
+        Clear
+      </button>
+
+      <hr />
+
+      <app-kernel-element
+        *ngFor="let kernel of listKernels"
+        [kernel]="kernel"
+        (updateFilters)="updateFilters()"
+      ></app-kernel-element>
+    </div>
+  </mat-drawer>
+
+  <div class="center-content horizontal-flex drawer-content">
+    <app-draw-canvas
+      [width]="512"
+      #drawingCanvas
+      (drawingEnded)="applyFilter()"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      title="Canvas"
+    ></app-draw-canvas>
+    <app-draw-canvas
+      [width]="512"
+      #resultCanvas
+      [drawable]="false"
+      title="Filtered canvas"
+    >
+    </app-draw-canvas>
+  </div>
+</mat-drawer-container>
