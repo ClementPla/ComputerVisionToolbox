@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
 import { Kernel, KernelGenerator } from './kernel';
 import { NgxOpenCVService, OpenCVState} from 'ngx-opencv';
+import { Base2DTutorialComponent } from '../base2-dtutorial/base2-dtutorial.component';
 
 declare var cv: any;
 
@@ -11,22 +12,19 @@ declare var cv: any;
   templateUrl: './spatial-filtering.component.html',
   styleUrls: ['./spatial-filtering.component.scss'],
 })
-export class SpatialFilteringComponent implements OnInit {
-  @ViewChild('drawingCanvas') drawCanvas: DrawCanvasComponent;
+export class SpatialFilteringComponent extends Base2DTutorialComponent implements OnInit {
   @ViewChild('resultCanvas') filterCanvas: DrawCanvasComponent;
 
   listKernels: Array<Kernel>;
-  cvState: string;
-  constructor(private ngxOpenCv: NgxOpenCVService) {
 
-  }
   updateFilters(){
     this.listKernels = this.listKernels.filter((value)=>{
       return !value.delete
     })
     this.applyFilter()
   }
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit()
     this.listKernels = new Array<Kernel>();
   }
 
@@ -54,6 +52,17 @@ export class SpatialFilteringComponent implements OnInit {
     this.listKernels.push(KernelGenerator.getSobelKernels());
     this.applyFilter()
   }
+
+  additiveFilter(value:number){
+    this.listKernels.push(KernelGenerator.getAdditiveKernel(value))
+    this.applyFilter()
+  }
+
+  multiplyFilter(value:number){
+    this.listKernels.push(KernelGenerator.getMultiplicativeKernel(value))
+    this.applyFilter()
+  }
+
   cleanFilterList() {
     this.listKernels = new Array<Kernel>();
     this.applyFilter()
@@ -68,7 +77,13 @@ export class SpatialFilteringComponent implements OnInit {
 
     this.listKernels.forEach((kernel) => {
       if (kernel.active) {
-        if (kernel.mat.length == 2) {
+        if(kernel.name=='Add'){
+          dst.convertTo(dst, -1, 1, kernel.mat[0][0])
+        }
+        else if(kernel.name=='Multiply'){
+          dst.convertTo(dst, -1, kernel.mat[0][0], 0)
+        }
+        else if (kernel.mat.length == 2) {
           let matKernel = cv.matFromArray(
             kernel.width,
             kernel.height,
@@ -110,19 +125,5 @@ export class SpatialFilteringComponent implements OnInit {
     cv.imshow(this.filterCanvas.getCanvas(), dst);
     mat.delete();
     dst.delete();
-  }
-
-  loadSelectedFile(event: any) {
-    if (event.target.files && event.target.files[0]) {
-      var reader = new FileReader();
-      reader.onload = (event: any) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          this.drawCanvas.drawImage(img);
-        };
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
   }
 }

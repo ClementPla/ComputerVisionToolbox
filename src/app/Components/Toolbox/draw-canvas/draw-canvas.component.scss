@@ -7,6 +7,18 @@
   cursor: none;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
+.BW-toggle{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  color: white;
+  z-index: 10;
+  background-color: rgba(127,127,127,0.5);
+  border-radius: 3px;
+  margin: 5px 5px;
+  padding: 0px 5px;
+
+}
 .title{
   position: absolute;
   top: 0px;
@@ -74,4 +86,36 @@
   to {
     transform: rotate(359deg);
   }
+}
+.BWFilter{
+  filter: grayscale(1);
+}
+
+
+.handle{
+  width: 12px;
+  aspect-ratio: 1;
+  border-radius: 100%;
+  position: absolute;
+  cursor: move;
+  transform: translate(-50%, -50%);
+  font-size: smaller;
+  transform-origin: top left;
+  z-index: 21;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  background: radial-gradient(circle at 6px 6px, #5cabff, #000);
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+}
+
+.handle p{
+  position: relative;
+  top: -24px;
+}
+#canvasUI{
+  pointer-events: none;
+}
+.handle:hover{
+  border: dashed white 1px;
 }

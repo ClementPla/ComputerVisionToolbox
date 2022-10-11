@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { NgxEchartsModule } from 'ngx-echarts';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -22,7 +22,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgxOpenCVModule, OpenCVConfig } from 'ngx-opencv';
 import { MatFormFieldModule } from '@angular/material/form-field';
-
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSelectModule} from '@angular/material/select';
 
 import {
@@ -38,9 +38,13 @@ import { SpatialFilteringComponent } from './Components/Tutorials/spatial-filter
 import { KernelElementComponent } from './Components/Tutorials/spatial-filtering/kernel-element/kernel-element.component';
 import { LabelledSlidersComponent } from './Components/labelled-sliders/labelled-sliders.component';
 import { ColorSpacesComponent } from './Components/Tutorials/color-spaces/color-spaces.component';
+import { MorphoToolsComponent } from './Components/Tutorials/morpho-tools/morpho-tools.component';
+import { StructuralElementComponent } from './Components/Tutorials/morpho-tools/structural-element/structural-element.component';
+import { Base2DTutorialComponent } from './Components/Tutorials/base2-dtutorial/base2-dtutorial.component';
+import { TutorialTemplateComponent } from './Components/Toolbox/tutorial-template/tutorial-template.component';
 
 const openCVConfig: OpenCVConfig = {
-  openCVDirPath: '/assets/opencv',
+  openCVDirPath: 'assets/opencv/',
 };
 @NgModule({
   declarations: [
@@ -53,9 +57,17 @@ const openCVConfig: OpenCVConfig = {
     KernelElementComponent,
     LabelledSlidersComponent,
     ColorSpacesComponent,
+    MorphoToolsComponent,
+    StructuralElementComponent,
+    Base2DTutorialComponent,
+    TutorialTemplateComponent,
   ],
   imports: [
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts')
+    }),
     MatSelectModule,
+    MatButtonToggleModule,
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,

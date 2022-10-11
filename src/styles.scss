@@ -1,3 +1,4 @@
+
 /* You can add global styles to this file, and also import other style files */
 :root {
   --clr-neutral-900: hsl(207, 19%, 9%);
@@ -27,24 +28,25 @@ mat-drawer-container{
   height: calc(100vh - 2 * 64px) ; // We remove twice the side of the toolbar
 }
 
-.drawer{
-  padding: 0.5em;
-}
 
 .center-content{
   align-items: center;
   justify-content: center;
 }
-.drawer-content{
-  height: 100%;
-}
-
 
 mat-toolbar-row{
   span{
     width: 100%;
     text-align: center;
   }
+}
+
+mat-drawer{
+  max-width: 50vw;
+}
+.drawer{
+  width: 80%;
+  margin: 10px;
 }
 
 
@@ -55,13 +57,19 @@ hr {
   width: 100%
 }
 
-.center-content{
-  gap: 1em;
-  flex-wrap: wrap;
-  width: 100%;
-}
-.center-content > *{
-  width: 30vw;
-  min-width: 45ch;
+@media (max-width:800px) {
+  .hide-smallscreen{
+    display: none !important;
+  }
+
 }
 
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}

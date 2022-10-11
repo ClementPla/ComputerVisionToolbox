@@ -88,4 +88,25 @@ export class KernelGenerator {
     };
   }
 
+  static getAdditiveKernel(value:number):Kernel{
+    const vals: Array<number> = [value];
+    return {
+      width: 1,
+      height: 1,
+      active: true,
+      mat: [vals],
+      name: 'Add',
+    };
+  }
+
+  static getMultiplicativeKernel(value:number):Kernel{
+    const vals: Array<number> = [value];
+    return {
+      width: 1,
+      height: 1,
+      active: true,
+      mat: [vals],
+      name: 'Multiply',
+    };
+  }
 }

@@ -1,3 +1,4 @@
+
 .filter-name{
   button{
     transform: scale(0.5);
@@ -9,4 +10,12 @@
 
 .filter-name{
   width: 100%;
+}
+.canvas{
+  width: 45%;
+  min-width: 256px;
+}
+.drawer-content{
+  margin: 1em 0;
+  gap: 1em;
 }

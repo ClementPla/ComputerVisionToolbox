@@ -1,0 +1,41 @@
+<mat-expansion-panel #panelH  [ngClass]="{'activated':kernel.active, 'deactivated':!kernel.active}">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <button mat-mini-fab class="action-button" color='accent' (click)="toggleActive($event)">
+        <mat-icon *ngIf="kernel.active">visibility</mat-icon>
+        <mat-icon *ngIf="!kernel.active">visibility_off</mat-icon>
+      </button>
+      <span>
+      <mat-form-field appearance="fill" (click)="panelH.toggle()">
+        <mat-label>Operation</mat-label>
+        <mat-select [(ngModel)]="this.kernel.morphOp" (ngModelChange)="updateFilter()">
+          <mat-option value="erosion">Erosion</mat-option>
+          <mat-option value="dilation">Dilation</mat-option>
+          <mat-option value="opening">Opening</mat-option>
+          <mat-option value="closing">Closing</mat-option>
+          <mat-option value="tophat">Top Hat</mat-option>
+          <mat-option value="gradient">Gradient</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </span>
+
+      <button mat-mini-fab class="action-button" color='warn' (click)="delete($event)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <div class="vertical-flex center">
+    <div class="rounded-table">
+      <table (mouseenter)="drawFilter()">
+        <tr *ngFor="let _ of [].constructor(kernel.size); let row = index">
+          <td
+            *ngFor="let _ of [].constructor(kernel.size); let col = index"
+          >
+            {{ this.getFormattedValue(row, col)}}
+          </td>
+        </tr>
+      </table>
+    </div>
+    <canvas #canvas></canvas>
+  </div>
+</mat-expansion-panel>

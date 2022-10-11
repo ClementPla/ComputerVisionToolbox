@@ -1,19 +1,37 @@
 .options-bar{
   gap: 2em;
-  height: 96px;
+  align-items: center;
+  button{
+    height: 80%;
+  }
+  padding: 0 2em;
 }
 
 .brush-slider{
   font-size: small;
 }
 
-.grid-item{
-  max-width: 20vw;
-}
-
 .main-canvas{
   border: solid 1px white;
-  margin: 1em 0;
+  margin: 1em 1em;
   border-radius: 0.25em;
   overflow: hidden;
+  aspect-ratio: 1;
+  min-width: 256px;
+  width: 33%;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
+
+.grid-item{
+  margin: auto;
+  min-width: 256px;
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+}
+
+.canvas-grid{
+  gap: 0.5em;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+

@@ -1,16 +1,16 @@
-<mat-toolbar>
+<mat-toolbar class="hide-smallscreen" color="primary">
   <mat-toolbar-row>
     <span>Colorspaces</span>
   </mat-toolbar-row>
 </mat-toolbar>
-<mat-toolbar color="primary" class="options-bar">
+<div class="options-bar horizontal-flex">
   <button mat-raised-button color="warn" (click)="drawingCanvas.clearCanvas()">
     Clear
   </button>
   <button
     type="button"
     mat-raised-button
-    color="accent"
+    color="primary"
     (click)="fileInput.click()"
   >
     Load image
@@ -23,8 +23,9 @@
     accept="images/*"
   />
   <span class="brush-slider"
-    >{{ brushSizeSlider.value }}
+    >Brush size: {{ brushSizeSlider.value }}
     <mat-slider
+      color="primary"
       #brushSizeSlider
       [min]="1"
       [max]="100"
@@ -49,8 +50,8 @@
       <mat-option value="YCrCb">YCrCb</mat-option>
     </mat-select>
   </mat-form-field>
-</mat-toolbar>
-<div class="horizontal-flex center-content parent">
+</div>
+<div class="horizontal-flex center-content">
   <app-draw-canvas
     class="main-canvas"
     [width]="512"
@@ -60,30 +61,39 @@
     [drawable]="true"
     [brushRadius]="brushSizeSlider.value"
     title="Canvas"
+    [BWOption]="true"
   >
   </app-draw-canvas>
-  <app-draw-canvas
-    #canvas1
-    [width]="512"
-    class="shrink"
-    class="grid-item"
-    title="One"
-    [drawable]="false"
-  ></app-draw-canvas>
-  <app-draw-canvas
-    #canvas2
-    [width]="512"
-    class="shrink"
-    class="grid-item"
-    title="Two"
-    [drawable]="false"
-  ></app-draw-canvas>
-  <app-draw-canvas
-    #canvas3
-    [width]="512"
-    class="shrink"
-    class="grid-item"
-    title="Three"
-    [drawable]="false"
-  ></app-draw-canvas>
+  <div class="horizontal-flex canvas-grid">
+    <app-draw-canvas
+      #canvas1
+      [width]="512"
+      [drawColor]="colorCtr.value?.rgba"
+      class="grid-item"
+      title="Red"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      (drawingEnded)="updateInput()"
+    ></app-draw-canvas>
+    <app-draw-canvas
+      #canvas2
+      [width]="512"
+      [drawColor]="colorCtr.value?.rgba"
+      class="grid-item"
+      title="Green"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      (drawingEnded)="updateInput()"
+    ></app-draw-canvas>
+    <app-draw-canvas
+      #canvas3
+      [width]="512"
+      [drawColor]="colorCtr.value?.rgba"
+      class="grid-item"
+      title="Blue"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      (drawingEnded)="updateInput()"
+    ></app-draw-canvas>
+  </div>
 </div>

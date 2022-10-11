@@ -1,40 +1,79 @@
-<h2>1D</h2>
-<div class="home-container horizontal-flex">
-  <a
-    href="https://clementpla.github.io/SegmentationMetricTutorial/main/classification"
-  >
-    <app-home-card
-      imgURL="assets/images/home-cards/metric.png"
-      title="Classification Metrics"
+<div class="translate-animation">
+  <h2>1D</h2>
+  <div class="home-container horizontal-flex">
+    <a routerLink="/convolution-correlation"
+      ><app-home-card
+        title="Convolution & Correlation"
+        imgURL="assets/images/home-cards/"
+      >
+      </app-home-card>
+    </a>
+
+    <a
+      href="https://clementpla.github.io/SegmentationMetricTutorial/main/classification"
     >
-    </app-home-card>
-  </a>
-</div>
-<h2>2D</h2>
-<div class="home-container horizontal-flex">
+      <app-home-card
+        imgURL="assets/images/home-cards/metric.png"
+        title="Classification Metrics"
+      >
+      </app-home-card>
+    </a>
+  </div>
+  <h2>2D</h2>
+  <div class="home-container horizontal-flex">
+    <a routerLink="/convolution2d"
+      ><app-home-card title="2D Convolution" imgURL="assets/images/home-cards/">
+      </app-home-card>
+    </a>
+    <a routerLink="/fourierTransform">
+      <app-home-card
+        title="Fourier Transform 2D"
+        imgURL="assets/images/home-cards/fourierTransform.png"
+      >
+      </app-home-card>
+    </a>
+    <a routerLink="/spatialFiltering"
+      ><app-home-card
+        title="Spatial Filtering"
+        imgURL="assets/images/home-cards/spatial_filtering.png"
+      >
+      </app-home-card>
+    </a>
 
+    <a routerLink="/colorspaces"
+      ><app-home-card
+        title="Colorspaces"
+        imgURL="assets/images/home-cards/colorspace.png"
+      >
+      </app-home-card>
+    </a>
 
-  <a routerLink="/fourierTransform">
-    <app-home-card title="Fourier Transform 2D"
-    imgURL="assets/images/home-cards/fourierTransform.png"
-    > </app-home-card>
-  </a>
-  <a routerLink="/spatialFiltering"
-    ><app-home-card title="Spatial Filtering"
-    imgURL="assets/images/home-cards/spatial_filtering.png"> </app-home-card>
-  </a>
+    <a routerLink="/morphology"
+      ><app-home-card
+        title="Morphology"
+        imgURL="assets/images/home-cards/morphology.png"
+      >
+      </app-home-card>
+    </a>
 
-  <a routerLink="/colorspaces"
-    ><app-home-card title="Colorspaces"
-    imgURL="assets/images/home-cards/colorspace.png"> </app-home-card>
-  </a>
-  <a
-    href="https://clementpla.github.io/SegmentationMetricTutorial/main/segmentation"
-  >
-    <app-home-card
-      imgURL="assets/images/home-cards/segmentation_metrics.png"
-      title="Segmentation Metrics"
+    <a routerLink="/edgeDetection"
+      ><app-home-card title="Edge Detection" imgURL="assets/images/home-cards/">
+      </app-home-card>
+    </a>
+
+    <a routerLink="/segmentation"
+      ><app-home-card title="Segmentation" imgURL="assets/images/home-cards/">
+      </app-home-card>
+    </a>
+
+    <a
+      href="https://clementpla.github.io/SegmentationMetricTutorial/main/segmentation"
     >
-    </app-home-card>
-  </a>
+      <app-home-card
+        imgURL="assets/images/home-cards/segmentation_metrics.png"
+        title="Segmentation Metrics"
+      >
+      </app-home-card>
+    </a>
+  </div>
 </div>

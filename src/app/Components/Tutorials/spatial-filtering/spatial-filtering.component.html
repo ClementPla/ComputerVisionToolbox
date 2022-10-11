@@ -1,4 +1,4 @@
-<mat-toolbar>
+<mat-toolbar color="primary">
   <mat-toolbar-row>
     <button mat-icon-button class="example-icon" (click)="drawer.toggle()">
       <mat-icon>menu</mat-icon>
@@ -26,13 +26,11 @@
       >
         Clear
       </button>
-
       <hr />
-
       <button
         type="button"
         mat-raised-button
-        color="accent"
+        color="primary"
         (click)="fileInput.click()"
       >
         Load image
@@ -47,6 +45,82 @@
       <app-labelled-sliders #brushSizeSlider title="Brush Size">
       </app-labelled-sliders>
       <hr />
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="filter-name">
+              <button
+                mat-mini-fab
+                class="action-button"
+                color="accent"
+                (click)="
+                  additiveFilter(additiveFilterSlider.value!);
+                  $event.stopPropagation()
+                "
+              >
+                <mat-icon> add </mat-icon>
+              </button>
+              Brightness
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-labelled-sliders
+          #additiveFilterSlider
+          title="Addition factor"
+          [max]="1"
+          [min]="-1"
+          [value]="0"
+          [step]="0.1"
+        >
+        </app-labelled-sliders>
+        <button
+          mat-raised-button
+          class="add-button"
+          color="primary"
+          (click)="additiveFilter(additiveFilterSlider.value!)"
+        >
+          Add
+        </button>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="filter-name">
+              <button
+                mat-mini-fab
+                class="action-button"
+                color="accent"
+                (click)="
+                  multiplyFilter(multiplyFilterSlider.value!);
+                  $event.stopPropagation()
+                "
+              >
+                <mat-icon> add </mat-icon>
+              </button>
+              Contrast
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-labelled-sliders
+          #multiplyFilterSlider
+          title="Multiplication factor"
+          [max]="5"
+          [min]="0"
+          [value]="1"
+          [step]="0.1"
+        >
+        </app-labelled-sliders>
+        <button
+          mat-raised-button
+          class="add-button"
+          color="primary"
+          (click)="multiplyFilter(multiplyFilterSlider.value!)"
+        >
+          Add
+        </button>
+      </mat-expansion-panel>
+
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
@@ -220,7 +294,7 @@
           class="add-button"
           mat-raised-button
           color="primary"
-          (click)="sobelFilter()"
+          (click)="laplacianFilter()"
         >
           Add
         </button>
@@ -257,16 +331,19 @@
     </div>
   </mat-drawer>
 
-  <div class="center-content horizontal-flex drawer-content">
+  <div class="horizontal-flex drawer-content">
     <app-draw-canvas
       [width]="512"
+      class="canvas"
       #drawingCanvas
       (drawingEnded)="applyFilter()"
       [drawable]="true"
+      [BWOption]="true"
       [brushRadius]="brushSizeSlider.value"
       title="Canvas"
     ></app-draw-canvas>
     <app-draw-canvas
+      class="canvas"
       [width]="512"
       #resultCanvas
       [drawable]="false"

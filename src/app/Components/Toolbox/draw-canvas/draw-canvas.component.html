@@ -1,14 +1,52 @@
-<div class="canvas-container"
-  [style.cursor]="this.drawable? 'none': 'default'">
-  <p *ngIf="title" class="title">{{title}}</p>
-  <div #cursor class="cursor" *ngIf="this.drawable"
-  [style.top.px]="cursorPosition.y"
-  [style.left.px]="cursorPosition.x"
-  [style.width.px]="getCursorTransform()">
-    <div class="cursor-radius"
-    [style.border-color]="drawColor"></div>
+<div
+  class="canvas-container"
+  (mousemove)="updateHandleDragPos($event)"
+  (mouseleave)="stopHandleDrag()"
+  [style.cursor]="this.drawable ? 'none' : 'default'"
+>
+  <p *ngIf="title" class="title">{{ title }}</p>
+  <span *ngIf="BWOption" class="BW-toggle">
+    <mat-slide-toggle [(ngModel)]="isBWChecked" color="primary"
+      >B&W</mat-slide-toggle
+    >
+  </span>
+  <div
+    #cursor
+    class="cursor"
+    *ngIf="this.drawable"
+    [style.top.px]="cursorPosition.y"
+    [style.left.px]="cursorPosition.x"
+    [style.width.px]="getCursorTransform()"
+  >
+    <div class="cursor-radius" [style.border-color]="drawColor"></div>
     <mat-icon>brush</mat-icon>
   </div>
+  <canvas
+    #canvas
+    id="canvasVisu"
+    [ngClass]="{ BWFilter: isBWChecked || OnlyBW }"
+  ></canvas>
 
-  <canvas #canvas id="canvasVisu"></canvas>
+  <canvas #canvasUI id="canvasUI"></canvas>
+
+  <ng-container *ngIf="this.profile">
+    <div
+      class="handle"
+      (mousedown)="startHandleDrag($event, 1)"
+      (mouseup)="stopHandleDrag()"
+      [style.top.px]="profileHandle1Pos.y"
+      [style.left.px]="profileHandle1Pos.x"
+    >
+    <p class="noselect">({{getHandlePos(1).x.toFixed(0)}},{{getHandlePos(1).y.toFixed(0)}})</p>
+  </div>
+    <div
+      class="handle"
+      (mousedown)="startHandleDrag($event, 2)"
+      (mouseup)="stopHandleDrag()"
+      [style.top.px]="profileHandle2Pos.y"
+      [style.left.px]="profileHandle2Pos.x"
+    >
+    <p class="noselect">({{getHandlePos(2).x.toFixed(0)}},{{getHandlePos(2).y.toFixed(0)}})</p>
+  </div>
+  </ng-container>
 </div>

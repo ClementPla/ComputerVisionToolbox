@@ -8,10 +8,39 @@ a {
   margin: 1em 5em;
 }
 
+@keyframes rotate {
+  from {transform: rotate3d(0,1,0,90deg);
+  opacity: 0.1;
+}
+  to {transform: rotate3d(0,1,0,0deg);
+    opacity: 1.0;}
+}
+
+.home-container :nth-child(n){
+  animation-name: rotate;
+  animation-duration: 0.2s;
+  animation-direction: normal;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out
+}
+
+@for $i from 1 through 25 {
+.home-container :nth-child(#{$i}n){
+  animation-delay: #{$i * 0.1}s;
+  }
+}
 h2 {
   border: solid white 2px;
   width: fit-content;
   margin: 1em;
   padding: 0 1em;
   border-radius: 2em;
+}
+
+
+@media (max-width: 768px) {
+  .home-container {
+    gap: 1em;
+    margin: 0 1em;
+  }
 }

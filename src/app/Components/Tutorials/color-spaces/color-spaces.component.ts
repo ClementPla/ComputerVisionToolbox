@@ -2,9 +2,10 @@ import { Component, destroyPlatform, OnInit, ViewChild} from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
 import { FormControl } from '@angular/forms';
-import { NgxMatColorPickerInput, Color, NgxMatColorPickerComponent } from '@angular-material-components/color-picker';
+import {Color, NgxMatColorPickerComponent } from '@angular-material-components/color-picker';
 
 import { NgxOpenCVService, OpenCVState} from 'ngx-opencv';
+import { Base2DTutorialComponent } from '../base2-dtutorial/base2-dtutorial.component';
 declare var cv: any;
 
 @Component({
@@ -12,8 +13,8 @@ declare var cv: any;
   templateUrl: './color-spaces.component.html',
   styleUrls: ['./color-spaces.component.scss']
 })
-export class ColorSpacesComponent implements OnInit {
-  @ViewChild('drawingCanvas') drawCanvas: DrawCanvasComponent;
+export class ColorSpacesComponent extends Base2DTutorialComponent implements OnInit {
+
   @ViewChild('canvas1') canvas1: DrawCanvasComponent;
   @ViewChild('canvas2') canvas2: DrawCanvasComponent;
   @ViewChild('canvas3') canvas3: DrawCanvasComponent;
@@ -22,33 +23,72 @@ export class ColorSpacesComponent implements OnInit {
   color:ThemePalette = 'warn';
   colorCtr: FormControl = new FormControl(null);
   colorspace:string='RGB'
-  cvState:string;
 
-  constructor(private ngxOpenCv:NgxOpenCVService) { }
 
-  ngOnInit(): void {
+  ngAfterViewInit(){
+    this.pickerInput.select(new Color(255,0,255))
+    this.updateColorSpace()
 
   }
-  ngAfterViewInit(): void {
+  updateInput():void{
+    let canal1 = cv.imread(this.canvas1.getCanvas(),  cv.IMREAD_GRAYSCALE)
+    let canal2 = cv.imread(this.canvas2.getCanvas(), cv.IMREAD_GRAYSCALE)
+    let canal3 = cv.imread(this.canvas3.getCanvas(), cv.IMREAD_GRAYSCALE)
+    cv.cvtColor(canal1, canal1, cv.COLOR_RGB2GRAY);
+    cv.cvtColor(canal2, canal2, cv.COLOR_RGB2GRAY);
+    cv.cvtColor(canal3, canal3, cv.COLOR_RGB2GRAY);
+    let tmp = new cv.MatVector()
+    let dst = new cv.Mat()
 
-    this.ngxOpenCv.cvState.subscribe((cvState: OpenCVState) => {
-      // do something with the state string
-      this.cvState = cvState.state;
-      if (cvState.error) {
-        // handle errors
-      } else if (cvState.loading) {
-        // e.g. show loading indicator
-      } else if (cvState.ready) {
+    switch(this.colorspace){
+      case 'RGB':{
+        tmp.push_back(canal1)
+        tmp.push_back(canal2)
+        tmp.push_back(canal3)
+        cv.merge(tmp, dst)
+        break
+      }
+      case 'YCrCb':{
+        tmp.push_back(canal1)
+        tmp.push_back(canal2)
+        tmp.push_back(canal3)
+        cv.merge(tmp, dst)
+        cv.cvtColor(dst, dst, cv.COLOR_YCrCb2RGB);
+        break
+      }
 
-        this.pickerInput.select(new Color(255,0,255))
-        this.updateColorSpace()
+      case 'LAB':{
+        tmp.push_back(canal1)
+        tmp.push_back(canal2)
+        tmp.push_back(canal3)
+        cv.merge(tmp, dst)
+        cv.cvtColor(dst, dst, cv.COLOR_Lab2RGB);
+        break
 
       }
-    });
+
+      case 'HSV':{
+        canal1.convertTo(canal1, cv.CV_32FC1)
+        cv.convertScaleAbs(canal1, canal1, 179/255, 0)
+        tmp.push_back(canal1)
+        tmp.push_back(canal2)
+        tmp.push_back(canal3)
+        cv.merge(tmp, dst)
+        cv.cvtColor(dst, dst, cv.COLOR_HSV2RGB);
+        break
+
+      }
+    }
+    cv.imshow(this.drawCanvas.getCanvas(), dst)
+    canal1.delete()
+    canal2.delete()
+    canal3.delete()
+    dst.delete()
+    tmp.delete()
+    this.updateColorSpace()
 
   }
   updateColorSpace():void{
-
     let mat = cv.imread(this.drawCanvas.getCanvas());
     let dst = new cv.MatVector();
     switch(this.colorspace){
@@ -94,19 +134,5 @@ export class ColorSpacesComponent implements OnInit {
     dst.delete();
   }
 
-  loadSelectedFile(event: any) {
-    if (event.target.files && event.target.files[0]) {
 
-      var reader = new FileReader();
-      reader.onload = (event: any) => {
-        const img = new Image()
-        img.src = event.target.result;
-        img.onload = () =>{
-          this.drawCanvas.drawImage(img)
-
-        }
-      };
-      reader.readAsDataURL(event.target.files[0])
-    }
-  }
 }

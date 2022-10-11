@@ -11,21 +11,18 @@ export class LabelledSlidersComponent implements OnInit {
   @Input() min:number=1;
   @Input() max:number=100;
   @Input() step:number=1;
-  @Input() value:number|null=25;
+  @Input() value:number|null=15;
   @Input() title:string='';
   @Output() change = new EventEmitter<MatSliderChange>();
   @Output() input = new EventEmitter<MatSliderChange>();
+  @Output() valueChange = new EventEmitter<number>();
 
   constructor() { }
 
   ngOnInit(): void {
   }
-
   onChange(event:MatSliderChange){
-    this.change.emit(event)
+    if(this.value)
+      this.valueChange.emit(this.value)
   }
-  onInput(event:MatSliderChange){
-    this.input.emit(event)
-  }
-
 }

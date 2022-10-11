@@ -1,7 +1,6 @@
 <mat-expansion-panel [ngClass]="{'activated':kernel.active, 'deactivated':!kernel.active}">
   <mat-expansion-panel-header>
     <mat-panel-title>
-      <span class="horizontal-flex">
       <button mat-mini-fab class="action-button" color='accent' (click)="toggleActive($event)">
         <mat-icon *ngIf="kernel.active">visibility</mat-icon>
         <mat-icon *ngIf="!kernel.active">visibility_off</mat-icon>
@@ -13,7 +12,6 @@
       <button mat-mini-fab class="action-button" color='warn' (click)="delete($event)">
         <mat-icon>close</mat-icon>
       </button>
-    </span>
     </mat-panel-title>
   </mat-expansion-panel-header>
   <div class="vertical-flex center">

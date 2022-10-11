@@ -1,3 +1,6 @@
+mat-expansion-panel-header{
+  height: fit-content;
+}
 canvas {
   width: 128px;
   aspect-ratio: 1;
@@ -34,9 +37,10 @@ td {
   border: solid white 1px;
 }
 .rounded-table {
-  border-radius: 0.75em;
   overflow: hidden;
   box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+  aspect-ratio: 1;
+  overflow: scroll;
 }
 
 button{

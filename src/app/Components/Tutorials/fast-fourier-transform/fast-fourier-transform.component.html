@@ -1,4 +1,4 @@
-<mat-toolbar>
+<mat-toolbar color="primary">
   <mat-toolbar-row>
     <button
       mat-icon-button
@@ -23,7 +23,7 @@
       <hr>
 
       <button type="button" mat-raised-button
-      color="accent"
+      color="primary"
       (click)="fileInput.click()">
         Load image
       </button>
@@ -39,13 +39,13 @@
       </app-labelled-sliders>
       <hr />
 
-      <button mat-raised-button color="accent" (click)="drawGaussian()">
+      <button mat-raised-button color="primary" (click)="drawGaussian()">
         Draw Gaussian
       </button>
       <mat-slide-toggle
         #toggleAxis
         class="example-margin"
-        color="accent"
+        color="primary"
         labelPosition="before"
       >
         Independant axis
@@ -61,6 +61,7 @@
           />
         </mat-form-field>
         <mat-slider
+        color="primary"
           #gaussXSlider
           min="0"
           max="128"
@@ -80,6 +81,7 @@
           />
         </mat-form-field>
         <mat-slider
+        color="primary"
           #gaussYSlider
           min="0"
           max="128"
@@ -101,6 +103,7 @@
           />
         </mat-form-field>
         <mat-slider
+        color="primary"
           #gaussSlider
           min="0"
           max="128"
@@ -115,7 +118,7 @@
 
       <hr />
 
-      <button mat-raised-button color="accent" (click)="drawSin()">
+      <button mat-raised-button color="primary" (click)="drawSin()">
         Draw sin(x)
       </button>
 
@@ -129,10 +132,11 @@
         />
       </mat-form-field>
       <mat-slider
+        color="primary"
         #angleSlider
         min="0"
-        max="90"
-        step="5"
+        max="180"
+        step="2.5"
         [(value)]="this.angle"
         thumbLabel
         tickInterval="auto"
@@ -148,6 +152,7 @@
         />
       </mat-form-field>
       <mat-slider
+      color="primary"
         #frequencySlider
         min="0"
         max="256"
@@ -160,9 +165,10 @@
     </div>
   </mat-drawer>
 
-  <div class="center-content horizontal-flex drawer-content">
+  <div class="horizontal-flex drawer-content">
     <app-draw-canvas
       #drawingCanvas
+      class="canvas"
       [width]="256"
       (drawingEnded)="updateFFT()"
       [drawable]="true"
@@ -171,6 +177,7 @@
     ></app-draw-canvas>
 
     <app-draw-canvas #fftCanvas [drawable]="false"
+    class="canvas"
     title="Fourier Transform"> </app-draw-canvas>
   </div>
 </mat-drawer-container>

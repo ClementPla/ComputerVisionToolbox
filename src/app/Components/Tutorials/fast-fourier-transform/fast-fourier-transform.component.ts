@@ -1,9 +1,7 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
-var lib = require('ml-fft');
-var FFTUtils = lib.FFTUtils;
 
-import { NgxOpenCVService, OpenCVState } from 'ngx-opencv';
+import { Base2DTutorialComponent } from '../base2-dtutorial/base2-dtutorial.component';
 declare var cv: any;
 
 @Component({
@@ -11,18 +9,15 @@ declare var cv: any;
   templateUrl: './fast-fourier-transform.component.html',
   styleUrls: ['./fast-fourier-transform.component.scss'],
 })
-export class FastFourierTransformComponent implements OnInit {
+export class FastFourierTransformComponent extends Base2DTutorialComponent implements OnInit {
   angle: number | null = 0;
   frequency: number | null = 25;
   magLog: boolean = true;
   brushSize: number = 10;
   gaussStdX: number | null = 10;
   gaussStdY: number | null = 10;
-  @ViewChild('drawingCanvas') drawCanvas: DrawCanvasComponent;
   @ViewChild('fftCanvas') fftCanvas: DrawCanvasComponent;
 
-  constructor(private ngxOpenCv: NgxOpenCVService) {}
-  ngOnInit(): void {}
 
   drawGaussian() {
     var width = this.drawCanvas.width;
@@ -152,18 +147,5 @@ export class FastFourierTransformComponent implements OnInit {
     complexI.delete();
     m1.delete();
     tmp.delete();
-  }
-  loadSelectedFile(event: any) {
-    if (event.target.files && event.target.files[0]) {
-      var reader = new FileReader();
-      reader.onload = (event: any) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          this.drawCanvas.drawImage(img);
-        };
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
   }
 }
