@@ -19,6 +19,9 @@ export class FastFourierTransformComponent extends Base2DTutorialComponent imple
   @ViewChild('fftCanvas') fftCanvas: DrawCanvasComponent;
 
 
+  profileOptions: any;
+
+
   drawGaussian() {
     var width = this.drawCanvas.width;
     var height = this.drawCanvas.height;
@@ -140,7 +143,7 @@ export class FastFourierTransformComponent extends Base2DTutorialComponent imple
     // The pixel value of cv.CV_32S type image ranges from 0 to 1.
     cv.normalize(mag, mag, 0, 1, cv.NORM_MINMAX);
 
-    cv.imshow(this.fftCanvas.getCanvas(), mag);
+    this.fftCanvas.drawMat(mag);
     src.delete();
     padded.delete();
     planes.delete();
@@ -148,4 +151,39 @@ export class FastFourierTransformComponent extends Base2DTutorialComponent imple
     m1.delete();
     tmp.delete();
   }
+
+  updateProfile() {
+    const yData = this.fftCanvas.getProfile();
+    this.profileOptions = {
+      legend: {
+        data: ['Profile'],
+        align: 'left',
+      },
+      tooltip: {},
+      xAxis: {
+        data: Array.from(Array(yData.length).keys()),
+        silent: false,
+        splitLine: {
+          show: false,
+        },
+      },
+      yAxis: [
+        {
+          type: 'value',
+        },
+      ],
+      series: [
+        {
+          name: 'profile',
+          type: 'line',
+          areaStyle: {},
+          data: yData,
+        },
+      ],
+      animationEasing: 'elasticOut',
+      animationDelayUpdate: (idx: number) => idx * 5,
+    };
+  }
+
+
 }

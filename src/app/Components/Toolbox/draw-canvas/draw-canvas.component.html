@@ -1,15 +1,22 @@
 <div
   class="canvas-container"
   (mousemove)="updateHandleDragPos($event)"
-  (mouseleave)="stopHandleDrag()"
   [style.cursor]="this.drawable ? 'none' : 'default'"
 >
   <p *ngIf="title" class="title">{{ title }}</p>
-  <span *ngIf="BWOption" class="BW-toggle">
+  <span *ngIf="BWOption" class="BW-toggle toggle">
     <mat-slide-toggle [(ngModel)]="isBWChecked" color="primary"
       >B&W</mat-slide-toggle
     >
   </span>
+
+  <span *ngIf="profileOption" class="Profile-toggle toggle">
+    <mat-slide-toggle [(ngModel)]="profile" color="primary"
+    (change)="updateCanvasUI()"
+      >profile</mat-slide-toggle
+    >
+  </span>
+
   <div
     #cursor
     class="cursor"
@@ -27,7 +34,10 @@
     [ngClass]="{ BWFilter: isBWChecked || OnlyBW }"
   ></canvas>
 
-  <canvas #canvasUI id="canvasUI"></canvas>
+  <canvas #canvasUI id="canvasUI"
+  [style.opacity.%]="this.profile? 100:0"
+
+  ></canvas>
 
   <ng-container *ngIf="this.profile">
     <div
@@ -50,3 +60,4 @@
   </div>
   </ng-container>
 </div>
+

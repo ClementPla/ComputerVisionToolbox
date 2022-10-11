@@ -1,0 +1,40 @@
+/* .centerDrawer{
+  align-items: center;
+  button{
+    width: 100%;
+  }
+}
+
+
+.drawer-content {
+  margin: 1em 0;
+  gap: 1em;
+}
+ */
+
+mat-drawer {
+  max-width: 50vw;
+}
+
+mat-toolbar-row {
+  span {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.drawer {
+  padding: 1em 0.25em;
+  align-items: center;
+}
+.drawer-container {
+  gap: 1em;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1em;
+}
+
+:host ::ng-deep h2 {
+  text-align: center;
+  margin: 1ch;
+}

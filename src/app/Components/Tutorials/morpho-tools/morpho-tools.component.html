@@ -1,108 +1,92 @@
-<mat-toolbar class="hide-smallscreen" color="primary">
-  <mat-toolbar-row>
-    <button mat-icon-button class="example-icon" (click)="drawer.toggle()">
-      <mat-icon>menu</mat-icon>
+<app-tutorial-template>
+  Morphological Transformations
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <button
+      class="fillWidth"
+      mat-raised-button
+      color="warn"
+      (click)="drawingCanvas.clearCanvas()"
+    >
+      Clear
     </button>
-    <span>Morphological Transformations</span>
+
+    <hr />
 
     <button
-      mat-icon-button
-      class="example-icon"
-      (click)="drawerKernels.toggle()"
+      class="fillWidth"
+      type="button"
+      mat-raised-button
+      color="primary"
+      (click)="fileInput.click()"
     >
-      <mat-icon>menu</mat-icon>
+      Load image
     </button>
-  </mat-toolbar-row>
-</mat-toolbar>
+    <input
+      hidden
+      #fileInput
+      type="file"
+      (change)="loadSelectedFile($event)"
+      accept="images/*"
+    />
+    <hr />
+    <app-labelled-sliders #brushSizeSlider title="Brush Size">
+    </app-labelled-sliders>
 
-<mat-drawer-container>
-  <mat-drawer #drawer mode="side" opened>
-    <div class="vertical-flex drawer centerDrawer">
-      <button
-        mat-raised-button
-        color="warn"
-        (click)="drawingCanvas.clearCanvas()"
+    <hr />
+
+    <app-labelled-sliders
+      [min]="3"
+      [max]="25"
+      [step]="2"
+      [title]="'Element size'"
+      [(value)]="ksize"
+      (valueChange)="updateVisu()"
+    >
+    </app-labelled-sliders>
+    <span>
+      <mat-button-toggle-group
+        [(ngModel)]="structuralElementType"
+        (change)="updateVisu()"
       >
-        Clear
-      </button>
+        <mat-button-toggle value="circle">
+          <mat-icon>toll</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="square">
+          <mat-icon>crop_square</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="cross"
+          ><mat-icon>games</mat-icon></mat-button-toggle
+        >
+      </mat-button-toggle-group>
+    </span>
+    <canvas #elementCanvasVisu class="structuralElementVisu"> </canvas>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="addFilter()"
+      class="fillWidth"
+    >
+      Add
+    </button>
+  </ng-container>
 
-      <hr />
+  <ng-container ngProjectAs="[drawerRight]">
+    <h2>Profile</h2>
 
-      <button
-        type="button"
-        mat-raised-button
-        color="primary"
-        (click)="fileInput.click()"
-      >
-        Load image
-      </button>
-      <input
-        hidden
-        #fileInput
-        type="file"
-        (change)="loadSelectedFile($event)"
-        accept="images/*"
-      />
-      <hr/>
-      <app-labelled-sliders #brushSizeSlider title="Brush Size">
-      </app-labelled-sliders>
+    <div echarts [options]="profileOptions" class="profile-graph"></div>
 
-      <hr />
+    <h2>Active filters</h2>
+    <hr />
+    <app-structural-element
+      *ngFor="let kernel of listKernels"
+      [kernel]="kernel"
+      (updateFilters)="updateFilters()"
+    >
+    </app-structural-element>
+  </ng-container>
 
-      <app-labelled-sliders
-        [min]="3"
-        [max]="25"
-        [step]="2"
-        [title]="'Element size'"
-        [(value)]="ksize"
-        (valueChange)="updateVisu()"
-      >
-      </app-labelled-sliders>
-        <span>
-          <mat-button-toggle-group
-            [(ngModel)]="structuralElementType"
-            (change)="updateVisu()"
-          >
-            <mat-button-toggle value="circle">
-              <mat-icon>toll</mat-icon>
-            </mat-button-toggle>
-            <mat-button-toggle value="square">
-              <mat-icon>crop_square</mat-icon>
-            </mat-button-toggle>
-            <mat-button-toggle value="cross"
-              ><mat-icon>games</mat-icon></mat-button-toggle
-            >
-          </mat-button-toggle-group>
-        </span>
-        <canvas #elementCanvasVisu class="structuralElementVisu"> </canvas>
-      <button mat-raised-button color="primary" (click)="addFilter()">Add</button>
-    </div>
-  </mat-drawer>
-
-  <mat-drawer
-    class="filter-drawer"
-    #drawerKernels
-    mode="side"
-    opened
-    position="end"
-  >
-    <div class="vertical-flex drawer">
-      <h2>Profile</h2>
-
-      <div echarts [options]="profileOptions" class="profile-graph"></div>
-
-      <h2>Active filters</h2>
-      <hr />
-      <app-structural-element
-        *ngFor="let kernel of listKernels"
-        [kernel]="kernel"
-        (updateFilters)="updateFilters()"
-      >
-      </app-structural-element>
-    </div>
-  </mat-drawer>
-
-  <div class="horizontal-flex drawer-content">
+  <ng-container ngProjectAs="[centerContent]">
     <app-draw-canvas
       [width]="512"
       class="canvas"
@@ -117,12 +101,12 @@
     <app-draw-canvas
       class="canvas"
       [width]="512"
-      [profile]="true"
+      [profileOption]="true"
       #resultCanvas
       [drawable]="false"
       title="Result"
       (profileChanged)="updateProfile()"
     >
     </app-draw-canvas>
-  </div>
-</mat-drawer-container>
+  </ng-container>
+</app-tutorial-template>

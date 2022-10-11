@@ -34,21 +34,6 @@ mat-drawer-container{
   justify-content: center;
 }
 
-mat-toolbar-row{
-  span{
-    width: 100%;
-    text-align: center;
-  }
-}
-
-mat-drawer{
-  max-width: 50vw;
-}
-.drawer{
-  width: 80%;
-  margin: 10px;
-}
-
 
 hr {
   display: block;
@@ -57,13 +42,16 @@ hr {
   width: 100%
 }
 
+.fillWidth{
+  width: 100% !important;
+}
+
 @media (max-width:800px) {
   .hide-smallscreen{
     display: none !important;
   }
 
 }
-
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -73,3 +61,4 @@ hr {
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+

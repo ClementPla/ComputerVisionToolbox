@@ -3,8 +3,9 @@
     <button mat-icon-button class="example-icon" (click)="drawerLeft.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
+    <span>
     <ng-content></ng-content>
-
+    </span>
     <button mat-icon-button class="example-icon" (click)="drawerRight.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
@@ -13,7 +14,7 @@
 
 <mat-drawer-container>
   <mat-drawer #drawerLeft mode="side" opened>
-    <div class="vertical-flex drawer centerDrawer">
+    <div class="vertical-flex drawer">
       <ng-content select="[drawerLeft]"></ng-content>
     </div>
   </mat-drawer>
@@ -28,7 +29,7 @@
     <ng-content select="[drawerRight]"></ng-content>
   </mat-drawer>
 
-  <div class="horizontal-flex drawer-content">
+  <div class="horizontal-flex drawer-container">
     <ng-content select="[centerContent]"></ng-content>
   </div>
 </mat-drawer-container>

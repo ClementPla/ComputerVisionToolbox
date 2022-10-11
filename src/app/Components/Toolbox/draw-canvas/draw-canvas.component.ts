@@ -40,8 +40,10 @@ export class DrawCanvasComponent implements OnInit {
   @Input() title = '';
   @Input() BWOption: boolean = false;
   @Input() OnlyBW: boolean = false;
-  @Input() profile: boolean = false;
   @Output() profileChanged = new EventEmitter<boolean>();
+  @Input() profileOption:boolean = false
+
+  profile:boolean = false
 
   isBWChecked = false;
   cursorPosition: Point2D = { x: 0, y: 0 };
@@ -285,6 +287,7 @@ export class DrawCanvasComponent implements OnInit {
   }
 
   updateCanvasUI() {
+    console.log('here')
     if (this.profile) {
       this.ctxUI.beginPath();
 
@@ -294,7 +297,7 @@ export class DrawCanvasComponent implements OnInit {
       this.ctxUI.moveTo(point1.x, point1.y);
       this.ctxUI.lineTo(point2.x, point2.y);
 
-      this.ctxUI.lineWidth = 2;
+      this.ctxUI.lineWidth = 1;
       this.ctxUI.strokeStyle = 'blue';
       this.ctxUI.globalCompositeOperation = 'copy';
       this.ctxUI.setLineDash([2, 4]);

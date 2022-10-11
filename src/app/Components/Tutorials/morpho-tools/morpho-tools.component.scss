@@ -1,7 +1,4 @@
-.drawer-content {
-  margin: 1em 0;
-  gap: 1em;
-}
+
 .canvas {
   width: 45%;
   min-width: 256px;
@@ -21,16 +18,6 @@
   margin: 1em;
 }
 
-.centerDrawer{
-  align-items: center;
-  button{
-    width: 100%;
-  }
-}
-
-.filter-drawer{
-  width: fit-content;
-}
 .profile-graph{
   min-width: 300px;
   padding: 0em 0.5em;
