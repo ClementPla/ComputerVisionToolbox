@@ -1,19 +1,22 @@
 <div class="translate-animation">
   <h2>1D</h2>
+
+
+
+
   <div class="home-container horizontal-flex">
-    <a routerLink="/convolution-correlation"
-      ><app-home-card
-        title="Convolution & Correlation"
-        imgURL="assets/images/home-cards/"
-      >
-      </app-home-card>
-    </a>
+    <a routerLink="/sampling">
+    <app-home-card
+      title="Sampling"
+    >
+    </app-home-card>
+  </a>
 
     <a
       href="https://clementpla.github.io/SegmentationMetricTutorial/main/classification"
     >
       <app-home-card
-        imgURL="assets/images/home-cards/metric.png"
+        imgURL="assets/images/home-cards/metric.jpg"
         title="Classification Metrics"
       >
       </app-home-card>
@@ -21,21 +24,26 @@
   </div>
   <h2>2D</h2>
   <div class="home-container horizontal-flex">
-    <a routerLink="/convolution2d"
-      ><app-home-card title="2D Convolution" imgURL="assets/images/home-cards/">
-      </app-home-card>
-    </a>
+
     <a routerLink="/fourierTransform">
       <app-home-card
         title="Fourier Transform 2D"
-        imgURL="assets/images/home-cards/fourierTransform.png"
+        imgURL="assets/images/home-cards/fourierTransform.jpg"
       >
       </app-home-card>
     </a>
     <a routerLink="/spatialFiltering"
       ><app-home-card
         title="Spatial Filtering"
-        imgURL="assets/images/home-cards/spatial_filtering.png"
+        imgURL="assets/images/home-cards/spatial_filtering.jpg"
+      >
+      </app-home-card>
+    </a>
+
+    <a routerLink="/spectralFiltering"
+      ><app-home-card
+        title="Spectral Filtering"
+        imgURL=""
       >
       </app-home-card>
     </a>
@@ -43,7 +51,7 @@
     <a routerLink="/colorspaces"
       ><app-home-card
         title="Colorspaces"
-        imgURL="assets/images/home-cards/colorspace.png"
+        imgURL="assets/images/home-cards/colorspace.jpg"
       >
       </app-home-card>
     </a>
@@ -51,18 +59,13 @@
     <a routerLink="/morphology"
       ><app-home-card
         title="Morphology"
-        imgURL="assets/images/home-cards/morphology.png"
+        imgURL="assets/images/home-cards/morphology.jpg"
       >
       </app-home-card>
     </a>
 
-    <a routerLink="/edgeDetection"
-      ><app-home-card title="Edge Detection" imgURL="assets/images/home-cards/">
-      </app-home-card>
-    </a>
-
-    <a routerLink="/segmentation"
-      ><app-home-card title="Segmentation" imgURL="assets/images/home-cards/">
+    <a routerLink="/histogram"
+      ><app-home-card title="Image Histogram" imgURL="assets/images/home-cards/histogram.jpg">
       </app-home-card>
     </a>
 
@@ -70,10 +73,23 @@
       href="https://clementpla.github.io/SegmentationMetricTutorial/main/segmentation"
     >
       <app-home-card
-        imgURL="assets/images/home-cards/segmentation_metrics.png"
+        imgURL="assets/images/home-cards/segmentation_metrics.jpg"
         title="Segmentation Metrics"
       >
       </app-home-card>
     </a>
   </div>
+  <h2>Machine Learning</h2>
+  <div class="home-container horizontal-flex">
+    <a routerLink="/weightLoss"
+      ><app-home-card title="Weights & Loss"
+        imgURL="assets/images/home-cards/weight_loss.png"
+      >
+      </app-home-card>
+    </a>
+
+
+  </div>
+
+
 </div>

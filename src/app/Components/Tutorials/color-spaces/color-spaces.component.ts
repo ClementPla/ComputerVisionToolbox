@@ -1,11 +1,10 @@
-import { Component, destroyPlatform, OnInit, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, destroyPlatform, OnInit, ViewChild} from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
 import { FormControl } from '@angular/forms';
 import {Color, NgxMatColorPickerComponent } from '@angular-material-components/color-picker';
 
-import { NgxOpenCVService, OpenCVState} from 'ngx-opencv';
-import { Base2DTutorialComponent } from '../base2-dtutorial/base2-dtutorial.component';
+import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 declare var cv: any;
 
 @Component({
@@ -13,7 +12,7 @@ declare var cv: any;
   templateUrl: './color-spaces.component.html',
   styleUrls: ['./color-spaces.component.scss']
 })
-export class ColorSpacesComponent extends Base2DTutorialComponent implements OnInit {
+export class ColorSpacesComponent extends TutorialTemplateImagesComponent implements AfterViewInit {
 
   @ViewChild('canvas1') canvas1: DrawCanvasComponent;
   @ViewChild('canvas2') canvas2: DrawCanvasComponent;
@@ -26,7 +25,7 @@ export class ColorSpacesComponent extends Base2DTutorialComponent implements OnI
 
 
   ngAfterViewInit(){
-    this.pickerInput.select(new Color(255,0,255))
+    this.pickerInput.select(new Color(255,255,255))
     this.updateColorSpace()
 
   }

@@ -28,6 +28,13 @@ mat-drawer-container{
   height: calc(100vh - 2 * 64px) ; // We remove twice the side of the toolbar
 }
 
+@media (max-width:800px) {
+  mat-drawer-container{
+    height: calc(100vh - 64px) ; // We remove twice the side of the toolbar
+  }
+
+}
+
 
 .center-content{
   align-items: center;
@@ -46,12 +53,18 @@ hr {
   width: 100% !important;
 }
 
-@media (max-width:800px) {
+@media (max-width:767px) {
   .hide-smallscreen{
     display: none !important;
   }
-
 }
+
+@media (min-width:768px){
+  .show-smallscreen{
+    display: none !important;
+  }
+}
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

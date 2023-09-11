@@ -24,7 +24,8 @@ import { NgxOpenCVModule, OpenCVConfig } from 'ngx-opencv';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSelectModule} from '@angular/material/select';
-
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatCardModule} from '@angular/material/card';
 import {
   NgxMatColorPickerModule,
   MAT_COLOR_FORMATS,
@@ -40,8 +41,15 @@ import { LabelledSlidersComponent } from './Components/labelled-sliders/labelled
 import { ColorSpacesComponent } from './Components/Tutorials/color-spaces/color-spaces.component';
 import { MorphoToolsComponent } from './Components/Tutorials/morpho-tools/morpho-tools.component';
 import { StructuralElementComponent } from './Components/Tutorials/morpho-tools/structural-element/structural-element.component';
-import { Base2DTutorialComponent } from './Components/Tutorials/base2-dtutorial/base2-dtutorial.component';
+import { TutorialTemplateImagesComponent } from './Components/Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { ImageHistogramComponent } from './Components/Tutorials/image-histogram/image-histogram.component';
+import { WeightsLossComponent } from './Components/Tutorials/MachineLearning/weights-loss/weights-loss.component';
+import { SamplingComponent } from './Components/Tutorials/OneDim/sampling/sampling.component';
 import { TutorialTemplateComponent } from './Components/Toolbox/tutorial-template/tutorial-template.component';
+import { LoadingButtonsComponent } from './Components/Toolbox/loading-buttons/loading-buttons.component';
+import { ImagePresetsComponent } from './Components/Presets/image-presets/image-presets.component';
+import { SpectralFilteringComponent } from './Components/Tutorials/spectral-filtering/spectral-filtering.component';
+
 
 const openCVConfig: OpenCVConfig = {
   openCVDirPath: 'assets/opencv/',
@@ -59,13 +67,22 @@ const openCVConfig: OpenCVConfig = {
     ColorSpacesComponent,
     MorphoToolsComponent,
     StructuralElementComponent,
-    Base2DTutorialComponent,
+    TutorialTemplateImagesComponent,
+    ImageHistogramComponent,
+    WeightsLossComponent,
+    SamplingComponent,
     TutorialTemplateComponent,
+    LoadingButtonsComponent,
+    ImagePresetsComponent,
+    SpectralFilteringComponent,
+
   ],
   imports: [
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),
+    MatCardModule,
+    MatProgressSpinnerModule,
     MatSelectModule,
     MatButtonToggleModule,
     CommonModule,

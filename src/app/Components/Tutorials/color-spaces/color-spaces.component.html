@@ -1,62 +1,40 @@
-<mat-toolbar class="hide-smallscreen" color="primary">
-  <mat-toolbar-row>
-    <span>Colorspaces</span>
-  </mat-toolbar-row>
-</mat-toolbar>
-<div class="options-bar horizontal-flex">
-  <button mat-raised-button color="warn" (click)="drawingCanvas.clearCanvas()">
-    Clear
-  </button>
-  <button
-    type="button"
-    mat-raised-button
-    color="primary"
-    (click)="fileInput.click()"
-  >
-    Load image
-  </button>
-  <input
-    hidden
-    #fileInput
-    type="file"
-    (change)="loadSelectedFile($event)"
-    accept="images/*"
-  />
-  <span class="brush-slider"
-    >Brush size: {{ brushSizeSlider.value }}
-    <mat-slider
-      color="primary"
-      #brushSizeSlider
-      [min]="1"
-      [max]="100"
-      [step]="1"
-      [value]="10"
-      thumbLabel
-      tickInterval="auto"
-    ></mat-slider>
-  </span>
-  <mat-form-field>
-    <input matInput [ngxMatColorPicker]="picker" [formControl]="colorCtr" />
-    <ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
-    <ngx-mat-color-picker #picker [color]="color"></ngx-mat-color-picker>
-  </mat-form-field>
+<app-tutorial-template-images
+[rightDrawer]="false">
 
-  <mat-form-field appearance="standard">
-    <mat-label>Choose a colorspace</mat-label>
-    <mat-select [(ngModel)]="colorspace" (selectionChange)="updateColorSpace()">
-      <mat-option value="RGB">RGB</mat-option>
-      <mat-option value="HSV">HSV</mat-option>
-      <mat-option value="LAB">LAB</mat-option>
-      <mat-option value="YCrCb">YCrCb</mat-option>
-    </mat-select>
-  </mat-form-field>
-</div>
-<div class="horizontal-flex center-content">
-  <app-draw-canvas
+  Colorspaces
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <app-labelled-sliders #brushSizeSlider title="Brush Size">
+    </app-labelled-sliders>
+
+    <hr/>
+    <h2>Brush color</h2>
+
+    <mat-form-field class="fillWidth">
+      <input matInput [ngxMatColorPicker]="picker" [formControl]="colorCtr" />
+      <ngx-mat-color-toggle matSuffix [for]="picker"></ngx-mat-color-toggle>
+      <ngx-mat-color-picker #picker [color]="color"></ngx-mat-color-picker>
+    </mat-form-field>
+    <hr/>
+    <h2>Colorspace</h2>
+
+    <mat-form-field appearance="standard" class="fillWidth">
+      <mat-label>Choose a colorspace</mat-label>
+      <mat-select [(ngModel)]="colorspace" (selectionChange)="updateColorSpace()">
+        <mat-option value="RGB">RGB</mat-option>
+        <mat-option value="HSV">HSV</mat-option>
+        <mat-option value="LAB">LAB</mat-option>
+        <mat-option value="YCrCb">YCrCb</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <app-draw-canvas
     class="main-canvas"
-    [width]="512"
+    [width]="256"
     [drawColor]="colorCtr.value?.rgba"
-    #drawingCanvas
+    #inputCanvas
     (drawingEnded)="updateColorSpace()"
     [drawable]="true"
     [brushRadius]="brushSizeSlider.value"
@@ -67,7 +45,7 @@
   <div class="horizontal-flex canvas-grid">
     <app-draw-canvas
       #canvas1
-      [width]="512"
+      [width]="256"
       [drawColor]="colorCtr.value?.rgba"
       class="grid-item"
       title="Red"
@@ -77,7 +55,7 @@
     ></app-draw-canvas>
     <app-draw-canvas
       #canvas2
-      [width]="512"
+      [width]="256"
       [drawColor]="colorCtr.value?.rgba"
       class="grid-item"
       title="Green"
@@ -87,7 +65,7 @@
     ></app-draw-canvas>
     <app-draw-canvas
       #canvas3
-      [width]="512"
+      [width]="256"
       [drawColor]="colorCtr.value?.rgba"
       class="grid-item"
       title="Blue"
@@ -96,4 +74,6 @@
       (drawingEnded)="updateInput()"
     ></app-draw-canvas>
   </div>
-</div>
+  </ng-container>
+
+</app-tutorial-template-images>

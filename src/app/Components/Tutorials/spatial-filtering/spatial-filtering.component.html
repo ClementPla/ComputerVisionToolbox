@@ -1,34 +1,7 @@
-<app-tutorial-template>
+<app-tutorial-template-images>
   Spatial filtering
 
   <ng-container ngProjectAs="[drawerLeft]">
-    <button
-    class="fillWidth"
-      mat-raised-button
-      color="warn"
-      (click)="drawingCanvas.clearCanvas()"
-    >
-      Clear
-    </button>
-    <hr />
-    <button
-    class="fillWidth"
-      type="button"
-      mat-raised-button
-      color="primary"
-      (click)="fileInput.click()"
-    >
-      Load image
-    </button>
-    <input
-      hidden
-      #fileInput
-      type="file"
-      (change)="loadSelectedFile($event)"
-      accept="images/*"
-    />
-
-    <hr />
 
     <app-labelled-sliders #brushSizeSlider title="Brush Size">
     </app-labelled-sliders>
@@ -317,20 +290,21 @@
     <app-draw-canvas
       [width]="512"
       class="canvas"
-      #drawingCanvas
+      #inputCanvas
       (drawingEnded)="applyFilter()"
       [drawable]="true"
       [BWOption]="true"
       [brushRadius]="brushSizeSlider.value"
       title="Canvas"
     ></app-draw-canvas>
+
     <app-draw-canvas
       class="canvas"
       [width]="512"
-      #resultCanvas
+      #outputCanvas
       [drawable]="false"
       title="Filtered canvas"
     >
     </app-draw-canvas>
   </ng-container>
-</app-tutorial-template>
+</app-tutorial-template-images>

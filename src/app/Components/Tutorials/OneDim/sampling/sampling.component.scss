@@ -1,0 +1,11 @@
+.graph{
+  width: 30vw;
+  height: 40vh;
+  background-color: white;
+  border: solid black 2px;
+  margin: 2px;
+}
+.grid-2x2{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
+import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 
-import { Base2DTutorialComponent } from '../base2-dtutorial/base2-dtutorial.component';
 declare var cv: any;
 
 @Component({
@@ -9,18 +9,14 @@ declare var cv: any;
   templateUrl: './fast-fourier-transform.component.html',
   styleUrls: ['./fast-fourier-transform.component.scss'],
 })
-export class FastFourierTransformComponent extends Base2DTutorialComponent implements OnInit {
+export class FastFourierTransformComponent extends TutorialTemplateImagesComponent {
   angle: number | null = 0;
   frequency: number | null = 25;
   magLog: boolean = true;
   brushSize: number = 10;
   gaussStdX: number | null = 10;
   gaussStdY: number | null = 10;
-  @ViewChild('fftCanvas') fftCanvas: DrawCanvasComponent;
-
-
-  profileOptions: any;
-
+  repsentationNorm: string = 'logAmplitudeOne';
 
   drawGaussian() {
     var width = this.drawCanvas.width;
@@ -107,8 +103,18 @@ export class FastFourierTransformComponent extends Base2DTutorialComponent imple
     let mag = planes.get(0);
     let m1 = new cv.Mat.ones(mag.rows, mag.cols, mag.type());
 
-    cv.add(mag, m1, mag);
-    cv.log(mag, mag);
+    switch (this.repsentationNorm) {
+      case 'logAmplitudeOne':
+        cv.add(mag, m1, mag);
+        cv.log(mag, mag);
+        break
+      case 'logAmplitude':
+        cv.log(mag, mag);
+        break
+      case 'amplitude':
+        break
+    }
+
 
     // crop the spectrum, if it has an odd number of rows or columns
     let rect = new cv.Rect(0, 0, mag.cols & -2, mag.rows & -2);
@@ -143,7 +149,7 @@ export class FastFourierTransformComponent extends Base2DTutorialComponent imple
     // The pixel value of cv.CV_32S type image ranges from 0 to 1.
     cv.normalize(mag, mag, 0, 1, cv.NORM_MINMAX);
 
-    this.fftCanvas.drawMat(mag);
+    this.outputCanvas.drawMat(mag);
     src.delete();
     padded.delete();
     planes.delete();
@@ -151,39 +157,4 @@ export class FastFourierTransformComponent extends Base2DTutorialComponent imple
     m1.delete();
     tmp.delete();
   }
-
-  updateProfile() {
-    const yData = this.fftCanvas.getProfile();
-    this.profileOptions = {
-      legend: {
-        data: ['Profile'],
-        align: 'left',
-      },
-      tooltip: {},
-      xAxis: {
-        data: Array.from(Array(yData.length).keys()),
-        silent: false,
-        splitLine: {
-          show: false,
-        },
-      },
-      yAxis: [
-        {
-          type: 'value',
-        },
-      ],
-      series: [
-        {
-          name: 'profile',
-          type: 'line',
-          areaStyle: {},
-          data: yData,
-        },
-      ],
-      animationEasing: 'elasticOut',
-      animationDelayUpdate: (idx: number) => idx * 5,
-    };
-  }
-
-
 }

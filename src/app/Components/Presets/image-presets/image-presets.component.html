@@ -1,0 +1,11 @@
+<button mat-button color="primary" (click)="uiservice.toggleImagePreset()">
+Close <mat-icon>close</mat-icon>
+</button>
+<div *ngFor="let folder of images_presets">
+<p>{{folder.name}}</p>
+<div *ngFor="let image of folder.content" class="horizontal-align">
+  <button mat-button (click)="loadSelectedImage(image.url)"> {{image.name}} </button>
+  <div class="filler"></div>
+  <img class="rounded" [src]="image.url" alt="image.name" width="32px" height="32px">
+</div>
+</div>

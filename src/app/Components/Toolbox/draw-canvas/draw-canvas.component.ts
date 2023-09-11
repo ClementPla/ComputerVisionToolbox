@@ -43,6 +43,8 @@ export class DrawCanvasComponent implements OnInit {
   @Output() profileChanged = new EventEmitter<boolean>();
   @Input() profileOption:boolean = false
 
+  @Output() BWSet = new EventEmitter<boolean>();
+
   profile:boolean = false
 
   isBWChecked = false;
@@ -52,8 +54,8 @@ export class DrawCanvasComponent implements OnInit {
 
   profileHandle1Drag = false;
   profileHandle2Drag = false;
-  profileHandle1Pos: Point2D = { x: 50, y: 50 };
-  profileHandle2Pos: Point2D = { x: 500, y: 500 };
+  profileHandle1Pos: Point2D = { x: 50, y: 100 };
+  profileHandle2Pos: Point2D = { x: 150, y: 100 };
 
   profileArray: Array<number>;
 
@@ -79,6 +81,10 @@ export class DrawCanvasComponent implements OnInit {
       this.captureEvents(canvasEl);
     }
     this.ctx.fillRect(0, 0, this.width, this.height);
+  }
+
+  BWToggle(){
+    this.BWSet.emit()
   }
 
   ngAfterViewInit(): void {
@@ -119,6 +125,9 @@ export class DrawCanvasComponent implements OnInit {
   drawMat(mat: any) {
     cv.imshow(this.getCanvas(), mat);
     this.updateCanvasUI();
+  }
+  drawMatWithoutEvent(mat:any){
+    cv.imshow(this.getCanvas(), mat);
   }
 
   drawArray(
@@ -256,7 +265,7 @@ export class DrawCanvasComponent implements OnInit {
     return scaleFactor;
   }
 
-  startHandleDrag(event: MouseEvent, handle: number) {
+  startHandleDrag(event: MouseEvent|TouchEvent, handle: number) {
     if (handle == 1) {
       this.profileHandle1Drag = true;
       this.profileHandle2Drag = false;
@@ -287,7 +296,6 @@ export class DrawCanvasComponent implements OnInit {
   }
 
   updateCanvasUI() {
-    console.log('here')
     if (this.profile) {
       this.ctxUI.beginPath();
 
@@ -341,5 +349,8 @@ export class DrawCanvasComponent implements OnInit {
       let index = (this.width * row + col) * 4;
       this.profileArray.push(data[index]);
     });
+  }
+  isBW(){
+    return this.isBWChecked;
   }
 }

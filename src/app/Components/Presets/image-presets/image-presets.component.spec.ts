@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Base2DTutorialComponent } from './base2-dtutorial.component';
+import { ImagePresetsComponent } from './image-presets.component';
 
-describe('Base2DTutorialComponent', () => {
-  let component: Base2DTutorialComponent;
-  let fixture: ComponentFixture<Base2DTutorialComponent>;
+describe('ImagePresetsComponent', () => {
+  let component: ImagePresetsComponent;
+  let fixture: ComponentFixture<ImagePresetsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ Base2DTutorialComponent ]
+      declarations: [ ImagePresetsComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Base2DTutorialComponent);
+    fixture = TestBed.createComponent(ImagePresetsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

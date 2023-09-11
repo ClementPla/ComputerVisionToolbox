@@ -22,7 +22,10 @@ export class LabelledSlidersComponent implements OnInit {
   ngOnInit(): void {
   }
   onChange(event:MatSliderChange){
-    if(this.value)
-      this.valueChange.emit(this.value)
+    if(event.value)
+      this.valueChange.emit(event.value)
+  }
+  onInput(event:MatSliderChange){
+    this.input.emit(event)
   }
 }

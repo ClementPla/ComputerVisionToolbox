@@ -1,8 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Kernel, KernelGenerator } from './kernel';
-import { NgxOpenCVService, OpenCVState} from 'ngx-opencv';
-import { Base2DTutorialComponent } from '../base2-dtutorial/base2-dtutorial.component';
+import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 
 declare var cv: any;
 
@@ -12,8 +10,7 @@ declare var cv: any;
   templateUrl: './spatial-filtering.component.html',
   styleUrls: ['./spatial-filtering.component.scss'],
 })
-export class SpatialFilteringComponent extends Base2DTutorialComponent implements OnInit {
-  @ViewChild('resultCanvas') filterCanvas: DrawCanvasComponent;
+export class SpatialFilteringComponent extends TutorialTemplateImagesComponent implements AfterContentInit {
 
   listKernels: Array<Kernel>;
 
@@ -23,8 +20,8 @@ export class SpatialFilteringComponent extends Base2DTutorialComponent implement
     })
     this.applyFilter()
   }
-  override ngOnInit(): void {
-    super.ngOnInit()
+  override ngAfterContentInit(): void {
+    super.ngAfterContentInit()
     this.listKernels = new Array<Kernel>();
   }
 
@@ -122,7 +119,7 @@ export class SpatialFilteringComponent extends Base2DTutorialComponent implement
       }
     });
     cv.convertScaleAbs(dst, dst, 255)
-    cv.imshow(this.filterCanvas.getCanvas(), dst);
+    cv.imshow(this.outputCanvas.getCanvas(), dst);
     mat.delete();
     dst.delete();
   }

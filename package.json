@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "start": "nx serve",
+    "build": "nx build",
+    "watch": "nx build --watch --configuration development",
+    "test": "nx test"
   },
   "private": true,
   "dependencies": {
@@ -22,6 +22,7 @@
     "@angular/platform-browser-dynamic": "^14.2.4",
     "@angular/router": "^14.2.4",
     "echarts": "^5.4.0",
+    "echarts-gl": "^2.0.9",
     "ml-fft": "^1.3.5",
     "ngx-echarts": "^14.0.0",
     "ngx-opencv": "^2.0.1",
@@ -31,8 +32,14 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.2.4",
+    "@angular-devkit/core": "^14.2.4",
+    "@angular-devkit/schematics": "^14.2.4",
     "@angular/cli": "^14.2.4",
     "@angular/compiler-cli": "^14.2.4",
+    "@nrwl/angular": "15.9.4",
+    "@nrwl/nx-cloud": "latest",
+    "@nrwl/workspace": "15.9.4",
+    "@schematics/angular": "^14.2.4",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
     "angular-cli-ghpages": "^1.0.3",
@@ -42,6 +49,7 @@
     "karma-coverage": "~2.1.0",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
+    "nx": "15.9.4",
     "typescript": "~4.6.2"
   }
 }

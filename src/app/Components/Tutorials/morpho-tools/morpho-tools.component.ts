@@ -5,10 +5,9 @@ import {
   ElementRef,
   AfterViewInit,
 } from '@angular/core';
-import { NgxOpenCVService, OpenCVState } from 'ngx-opencv';
+import { OpenCVState } from 'ngx-opencv';
 import { __values } from 'tslib';
-import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
-import { Base2DTutorialComponent } from '../base2-dtutorial/base2-dtutorial.component';
+import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 import { StructuralElement } from './structuralElement';
 
 declare var cv: any;
@@ -19,69 +18,27 @@ declare var cv: any;
   styleUrls: ['./morpho-tools.component.scss'],
 })
 export class MorphoToolsComponent
-  extends Base2DTutorialComponent
-  implements OnInit, AfterViewInit
+  extends TutorialTemplateImagesComponent
+  implements AfterViewInit
 {
-  @ViewChild('resultCanvas') filterCanvas: DrawCanvasComponent;
   @ViewChild('elementCanvasVisu', { static: true })
   private eltCanvasVisu: ElementRef<HTMLCanvasElement>;
-  listKernels: Array<StructuralElement>;
+  listKernels: Array<StructuralElement> = new Array<StructuralElement>();
 
-  ksize: number = 11;
-  profileOptions: any;
+  ksize: number = 3;
   structuralElementType?: string = 'circle';
-  private ctx: CanvasRenderingContext2D;
+  width: number = 256;
 
-  override ngOnInit(): void {
-    super.ngOnInit();
-  }
   ngAfterViewInit(): void {
     this.cleanFilterList();
     this.updateVisu();
-  }
-
-  updateProfile() {
-    const yData = this.filterCanvas.getProfile();
-    this.profileOptions = {
-      legend: {
-        data: ['Profile'],
-        align: 'left',
-      },
-      tooltip: {},
-      xAxis: {
-        data: Array.from(Array(yData.length).keys()),
-        silent: false,
-        splitLine: {
-          show: false,
-        },
-      },
-      yAxis: [
-        {
-          type: 'value',
-        },
-      ],
-      series: [
-        {
-          name: 'profile',
-          type: 'line',
-          areaStyle: {},
-          data: yData,
-        },
-      ],
-      animationEasing: 'elasticOut',
-      animationDelayUpdate: (idx: number) => idx * 5,
-    };
   }
 
   updateVisu() {
     this.ngxOpenCv.cvState.subscribe((cvState: OpenCVState) => {
       // do something with the state string
       this.cvState = cvState.state;
-      if (cvState.error) {
-        // handle errors
-      } else if (cvState.loading) {
-        // e.g. show loading indicator
-      } else if (cvState.ready) {
+      if (cvState.ready) {
         let mat = this.getStructuringMat(
           this.ksize,
           this.structuralElementType!
@@ -166,10 +123,31 @@ export class MorphoToolsComponent
           cv.morphologyEx(dst, dst, cv.MORPH_TOPHAT, M);
           break;
         }
+        case 'skeletonize':{
+          var skel  = new cv.Mat(this.width, this.width, cv.CV_8UC1, new cv.Scalar(0))
+          var tmp = new cv.Mat()
+          var eroded = new cv.Mat()
+          var hasConverged = false
+          var maxIter = 50;
+          while(!(hasConverged) && (maxIter>0)){
+            cv.erode(dst, eroded, M)
+            cv.dilate(eroded, tmp, M)
+            cv.subtract(dst, tmp, tmp)
+            cv.bitwise_or(skel, tmp, skel)
+            eroded.copyTo(dst)
+            hasConverged = cv.norm(dst)==0
+            maxIter--;
+          }
+          skel.copyTo(dst)
+          skel.delete()
+          tmp.delete()
+          eroded.delete()
+          break
+        }
       }
       M.delete();
     });
-    this.filterCanvas.drawMat(dst);
+    this.outputCanvas.drawMat(dst);
     dst.delete();
     src.delete();
   }

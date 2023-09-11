@@ -1,0 +1,86 @@
+<app-tutorial-template-images>
+  Histogram and equalization
+  <ng-container ngProjectAs="[drawerLeft]">
+    <h3>Colorspace</h3>
+    <mat-button-toggle-group
+      name="Colorspace"
+      [(ngModel)]="colorspace"
+      aria-label="Color space"
+    >
+      <mat-button-toggle value="RGB"><b>RGB</b></mat-button-toggle>
+      <mat-button-toggle value="LAB"><b>L</b>AB</mat-button-toggle>
+      <mat-button-toggle value="HSV">HS<b>V</b></mat-button-toggle>
+    </mat-button-toggle-group>
+    <hr />
+    <button
+      mat-raised-button
+      color="primary"
+      class="fillWidth"
+      (click)="equalizeHistogram()"
+    >
+      Histogram equalization
+    </button>
+    <hr />
+    <h3>
+      Contrast Limited <br> Adaptive Histogram <br> Equalization
+    </h3>
+
+    <app-labelled-sliders
+      [min]="4"
+      [max]="48"
+      [step]="2"
+      [title]="'Tile Grid size'"
+      [(value)]="tileGridSize"
+      (valueChange)="CLAHE()"
+    >
+    </app-labelled-sliders>
+
+    <app-labelled-sliders
+      [min]="4"
+      [max]="48"
+      [step]="2"
+      [title]="'Clip Limit'"
+      [(value)]="clipLimit"
+      (valueChange)="CLAHE()"
+    >
+    </app-labelled-sliders>
+
+    <button
+      mat-raised-button
+      color="primary"
+      class="fillWidth"
+      (click)="CLAHE()"
+    >
+      CLAHE
+    </button>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerRight]">
+    <div echarts [options]="inputHistoOptions" class="histo-graph"></div>
+    <h2>Result canvas</h2>
+    <div echarts [options]="outputHistoOptions" class="histo-graph"></div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <app-draw-canvas
+      [width]="1024"
+      class="canvas"
+      #inputCanvas
+      (drawingEnded)="updateHistogram()"
+      [drawable]="false"
+      [BWOption]="true"
+      (BWSet)="updateHistogram()"
+      title="Image"
+    ></app-draw-canvas>
+    <app-draw-canvas
+      class="canvas"
+      [width]="1024"
+      #outputCanvas
+      [drawable]="false"
+      title="Result"
+      [BWOption]="true"
+      (BWSet)="updateHistogram()"
+    >
+    </app-draw-canvas>
+  </ng-container>
+</app-tutorial-template-images>

@@ -1,0 +1,34 @@
+<app-tutorial-template-images>
+  Spectral filtering
+
+  <ng-container ngProjectAs="[drawerLeft]">
+
+    <app-labelled-sliders #brushSizeSlider title="Brush Size">
+    </app-labelled-sliders>
+    <hr />
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+    <app-draw-canvas
+      [width]="width"
+      class="canvas"
+      #inputCanvas
+      (drawingEnded)="updateFFT()"
+      [drawable]="true"
+      [BWOption]="true"
+      [brushRadius]="brushSizeSlider.value"
+      title="Canvas"
+    ></app-draw-canvas>
+
+    <app-draw-canvas
+      class="canvas"
+      [width]="width"
+      [drawColor]="'black'"
+      #outputCanvas
+      [drawable]="true"
+      (drawingEnded)="updateIFFT()"
+      [brushRadius]="brushSizeSlider.value"
+      title="Fourier space"
+    >
+    </app-draw-canvas>
+  </ng-container>
+</app-tutorial-template-images>

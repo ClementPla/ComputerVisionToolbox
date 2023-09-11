@@ -1,0 +1,11 @@
+<button type="button" mat-raised-button color="primary"
+(click)="toggleShowImagePreset()">Show preset</button>
+<button type="button" mat-raised-button color="primary" (click)="fileInput.click()">
+    Load image
+</button>
+<input
+  hidden
+  #fileInput
+  type="file"
+  (change)="loading($event)"
+  accept="images/*"/>

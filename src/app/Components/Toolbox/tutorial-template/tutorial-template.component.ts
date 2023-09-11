@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-tutorial-template',
   templateUrl: './tutorial-template.component.html',
   styleUrls: ['./tutorial-template.component.scss']
 })
-export class TutorialTemplateComponent implements OnInit {
+export class TutorialTemplateComponent {
+
+  @Input() leftDrawer:boolean=true
+  @Input() rightDrawer:boolean=true
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
 
 }

@@ -6,6 +6,7 @@
   <p *ngIf="title" class="title">{{ title }}</p>
   <span *ngIf="BWOption" class="BW-toggle toggle">
     <mat-slide-toggle [(ngModel)]="isBWChecked" color="primary"
+    (change)="BWToggle()"
       >B&W</mat-slide-toggle
     >
   </span>
@@ -43,6 +44,8 @@
     <div
       class="handle"
       (mousedown)="startHandleDrag($event, 1)"
+      (touchstart)="startHandleDrag($event, 1)"
+      (touchstop)="stopHandleDrag()"
       (mouseup)="stopHandleDrag()"
       [style.top.px]="profileHandle1Pos.y"
       [style.left.px]="profileHandle1Pos.x"
@@ -52,7 +55,9 @@
     <div
       class="handle"
       (mousedown)="startHandleDrag($event, 2)"
+      (touchstart)="startHandleDrag($event, 2)"
       (mouseup)="stopHandleDrag()"
+      (touchstop)="stopHandleDrag()"
       [style.top.px]="profileHandle2Pos.y"
       [style.left.px]="profileHandle2Pos.x"
     >

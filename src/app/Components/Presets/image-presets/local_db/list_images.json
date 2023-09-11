@@ -1,0 +1,58 @@
+
+[
+{
+  "name": "Fourier Transform",
+  "content": [
+    {
+      "name": "House",
+      "url": "assets/image_presets/House.jpeg"
+    },
+    {
+      "name": "Moon",
+      "url": "assets/image_presets/Moon.jpeg"
+    },
+    {
+      "name": "CT Scan",
+      "url": "assets/image_presets/CTandstripes.jpeg"
+    },
+    {
+      "name": "X Ray",
+      "url": "assets/image_presets/XrayBar.jpeg"
+    }
+  ]
+},
+{
+  "name": "Morphological Operations",
+  "content": [
+    {
+      "name": "Hello",
+      "url": "assets/image_presets/Hello.jpeg"
+    },
+    {
+      "name": "Tree",
+      "url": "assets/image_presets/arbre_binaire.jpeg"
+    },
+    {
+      "name": "Little Guy",
+      "url": "assets/image_presets/bonhomme_morpho.jpeg"
+    }
+  ]
+},
+{
+  "name": "Color images",
+  "content": [
+    {
+      "name": "Peppers",
+      "url": "assets/image_presets/poivron.jpeg"
+    },
+    {
+      "name": "Butterfly",
+      "url": "assets/image_presets/papillon.jpg"
+    },
+    {
+      "name": "Homomorphic Flower",
+      "url": "assets/image_presets/hibiscus_homomorphic.jpg"
+    }
+  ]
+}
+]

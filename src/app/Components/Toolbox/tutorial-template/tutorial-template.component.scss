@@ -12,7 +12,7 @@
 }
  */
 
-mat-drawer {
+ mat-drawer {
   max-width: 50vw;
 }
 
@@ -23,6 +23,19 @@ mat-toolbar-row {
   }
 }
 
+.loading{
+  position: fixed;
+  z-index: 100;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba($color: #000000, $alpha: 0.8);
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
 .drawer {
   padding: 1em 0.25em;
   align-items: center;

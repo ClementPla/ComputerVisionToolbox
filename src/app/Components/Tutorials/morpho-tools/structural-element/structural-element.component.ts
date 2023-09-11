@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
-import { Base2DTutorialComponent } from '../../base2-dtutorial/base2-dtutorial.component';
 import { StructuralElement } from '../structuralElement';
 
 @Component({
@@ -7,7 +6,7 @@ import { StructuralElement } from '../structuralElement';
   templateUrl: './structural-element.component.html',
   styleUrls: ['./structural-element.component.scss']
 })
-export class StructuralElementComponent extends Base2DTutorialComponent implements OnInit {
+export class StructuralElementComponent implements OnInit {
 
   @Input() kernel: StructuralElement;
   @Output() updateFilters = new EventEmitter<boolean>();
@@ -15,8 +14,7 @@ export class StructuralElementComponent extends Base2DTutorialComponent implemen
   private canvas: ElementRef<HTMLCanvasElement>;
   private ctx: CanvasRenderingContext2D;
 
-  override ngOnInit(): void {
-    super.ngOnInit()
+  ngOnInit(): void {
     this.kernel.delete = false;
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
     this.ctx = canvasEl.getContext('2d', {alpha:false})!;

@@ -1,35 +1,16 @@
-<app-tutorial-template>
+<app-tutorial-template-images>
   Fourier Transform
 
   <ng-container ngProjectAs="[drawerLeft]">
-    <button
-      class="fillWidth"
-      mat-raised-button
-      color="warn"
-      (click)="drawingCanvas.clearCanvas()"
-    >
-      Clear
-    </button>
+    <mat-button-toggle-group name="representationNorm" [(ngModel)]="repsentationNorm"
+      (change)="updateFFT()">
+      <mat-button-toggle value="amplitude">A</mat-button-toggle>
+      <mat-button-toggle value="logAmplitude">log(A)</mat-button-toggle>
+      <mat-button-toggle value="logAmplitudeOne">log(1+A)</mat-button-toggle>
 
-    <hr />
+    </mat-button-toggle-group>
+    <hr/>
 
-    <button
-      class="fillWidth"
-      type="button"
-      mat-raised-button
-      color="primary"
-      (click)="fileInput.click()"
-    >
-      Load image
-    </button>
-    <input
-      hidden
-      #fileInput
-      type="file"
-      (change)="loadSelectedFile($event)"
-      accept="images/*"
-    />
-    <hr />
     <app-labelled-sliders #brushSizeSlider title="Brush Size">
     </app-labelled-sliders>
     <hr />
@@ -53,9 +34,9 @@
     <ng-container *ngIf="toggleAxis.checked; else singleGaussAxis">
       <app-labelled-sliders
         title="Gaussian STD X"
-        [min]="0"
+        [min]="0.5"
         [max]="128"
-        [step]="1"
+        [step]="0.5"
         [(value)]="this.gaussStdX"
         thumbLabel
         tickInterval="auto"
@@ -65,9 +46,9 @@
 
       <app-labelled-sliders
         title="Gaussian STD Y"
-        [min]="0"
+        [min]="0.5"
         [max]="128"
-        [step]="1"
+        [step]="0.5"
         [(value)]="this.gaussStdY"
         thumbLabel
         tickInterval="auto"
@@ -78,9 +59,9 @@
     <ng-template #singleGaussAxis>
       <app-labelled-sliders
         title="Gaussian STD"
-        [min]="0"
+        [min]="0.5"
         [max]="128"
-        [step]="1"
+        [step]="0.5"
         [(value)]="this.gaussStdY"
         [(value)]="this.gaussStdX"
         thumbLabel
@@ -129,30 +110,29 @@
   <ng-container ngProjectAs="[drawerRight]">
 
     <h2>Profile</h2>
-
     <div echarts [options]="profileOptions" class="profile-graph"></div>
   </ng-container>
 
   <ng-container ngProjectAs="[centerContent]">
     <app-draw-canvas
-      #drawingCanvas
+      #inputCanvas
       class="canvas"
       [width]="256"
       (drawingEnded)="updateFFT()"
       [drawable]="true"
+      [OnlyBW]="true"
       [brushRadius]="brushSizeSlider.value"
       title="Canvas"
     ></app-draw-canvas>
 
     <app-draw-canvas
-      #fftCanvas
+      #outputCanvas
       [drawable]="false"
       class="canvas"
       title="Fourier Transform"
       [profileOption]="true"
       (profileChanged)="updateProfile()"
-
     >
     </app-draw-canvas>
   </ng-container>
-</app-tutorial-template>
+</app-tutorial-template-images>

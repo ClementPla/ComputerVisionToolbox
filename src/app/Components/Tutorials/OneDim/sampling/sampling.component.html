@@ -1,0 +1,22 @@
+<app-tutorial-template [rightDrawer]="false">
+  Sampling Frequency and Nyquist-Shannon Theorem
+  <ng-container ngProjectAs="[drawerLeft]">
+    <app-labelled-sliders
+    title="Sampling frequency"
+    [value]="this.fe"
+    (input)="update_fe($event.value)"
+    >
+
+    </app-labelled-sliders>
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+
+    <div class="grid-2x2">
+      <div class="graph" echarts [options]="original_graph"></div>
+      <div class="graph" echarts [options]="sampled_graph" (chartInit)="onSampledChartInit($event)"
+      ></div>
+      <div class="graph" echarts [options]="original_fft_graph"></div>
+      <div class="graph" echarts [options]="sampled_fft_graph"></div>
+    </div>
+  </ng-container>
+</app-tutorial-template>
