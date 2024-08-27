@@ -1,68 +1,36 @@
-<div
-  class="canvas-container"
-  (mousemove)="updateHandleDragPos($event)"
-  [style.cursor]="this.drawable ? 'none' : 'default'"
->
-  <p *ngIf="title" class="title">{{ title }}</p>
+<div class="canvas-container" (mousemove)="updateHandleDragPos($event)"
+  [style.cursor]="this.drawable ? 'none' : 'default'">
+  <p *ngIf="title" class="title select-none">{{ title }}</p>
   <span *ngIf="BWOption" class="BW-toggle toggle">
-    <mat-slide-toggle [(ngModel)]="isBWChecked" color="primary"
-    (change)="BWToggle()"
-      >B&W</mat-slide-toggle
-    >
+    <mat-slide-toggle [(ngModel)]="isBWChecked" color="primary" (change)="BWToggle()">B&W</mat-slide-toggle>
   </span>
 
   <span *ngIf="profileOption" class="Profile-toggle toggle">
-    <mat-slide-toggle [(ngModel)]="profile" color="primary"
-    (change)="updateCanvasUI()"
-      >profile</mat-slide-toggle
-    >
+    <mat-slide-toggle [(ngModel)]="profile" color="primary" (change)="updateCanvasUI()">profile</mat-slide-toggle>
   </span>
 
-  <div
-    #cursor
-    class="cursor"
-    *ngIf="this.drawable"
-    [style.top.px]="cursorPosition.y"
-    [style.left.px]="cursorPosition.x"
-    [style.width.px]="getCursorTransform()"
-  >
+  <div #cursor class="cursor" *ngIf="this.drawable" [style.top.px]="cursorPosition.y" [style.left.px]="cursorPosition.x"
+    [style.width.px]="getCursorTransform()">
     <div class="cursor-radius" [style.border-color]="drawColor"></div>
     <mat-icon>brush</mat-icon>
   </div>
-  <canvas
-    #canvas
-    id="canvasVisu"
-    [ngClass]="{ BWFilter: isBWChecked || OnlyBW }"
-  ></canvas>
+  <canvas #canvas id="canvasVisu" [ngClass]="{ BWFilter: isBWChecked || OnlyBW }"></canvas>
 
-  <canvas #canvasUI id="canvasUI"
-  [style.opacity.%]="this.profile? 100:0"
+  <!-- UI Canvas -->
+  <canvas #canvasUI id="canvasUI" [width]="UIwidth" class="pointer-events-none"></canvas>
 
-  ></canvas>
-
-  <ng-container *ngIf="this.profile">
-    <div
-      class="handle"
-      (mousedown)="startHandleDrag($event, 1)"
-      (touchstart)="startHandleDrag($event, 1)"
-      (touchstop)="stopHandleDrag()"
-      (mouseup)="stopHandleDrag()"
-      [style.top.px]="profileHandle1Pos.y"
-      [style.left.px]="profileHandle1Pos.x"
-    >
-    <p class="noselect">({{getHandlePos(1).x.toFixed(0)}},{{getHandlePos(1).y.toFixed(0)}})</p>
+  <!-- Profile Handles -->
+  <div [ngClass]="{'hidden': !this.profile}">
+    <app-handle #handleProfile class="handle" [handlePos]="{x: 50, y:100}" [scale]="getScreenToCanvasScale()">
+    </app-handle>
+    <app-handle #handleProfile class="handle" [handlePos]="{x: 250, y:100}" [scale]="getScreenToCanvasScale()">
+    </app-handle>
   </div>
-    <div
-      class="handle"
-      (mousedown)="startHandleDrag($event, 2)"
-      (touchstart)="startHandleDrag($event, 2)"
-      (mouseup)="stopHandleDrag()"
-      (touchstop)="stopHandleDrag()"
-      [style.top.px]="profileHandle2Pos.y"
-      [style.left.px]="profileHandle2Pos.x"
-    >
-    <p class="noselect">({{getHandlePos(2).x.toFixed(0)}},{{getHandlePos(2).y.toFixed(0)}})</p>
-  </div>
-  </ng-container>
+
+  <!-- ROI HANDLE -->
+
+  <app-roi #ROI [point1]="r.initial1" [point2]="r.initial2" [scale]="getScreenToCanvasScale()"
+    [property]="r" *ngFor="let r of roi">
+  </app-roi>
+
 </div>
-

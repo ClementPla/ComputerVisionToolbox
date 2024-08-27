@@ -1,0 +1,72 @@
+<app-tutorial-template-images>
+    Image Quality
+    <ng-container ngProjectAs="[drawerLeft]">
+
+        <app-labelled-sliders #brushSizeSlider title="Brush Size">
+        </app-labelled-sliders>
+
+        <hr />        
+        <app-labelled-sliders title="Probability"
+        [(value)]="pepperSaltNoise"
+        [min]="0"
+        [max]="1.0"
+        (valueChange)="pepperSaltNoise = $event"
+        [step]="0.01">
+        </app-labelled-sliders>
+
+        <button mat-raised-button color="primary" (click)="addPepperSaltNoise()">Add pepper & salt noise</button>
+        <hr />
+
+        <app-labelled-sliders title="Gaussian Noise"
+        [(value)]="gaussianNoise"
+        [min]="0"
+        [max]="75"
+        (valueChange)="gaussianNoise = $event"
+        [step]="0.5">
+        </app-labelled-sliders>
+        <button mat-raised-button color="primary" (click)="addGaussianNoise()">Add Gaussian noise</button>
+
+    </ng-container>
+
+    <ng-container ngProjectAs="[centerContent]">
+        <app-draw-canvas class="main-canvas" [width]="512" #inputCanvas [drawable]="false" title="Canvas" [roi]="rois"
+            [drawable]="true"
+            [brushRadius]="brushSizeSlider.value"
+            [BWOption]="true" [profileOption]="false" (roiChanged)="updateCanvasROI($event)">
+        </app-draw-canvas>
+
+    </ng-container>
+
+    <ng-container ngProjectAs="[drawerRight]">
+        <div class="flex flex-col gap-2 mx-4">
+            <h3>Background</h3>
+
+            <canvas class="w-64 aspect-square border" [style.border-color]="rois[0].color" #background></canvas>
+            <div class="flex justify-between">
+                <p>Mean</p>
+                <p>{{meanBG.toFixed(3)}}</p>
+            </div>
+
+            <mat-divider></mat-divider>
+            <h3>Foreground</h3>
+            <canvas class="w-64 aspect-square border" [style.border-color]="rois[1].color" #foreground></canvas>
+            <div class="flex justify-between">
+                <p>Mean</p>
+                <p>{{meanFG.toFixed(3)}}</p>
+            </div>
+            <mat-divider></mat-divider>
+            <h3>Statistics</h3>
+
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between">
+                    <p>SNR Differential</p>
+                    <p>{{psnr.toFixed(3)}}</p>
+                </div>
+                <div class="flex justify-between">
+                    <p>Local contrast</p>
+                    <p>{{localcontrast.toFixed(3)}}</p>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</app-tutorial-template-images>

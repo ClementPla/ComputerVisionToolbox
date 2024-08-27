@@ -9,9 +9,11 @@ import { MorphoToolsComponent } from './Components/Tutorials/morpho-tools/morpho
 import { SamplingComponent } from './Components/Tutorials/OneDim/sampling/sampling.component';
 import { SpatialFilteringComponent } from './Components/Tutorials/spatial-filtering/spatial-filtering.component';
 import { SpectralFilteringComponent } from './Components/Tutorials/spectral-filtering/spectral-filtering.component';
+import { PSNRComponent } from './Components/Tutorials/psnr/psnr.component';
+
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch:'full'},
+  {path: '', redirectTo: 'home', pathMatch:'full'},
   {path:'home', component:HomeComponent},
   {path:'fourierTransform', component:FastFourierTransformComponent},
   {path:'spatialFiltering', component:SpatialFilteringComponent},
@@ -20,7 +22,8 @@ const routes: Routes = [
   {path:'histogram', component:ImageHistogramComponent},
   {path:'weightLoss', component:WeightsLossComponent},
   {path:'sampling', component:SamplingComponent},
-  {path:'spectralFiltering', component:SpectralFilteringComponent}
+  {path:'spectralFiltering', component:SpectralFilteringComponent},
+  {path:'PSNR', component:PSNRComponent}
 
 ];
 @NgModule({

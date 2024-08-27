@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Kernel, KernelGenerator } from './kernel';
 import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 
@@ -20,8 +20,7 @@ export class SpatialFilteringComponent extends TutorialTemplateImagesComponent i
     })
     this.applyFilter()
   }
-  override ngAfterContentInit(): void {
-    super.ngAfterContentInit()
+  ngAfterContentInit(): void {
     this.listKernels = new Array<Kernel>();
   }
 

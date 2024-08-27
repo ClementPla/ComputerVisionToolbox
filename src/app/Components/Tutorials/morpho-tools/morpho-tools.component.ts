@@ -29,7 +29,8 @@ export class MorphoToolsComponent
   structuralElementType?: string = 'circle';
   width: number = 256;
 
-  ngAfterViewInit(): void {
+  override ngAfterViewInit(): void {
+    super.ngAfterViewInit();
     this.cleanFilterList();
     this.updateVisu();
   }

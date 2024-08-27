@@ -6,12 +6,18 @@ import {
   Output,
   ViewChild,
   EventEmitter,
+  ViewChildren,
+  QueryList,
+  HostListener,
 } from '@angular/core';
 import { fromEvent, merge } from 'rxjs';
 import { Point2D } from 'src/app/utils/geometry';
 import { switchMap, takeUntil, pairwise, mapTo } from 'rxjs/operators';
 
 import { getLine } from 'src/app/utils/bresenham';
+import { HandleComponent } from '../handle/handle.component';
+import { ROIComponent } from '../roi/roi.component';
+import { ROIProperty } from 'src/app/utils/interface';
 
 declare var cv: any;
 
@@ -31,35 +37,41 @@ export class DrawCanvasComponent implements OnInit {
   private canvasUI: ElementRef<HTMLCanvasElement>;
   private ctxUI: CanvasRenderingContext2D;
 
+
+  @ViewChildren('handleProfile') handles: QueryList<HandleComponent>;
+
+  @ViewChildren('ROI') ROIs: QueryList<ROIComponent>;
+
   @Input() width = 256;
   height = this.width;
 
+  UIwidth = 1024
+
+  @Input() roi: Array<ROIProperty> = [];
   @Input() brushRadius: number | null = 10;
   @Input() drawColor = 'white';
   @Input() drawable = true;
   @Input() title = '';
   @Input() BWOption: boolean = false;
   @Input() OnlyBW: boolean = false;
-  @Output() profileChanged = new EventEmitter<boolean>();
-  @Input() profileOption:boolean = false
+  @Input() profileOption: boolean = false
 
   @Output() BWSet = new EventEmitter<boolean>();
+  @Output() profileChanged = new EventEmitter<boolean>();
 
-  profile:boolean = false
+  @Output() roiChanged = new EventEmitter<ROIProperty>();
+
+  profile: boolean = false
 
   isBWChecked = false;
   cursorPosition: Point2D = { x: 0, y: 0 };
   startDrawing: boolean = false;
   initialPos: Point2D;
 
-  profileHandle1Drag = false;
-  profileHandle2Drag = false;
-  profileHandle1Pos: Point2D = { x: 50, y: 100 };
-  profileHandle2Pos: Point2D = { x: 150, y: 100 };
 
   profileArray: Array<number>;
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
@@ -74,8 +86,8 @@ export class DrawCanvasComponent implements OnInit {
 
     const canvasElUI: HTMLCanvasElement = this.canvasUI.nativeElement;
     this.ctxUI = canvasElUI.getContext('2d', { alpha: true })!;
-    canvasElUI.width = this.width;
-    canvasElUI.height = this.height;
+    canvasElUI.width = this.UIwidth;
+    canvasElUI.height = this.UIwidth;
 
     if (this.drawable) {
       this.captureEvents(canvasEl);
@@ -83,7 +95,7 @@ export class DrawCanvasComponent implements OnInit {
     this.ctx.fillRect(0, 0, this.width, this.height);
   }
 
-  BWToggle(){
+  BWToggle() {
     this.BWSet.emit()
   }
 
@@ -116,9 +128,8 @@ export class DrawCanvasComponent implements OnInit {
   drawImage(image: CanvasImageSource) {
     this.ctx.drawImage(image, 0, 0, this.width, this.height);
 
-    if (this.profile) {
-      this.updateCanvasUI();
-    }
+    this.updateCanvasUI();
+
     this.drawingEnded.emit();
   }
 
@@ -126,7 +137,7 @@ export class DrawCanvasComponent implements OnInit {
     cv.imshow(this.getCanvas(), mat);
     this.updateCanvasUI();
   }
-  drawMatWithoutEvent(mat:any){
+  drawMatWithoutEvent(mat: any) {
     cv.imshow(this.getCanvas(), mat);
   }
 
@@ -140,9 +151,8 @@ export class DrawCanvasComponent implements OnInit {
     var image = new ImageData(data, width, height);
     this.ctx.putImageData(image, x, y);
 
-    if (this.profile) {
-      this.updateCanvasUI();
-    }
+    this.updateCanvasUI();
+
     this.drawingEnded.emit();
   }
 
@@ -160,9 +170,8 @@ export class DrawCanvasComponent implements OnInit {
     var image = new ImageData(data, width, height);
     this.ctx.putImageData(image, x, y, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 
-    if (this.profile) {
-      this.updateCanvasUI();
-    }
+    this.updateCanvasUI();
+
     this.drawingEnded.emit();
   }
 
@@ -265,79 +274,156 @@ export class DrawCanvasComponent implements OnInit {
     return scaleFactor;
   }
 
-  startHandleDrag(event: MouseEvent|TouchEvent, handle: number) {
-    if (handle == 1) {
-      this.profileHandle1Drag = true;
-      this.profileHandle2Drag = false;
-    } else {
-      this.profileHandle1Drag = false;
-      this.profileHandle2Drag = true;
-    }
-  }
-  stopHandleDrag() {
-    this.profileHandle1Drag = false;
-    this.profileHandle2Drag = false;
-  }
-
   updateHandleDragPos(event: MouseEvent) {
     const canvas = this.ctxUI.canvas;
     const rect = canvas.getBoundingClientRect();
     var pos = this.getClientPosition(event);
 
-    if (this.profileHandle1Drag) {
-      this.profileHandle1Pos.x = pos.clientX - rect.left;
-      this.profileHandle1Pos.y = pos.clientY - rect.top;
+    let handles = this.handles.toArray();
+    let rois = this.ROIs.toArray();
+    
+    const x = pos.clientX - rect.left;
+    const y = pos.clientY - rect.top;
+    let redrawNeeded = false;
+    const outOfBounds = x >= rect.width || x <= 0 || y >= rect.height || y <= 0
+    handles.forEach((handle) => {
+      handle.handleDrag = outOfBounds ? false : handle.handleDrag;
+      if (handle.handleDrag) {
+        handle.moveTo(x, y, rect.width ,  rect.height);
+        redrawNeeded = true;
+      }
+
+    });
+    rois.forEach((roi) => {
+      let roiHandles = roi.getHandles();
+      roiHandles.forEach((handle) => {
+        handle.handleDrag = outOfBounds ? false : handle.handleDrag;
+        if (handle.handleDrag) {
+          handle.moveTo(x, y, rect.width, rect.height);
+          roi.update();
+          redrawNeeded = true;
+        }
+      });
+      let midHandle = roi.getMidHandle();
+      midHandle.handleDrag = outOfBounds ? false : midHandle.handleDrag;
+      if (midHandle.handleDrag) {
+        let offsetX = x - midHandle.handlePos.x
+        let offsetY = y - midHandle.handlePos.y
+        roiHandles.forEach((handle) => {
+          handle.moveTo(handle.handlePos.x + offsetX, handle.handlePos.y + offsetY, rect.width, rect.height);
+          roi.update();
+          redrawNeeded = true;
+        })
+        
+      }
+    
+    })
+
+
       this.updateCanvasUI();
-    } else if (this.profileHandle2Drag) {
-      this.profileHandle2Pos.x = pos.clientX - rect.left;
-      this.profileHandle2Pos.y = pos.clientY - rect.top;
-      this.updateCanvasUI();
-    }
+
+
   }
 
+  @HostListener('window:resize', ['$event'])
   updateCanvasUI() {
-    if (this.profile) {
-      this.ctxUI.beginPath();
+    this.ctxUI.clearRect(0, 0, this.UIwidth, this.UIwidth);
+    // this.ctxUI.globalCompositeOperation = 'copy';
+    
+      requestAnimationFrame(() => { // We use setTimeout to be sure handles exist (wait for next frame)
+        
+        if (this.ROIs.length > 0) {
+          this.updateROI();
 
-      let point1 = this.scaleCoordinates(this.profileHandle1Pos);
-      let point2 = this.scaleCoordinates(this.profileHandle2Pos);
+        }
+        if (this.profile) {
+          this.updateProfile();
 
-      this.ctxUI.moveTo(point1.x, point1.y);
-      this.ctxUI.lineTo(point2.x, point2.y);
+        }
 
-      this.ctxUI.lineWidth = 1;
-      this.ctxUI.strokeStyle = 'blue';
-      this.ctxUI.globalCompositeOperation = 'copy';
-      this.ctxUI.setLineDash([2, 4]);
-      this.ctxUI.stroke();
+      });
 
-      this.updateProfile(point1, point2);
-      this.profileChanged.emit();
-    }
+      
+
   }
 
-  scaleCoordinates(point: Point2D): Point2D {
+  transformCoordinatesFromScreenToUISpace(point: Point2D): Point2D {
     const canvas = this.ctxUI.canvas;
     const rect = canvas.getBoundingClientRect();
-
-    let scaleX = this.width / rect.width;
-    let scaleY = this.height / rect.height;
-    return { x: point.x * scaleX, y: point.y * scaleY };
+    const width = rect.width;
+    const height = rect.height;
+    const x = point.x * (this.UIwidth / width);
+    const y = point.y * (this.UIwidth / height);
+    return { x, y };
   }
-  getHandlePos(handle:number):Point2D{
-    if(handle==1){
-      return this.scaleCoordinates(this.profileHandle1Pos)
-    }
-    else{
-      return this.scaleCoordinates(this.profileHandle2Pos)
-
-    }
+  transformCoordinatesFromScreenToCanvas(point: Point2D): Point2D {
+    const canvas = this.ctx.canvas;
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const x = point.x * (this.width / width);
+    const y = point.y * (this.height / height);
+    return { x, y };
   }
 
-  getProfile() {
+  getScreenToCanvasScale(): number {
+
+    const canvas = this.ctx.canvas;
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width;
+    return this.width / width;
+
+  }
+  getProfile(): Array<number> {
     return this.profileArray;
   }
-  updateProfile(point1: Point2D, point2: Point2D) {
+
+  updateProfile() {
+    this.ctxUI.beginPath();
+    let handles = this.handles.toArray();
+
+    const pointCanvas1 = this.transformCoordinatesFromScreenToCanvas(handles[0].handlePos);
+    const pointCanvas2 = this.transformCoordinatesFromScreenToCanvas(handles[1].handlePos);
+
+    const pointUI1 = this.transformCoordinatesFromScreenToUISpace(handles[0].handlePos);
+    const pointUI2 = this.transformCoordinatesFromScreenToUISpace(handles[1].handlePos);
+
+    this.ctxUI.moveTo(pointUI1.x, pointUI1.y);
+    this.ctxUI.lineTo(pointUI2.x, pointUI2.y);
+
+    this.ctxUI.lineWidth = 3;
+    this.ctxUI.strokeStyle = 'blue';
+    this.ctxUI.setLineDash([10, 20]);
+    this.ctxUI.stroke();
+
+    this.recomputeProfile(pointCanvas1, pointCanvas2);
+
+  }
+  updateROI() {
+    let rois = this.ROIs.toArray();
+    this.ctxUI.setLineDash([5, 5]);
+    this.ctxUI.lineWidth = 2;
+
+    rois.forEach((roi) => {
+
+      const handles = roi.getHandles();
+      const pointUI1 = this.transformCoordinatesFromScreenToUISpace(handles[0].handlePos);
+      const pointUI2 = this.transformCoordinatesFromScreenToUISpace(handles[1].handlePos);
+      this.ctxUI.beginPath();
+      this.ctxUI.strokeStyle = roi.property.color;
+      this.ctxUI.fillStyle = roi.property.color;
+      this.ctxUI.strokeRect(pointUI1.x, pointUI1.y, pointUI2.x - pointUI1.x, pointUI2.y - pointUI1.y);
+      this.ctxUI.globalAlpha = 0.3;
+      this.ctxUI.fillRect(pointUI1.x, pointUI1.y, pointUI2.x - pointUI1.x, pointUI2.y - pointUI1.y);
+      this.ctxUI.fill()
+      this.ctxUI.globalAlpha = 1;
+      this.ctxUI.stroke();
+      this.recomputeROI(roi);
+    });
+
+  }
+  recomputeProfile
+    (point1: Point2D, point2: Point2D) {
     let array: Array<Point2D> = getLine(point1, point2);
     this.profileArray = new Array<number>();
 
@@ -349,8 +435,30 @@ export class DrawCanvasComponent implements OnInit {
       let index = (this.width * row + col) * 4;
       this.profileArray.push(data[index]);
     });
+    this.profileChanged.emit();
   }
-  isBW(){
+
+  recomputeROI(roi: ROIComponent) {
+    let handles = roi.getHandles();
+    let point1 = this.transformCoordinatesFromScreenToCanvas(handles[0].handlePos);
+    let point2 = this.transformCoordinatesFromScreenToCanvas(handles[1].handlePos);
+    let x = Math.min(point1.x, point2.x);
+    let y = Math.min(point1.y, point2.y);
+
+    let w = Math.abs(point1.x - point2.x);
+    let h = Math.abs(point1.y - point2.y);
+    let square = this.ctx.getImageData(x, y, w, h)
+    roi.property.data = square;
+    this.roiChanged.emit(roi.property);
+  }
+
+  isBW() {
     return this.isBWChecked;
+  }
+
+  getValueAtSquare(x: number, y: number, w: number, h: number): Uint8ClampedArray {
+    let square = this.ctx.getImageData(x, y, w, h).data;
+    return square;
+
   }
 }

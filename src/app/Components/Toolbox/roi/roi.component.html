@@ -1,0 +1,18 @@
+
+<app-handle #handle1
+[handlePos]="point1" [scale]="scale" [handleColor]="property.color">
+</app-handle>
+<app-handle
+#handle2
+[handlePos]="point2" [scale]="scale" [handleColor]="property.color">
+</app-handle>
+<app-handle
+#midHandle
+[handlePos]="midPoint" [scale]="scale" [handleColor]="'white'"
+[handleSize]="12"
+[showCoordinates]="false"
+[isAnchor]="true"
+>
+</app-handle>
+<p class="absolute label text-sm select-none pointer-events-none" 
+[style.top.px]="labelPos.y" [style.left.px]="labelPos.x">{{property.name}}</p>

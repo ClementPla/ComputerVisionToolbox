@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, destroyPlatform, OnInit, ViewChild} from '@angular/core';
+import { AfterContentChecked, AfterViewInit, Component, destroyPlatform, OnInit, ViewChild} from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
 import { FormControl } from '@angular/forms';
@@ -24,7 +24,8 @@ export class ColorSpacesComponent extends TutorialTemplateImagesComponent implem
   colorspace:string='RGB'
 
 
-  ngAfterViewInit(){
+  override ngAfterViewInit(){
+    super.ngAfterViewInit
     this.pickerInput.select(new Color(255,255,255))
     this.updateColorSpace()
 

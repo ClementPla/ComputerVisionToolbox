@@ -286,7 +286,6 @@ export class ImageHistogramComponent
     src.delete()
   }
 
-
   CLAHE(){
     let src = cv.imread(this.drawCanvas.getCanvas());
     let tileGridSize = new cv.Size(this.tileGridSize, this.tileGridSize);
@@ -344,7 +343,8 @@ export class ImageHistogramComponent
     clahe.delete()
   }
 
-  ngAfterViewInit(): void {
+  override ngAfterViewInit(): void {
+    super.ngAfterViewInit();
     this.ngxOpenCv.cvState.subscribe((cvState) => {
       this.cvState = cvState.state;
       if (cvState.ready) {

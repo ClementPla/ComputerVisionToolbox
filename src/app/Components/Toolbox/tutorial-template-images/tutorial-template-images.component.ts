@@ -1,4 +1,4 @@
-import {AfterContentChecked, AfterContentInit, Component, ContentChild, Input, OnInit, ViewChild } from '@angular/core';
+import {AfterContentChecked, AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, Input, OnInit, ViewChild } from '@angular/core';
 import { NgxOpenCVService, OpenCVState } from 'ngx-opencv';
 import { DrawCanvasComponent } from '../draw-canvas/draw-canvas.component';
 import { TutorialTemplateComponent } from '../tutorial-template/tutorial-template.component';
@@ -10,7 +10,7 @@ import { UIControlService } from 'src/app/Services/uicontrol.service';
   styleUrls: ['./tutorial-template-images.component.scss',
   '../tutorial-template/tutorial-template.component.scss']
 })
-export class TutorialTemplateImagesComponent extends TutorialTemplateComponent implements AfterContentInit {
+export class TutorialTemplateImagesComponent extends TutorialTemplateComponent implements AfterViewInit {
 
   cvState: string;
 
@@ -29,11 +29,11 @@ export class TutorialTemplateImagesComponent extends TutorialTemplateComponent i
   public sideMenuContext = true;
 
 
-  constructor(protected ngxOpenCv:NgxOpenCVService, public uiservice: UIControlService) {
+  constructor(protected ngxOpenCv:NgxOpenCVService, public uiservice: UIControlService, private cdr: ChangeDetectorRef) {
     super()
   }
 
-  ngAfterContentInit(): void {
+  ngAfterViewInit(): void {
     this.ngxOpenCv.cvState.subscribe((cvState: OpenCVState) => {
       // do something with the state string
       this.cvState = cvState.state;
@@ -45,6 +45,7 @@ export class TutorialTemplateImagesComponent extends TutorialTemplateComponent i
 
       }
     });
+    this.cdr.detectChanges();
 
   }
   loadSelectedFileFromPath(path:string){
@@ -54,7 +55,12 @@ export class TutorialTemplateImagesComponent extends TutorialTemplateComponent i
     }
     img.src = path;
     img.onload = () =>{
-      this.drawCanvasContained.drawImage(img)
+      if(this.drawCanvas){
+        this.drawCanvas.drawImage(img)
+      }
+      else if(this.drawCanvasContained){
+        this.drawCanvasContained.drawImage(img)
+      }
     }
   }
 
@@ -114,5 +120,6 @@ export class TutorialTemplateImagesComponent extends TutorialTemplateComponent i
   toggleImagePresets(){
     this.sideMenuContext = !this.sideMenuContext
   }
+
 
 }

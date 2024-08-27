@@ -22,6 +22,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgxOpenCVModule, OpenCVConfig } from 'ngx-opencv';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatCheckboxModule} from '@angular/material/checkbox'; 
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSelectModule} from '@angular/material/select';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -31,6 +32,8 @@ import {
   MAT_COLOR_FORMATS,
   NGX_MAT_COLOR_FORMATS,
 } from '@angular-material-components/color-picker';
+
+
 
 import { MatSliderModule } from '@angular/material/slider';
 import { HomeComponent } from './Components/home/home.component';
@@ -49,6 +52,9 @@ import { TutorialTemplateComponent } from './Components/Toolbox/tutorial-templat
 import { LoadingButtonsComponent } from './Components/Toolbox/loading-buttons/loading-buttons.component';
 import { ImagePresetsComponent } from './Components/Presets/image-presets/image-presets.component';
 import { SpectralFilteringComponent } from './Components/Tutorials/spectral-filtering/spectral-filtering.component';
+import { PSNRComponent } from './Components/Tutorials/psnr/psnr.component';
+import { HandleComponent } from './Components/Toolbox/handle/handle.component';
+import { ROIComponent } from './Components/Toolbox/roi/roi.component';
 
 
 const openCVConfig: OpenCVConfig = {
@@ -56,6 +62,7 @@ const openCVConfig: OpenCVConfig = {
 };
 @NgModule({
   declarations: [
+
     AppComponent,
     FastFourierTransformComponent,
     DrawCanvasComponent,
@@ -75,12 +82,16 @@ const openCVConfig: OpenCVConfig = {
     LoadingButtonsComponent,
     ImagePresetsComponent,
     SpectralFilteringComponent,
+    PSNRComponent,
+    HandleComponent,
+    ROIComponent,
 
   ],
   imports: [
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),
+    MatCheckboxModule,
     MatCardModule,
     MatProgressSpinnerModule,
     MatSelectModule,
