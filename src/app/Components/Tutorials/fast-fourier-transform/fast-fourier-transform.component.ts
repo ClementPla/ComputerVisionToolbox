@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
 import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
 
 declare var cv: any;
 
@@ -9,7 +10,7 @@ declare var cv: any;
   templateUrl: './fast-fourier-transform.component.html',
   styleUrls: ['./fast-fourier-transform.component.scss'],
 })
-export class FastFourierTransformComponent extends TutorialTemplateImagesComponent {
+export class FastFourierTransformComponent extends TutorialImageClass {
   angle: number | null = 0;
   frequency: number | null = 25;
   magLog: boolean = true;

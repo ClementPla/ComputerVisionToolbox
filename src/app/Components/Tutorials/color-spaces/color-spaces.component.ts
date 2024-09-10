@@ -4,7 +4,7 @@ import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.compo
 import { FormControl } from '@angular/forms';
 import {Color, NgxMatColorPickerComponent } from '@angular-material-components/color-picker';
 
-import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
 declare var cv: any;
 
 @Component({
@@ -12,7 +12,7 @@ declare var cv: any;
   templateUrl: './color-spaces.component.html',
   styleUrls: ['./color-spaces.component.scss']
 })
-export class ColorSpacesComponent extends TutorialTemplateImagesComponent implements AfterViewInit {
+export class ColorSpacesComponent extends TutorialImageClass implements AfterViewInit {
 
   @ViewChild('canvas1') canvas1: DrawCanvasComponent;
   @ViewChild('canvas2') canvas2: DrawCanvasComponent;

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
 
 declare var cv: any;
 
@@ -9,7 +10,7 @@ declare var cv: any;
   templateUrl: './spectral-filtering.component.html',
   styleUrls: ['./spectral-filtering.component.scss']
 })
-export class SpectralFilteringComponent extends TutorialTemplateImagesComponent {
+export class SpectralFilteringComponent extends TutorialImageClass {
 
   width: number=256;
 

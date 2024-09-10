@@ -39,6 +39,15 @@
   ]
 },
 {
+  "name": "Miscellaneous",
+  "content": [
+    {
+      "name": "Phantom",
+      "url": "assets/image_presets/phantom.png"
+    }
+  ]	
+},
+{
   "name": "Color images",
   "content": [
     {

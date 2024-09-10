@@ -9,7 +9,7 @@ import { OpenCVState } from 'ngx-opencv';
 import { __values } from 'tslib';
 import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 import { StructuralElement } from './structuralElement';
-
+import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
 declare var cv: any;
 
 @Component({
@@ -18,7 +18,7 @@ declare var cv: any;
   styleUrls: ['./morpho-tools.component.scss'],
 })
 export class MorphoToolsComponent
-  extends TutorialTemplateImagesComponent
+  extends TutorialImageClass
   implements AfterViewInit
 {
   @ViewChild('elementCanvasVisu', { static: true })

@@ -29,7 +29,7 @@
     </ng-container>
 
     <ng-container ngProjectAs="[centerContent]">
-        <app-draw-canvas class="main-canvas" [width]="512" #inputCanvas [drawable]="false" title="Canvas" [roi]="rois"
+        <app-draw-canvas class="w-1/2" [width]="512" #inputCanvas [drawable]="false" title="Canvas" [roi]="rois"
             [drawable]="true"
             [brushRadius]="brushSizeSlider.value"
             [BWOption]="true" [profileOption]="false" (roiChanged)="updateCanvasROI($event)">

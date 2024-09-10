@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { EChartsOption, graphic } from 'echarts';
 import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
 
 declare var cv: any;
 
@@ -10,7 +11,7 @@ declare var cv: any;
   styleUrls: ['./image-histogram.component.scss'],
 })
 export class ImageHistogramComponent
-  extends TutorialTemplateImagesComponent
+  extends TutorialImageClass
   implements AfterViewInit
 {
   inputHistoOptions: EChartsOption;

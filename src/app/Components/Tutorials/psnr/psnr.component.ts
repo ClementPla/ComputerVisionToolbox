@@ -1,14 +1,15 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 import { ROIProperty } from 'src/app/utils/interface';
-import { ROIComponent } from '../../Toolbox/roi/roi.component';
+
+import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
 import { gaussianRandom, getMean, getStandardDeviation } from 'src/app/utils/math';
 @Component({
   selector: 'app-psnr',
   templateUrl: './psnr.component.html',
   styleUrls: ['./psnr.component.scss']
 })
-export class PSNRComponent extends TutorialTemplateImagesComponent implements AfterViewInit, OnInit
+export class PSNRComponent extends TutorialImageClass implements AfterViewInit, OnInit
 { 
 
   viewerSize: number = 256;
@@ -49,7 +50,7 @@ export class PSNRComponent extends TutorialTemplateImagesComponent implements Af
   
   override ngAfterViewInit(): void {
     super.ngAfterViewInit();
-    super.loadSelectedFileFromPath('assets/image_presets/poivron.jpeg')
+    super.loadSelectedFileFromPath('assets/image_presets/phantom.png')
 
   }
 
