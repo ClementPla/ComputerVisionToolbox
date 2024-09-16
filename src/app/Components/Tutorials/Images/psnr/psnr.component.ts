@@ -1,8 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 import { ROIProperty } from 'src/app/utils/interface';
 
-import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
 import { gaussianRandom, getMean, getStandardDeviation } from 'src/app/utils/math';
 @Component({
   selector: 'app-psnr',

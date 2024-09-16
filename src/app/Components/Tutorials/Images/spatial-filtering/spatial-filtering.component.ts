@@ -1,7 +1,6 @@
-import { AfterContentInit, AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, Component } from '@angular/core';
 import { Kernel, KernelGenerator } from './kernel';
-import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
-import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
 
 declare var cv: any;
 

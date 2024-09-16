@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter, AfterViewInit, ChangeDetectorRef} from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, AfterContentInit} from '@angular/core';
 import { MatSliderChange } from '@angular/material/slider';
 
 @Component({
@@ -6,7 +6,7 @@ import { MatSliderChange } from '@angular/material/slider';
   templateUrl: './labelled-sliders.component.html',
   styleUrls: ['./labelled-sliders.component.scss']
 })
-export class LabelledSlidersComponent implements OnInit, AfterViewInit {
+export class LabelledSlidersComponent implements OnInit, AfterViewInit, AfterContentInit {
 
   @Input() min:number=1;
   @Input() max:number=100;
@@ -20,6 +20,9 @@ export class LabelledSlidersComponent implements OnInit, AfterViewInit {
   constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+  }
+  ngAfterContentInit(): void {
+    this.cdr.detectChanges()
   }
   ngAfterViewInit(): void {
     this.cdr.detectChanges()

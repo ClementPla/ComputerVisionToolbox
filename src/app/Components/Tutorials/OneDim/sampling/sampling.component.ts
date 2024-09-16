@@ -78,6 +78,7 @@ export class SamplingComponent implements AfterViewInit {
     {
       data: this.sampled_data,
       type: 'bar',
+      barWidth: 2,
     }
     ]
     this.original_graph.title = {

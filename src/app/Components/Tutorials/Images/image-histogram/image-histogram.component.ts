@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { EChartsOption, graphic } from 'echarts';
-import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
-import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
 
 declare var cv: any;
 

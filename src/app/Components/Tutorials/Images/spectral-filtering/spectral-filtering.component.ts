@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { TutorialTemplateImagesComponent } from '../../Toolbox/tutorial-template-images/tutorial-template-images.component';
-import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
 
 declare var cv: any;
 

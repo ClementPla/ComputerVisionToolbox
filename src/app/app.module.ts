@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { FastFourierTransformComponent } from './Components/Tutorials/fast-fourier-transform/fast-fourier-transform.component';
 import { DrawCanvasComponent } from './Components/Toolbox/draw-canvas/draw-canvas.component';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -34,27 +33,35 @@ import {
 } from '@angular-material-components/color-picker';
 
 
-
 import { MatSliderModule } from '@angular/material/slider';
 import { HomeComponent } from './Components/home/home.component';
 import { HomeCardComponent } from './Components/home-card/home-card.component';
-import { SpatialFilteringComponent } from './Components/Tutorials/spatial-filtering/spatial-filtering.component';
-import { KernelElementComponent } from './Components/Tutorials/spatial-filtering/kernel-element/kernel-element.component';
+import { SpatialFilteringComponent } from './Components/Tutorials/Images/spatial-filtering/spatial-filtering.component';
+import { KernelElementComponent } from './Components/Tutorials/Images/spatial-filtering/kernel-element/kernel-element.component';
 import { LabelledSlidersComponent } from './Components/labelled-sliders/labelled-sliders.component';
-import { ColorSpacesComponent } from './Components/Tutorials/color-spaces/color-spaces.component';
-import { MorphoToolsComponent } from './Components/Tutorials/morpho-tools/morpho-tools.component';
-import { StructuralElementComponent } from './Components/Tutorials/morpho-tools/structural-element/structural-element.component';
+import { MorphoToolsComponent } from './Components/Tutorials/Images/morpho-tools/morpho-tools.component';
+import { StructuralElementComponent } from './Components/Tutorials/Images/morpho-tools/structural-element/structural-element.component';
 import { TutorialTemplateImagesComponent } from './Components/Toolbox/tutorial-template-images/tutorial-template-images.component';
-import { ImageHistogramComponent } from './Components/Tutorials/image-histogram/image-histogram.component';
-import { WeightsLossComponent } from './Components/Tutorials/MachineLearning/weights-loss/weights-loss.component';
-import { SamplingComponent } from './Components/Tutorials/OneDim/sampling/sampling.component';
 import { TutorialTemplateComponent } from './Components/Toolbox/tutorial-template/tutorial-template.component';
 import { LoadingButtonsComponent } from './Components/Toolbox/loading-buttons/loading-buttons.component';
 import { ImagePresetsComponent } from './Components/Presets/image-presets/image-presets.component';
-import { SpectralFilteringComponent } from './Components/Tutorials/spectral-filtering/spectral-filtering.component';
-import { PSNRComponent } from './Components/Tutorials/psnr/psnr.component';
 import { HandleComponent } from './Components/Toolbox/handle/handle.component';
 import { ROIComponent } from './Components/Toolbox/roi/roi.component';
+
+
+
+import { SamplingComponent } from './Components/Tutorials/OneDim/sampling/sampling.component';
+
+
+import { FastFourierTransformComponent } from './Components/Tutorials/Images/fast-fourier-transform/fast-fourier-transform.component';
+import { ImageHistogramComponent } from './Components/Tutorials/Images/image-histogram/image-histogram.component';
+import { SpectralFilteringComponent } from './Components/Tutorials/Images/spectral-filtering/spectral-filtering.component';
+import { ColorSpacesComponent } from './Components/Tutorials/Images/color-spaces/color-spaces.component';
+import { PSNRComponent } from './Components/Tutorials/Images/psnr/psnr.component';
+import { WeightsLossComponent } from './Components/Tutorials/MachineLearning/weights-loss/weights-loss.component';
+
+import { GradientDescentComponent } from './Components/Tutorials/MachineLearning/gradient-descent/gradient-descent.component';
+import { NeuralNetworkComponent } from './Components/Tutorials/MachineLearning/Visu/neural-network/neural-network.component';
 
 
 const openCVConfig: OpenCVConfig = {
@@ -85,6 +92,8 @@ const openCVConfig: OpenCVConfig = {
     PSNRComponent,
     HandleComponent,
     ROIComponent,
+    GradientDescentComponent,
+    NeuralNetworkComponent,
 
   ],
   imports: [

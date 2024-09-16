@@ -1,0 +1,25 @@
+.datapoint{
+    border-radius: 100%;
+    width: .75em;
+    z-index: 250;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border: rgb(192, 192, 192) solid 1px;
+
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+
+}
+.datapoint:hover{
+    scale: 1.5;
+    transform-origin: top left;
+    filter: brightness(1.5);
+}
+
+.canvasContainer{
+    width: 512px;
+    aspect-ratio: 1;
+    border-radius: 1em;
+    overflow: hidden;
+    border: solid white 1px;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+}

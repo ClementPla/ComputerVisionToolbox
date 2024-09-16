@@ -1,10 +1,10 @@
 import { AfterContentChecked, AfterViewInit, Component, destroyPlatform, OnInit, ViewChild} from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { DrawCanvasComponent } from '../../Toolbox/draw-canvas/draw-canvas.component';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
 import { FormControl } from '@angular/forms';
 import {Color, NgxMatColorPickerComponent } from '@angular-material-components/color-picker';
 
-import { TutorialImageClass } from '../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
 declare var cv: any;
 
 @Component({
