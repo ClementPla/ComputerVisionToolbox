@@ -28,7 +28,7 @@ interface Point {
 export class GradientDescentComponent extends TutorialClass implements OnInit, AfterViewInit {
 
   @ViewChild('heatmapCanvas') heatmapCanvas: ElementRef<HTMLCanvasElement>;
-
+  @ViewChild('legendHeatmap') legendHeatmap: ElementRef<HTMLCanvasElement>;
   paramsNormsEcharts: ECharts[] = []
   ctx: CanvasRenderingContext2D;
 
@@ -118,6 +118,7 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
 
   ngAfterViewInit(): void {
     this.ctx = this.heatmapCanvas.nativeElement.getContext('2d')!
+    this.buildHeatmapLegend()
     this.resetDataset()
     this.updateParamsNormsView()
     setInterval(() => {
@@ -136,6 +137,17 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
   getClosestLayer(idx: number) {
     return Math.floor(idx / 2)
   }
+
+  buildHeatmapLegend() {
+    let ctx = this.legendHeatmap.nativeElement.getContext('2d')!
+    let l = spectral.length
+    for (let i = 0; i < this.gridResolution; i++) {
+      ctx.fillStyle = this.colormap(i / this.gridResolution)
+      ctx.fillRect(i, 0, 1, 1)
+    }
+
+  }
+  
   updateParamsNormsView() {
     if(!this.allParamsNorms){
       return

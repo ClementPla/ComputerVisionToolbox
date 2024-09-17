@@ -47,7 +47,7 @@ export class Sigmoid extends Activation {
         this.ctx.push(input);
         this.ctx.push(output);
         for (let i = 0; i < output.data.length; i++) {
-            output.data[i] = 1 / (1 + Math.exp(-output.data[i]));
+            output.data[i] = 1 / (1 + Math.exp(-input.data[i]));
         }
         return output;
     }

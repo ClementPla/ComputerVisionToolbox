@@ -9,7 +9,7 @@ export class Dataset{
     class1Color = "#313695";
     class2Color = "#a50026";
     constructor(){}
-    get(index: number){
+    get(index: number){     
         return this.data[index]
     }
     length(){

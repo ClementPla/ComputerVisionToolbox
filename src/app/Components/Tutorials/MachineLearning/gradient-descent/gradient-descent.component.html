@@ -117,9 +117,27 @@
   <ng-container ngProjectAs="[centerContent]">
 
 
-    <div class="flex gap-4 items-center">
-      <div class="w-1/2">
+    <div class="flex gap-2 items-center">
+      <div class="w-1/2 m-4">
+        <h2>Context</h2>
+        <p>
+          In this setup, each datapoint lies in a 2D space. The color of the datapoint represents the class it belongs to.
+          The goal of the neural network is to learn the decision boundary that separates the two classes in the 2D space.
+          
+        </p>
+        <p>
+          The neural network receives the 2D coordinates of the datapoint as input and outputs the probability of the datapoint belonging to the blue class.
+          The datapoints are randomly generated following different distributions: circular, linear or spiral.
+        </p>
+        <p>
+          The neural network is trained using the gradient descent algorithm. The loss function is the binary cross entropy loss.
+          The network is trained using the backpropagation algorithm.
+        </p>
+        
         <h2>Model</h2>
+        <p>
+          You can visualize the weight's norms of the network's layers evolving over time.
+        </p>
         <mat-accordion>
 
           <mat-expansion-panel *ngFor="let layer of model.layers; index as i" [hideToggle]="layer.description().length == 0" [disabled]="layer.description().length === 0">
@@ -139,7 +157,9 @@
         </mat-accordion>
       </div>
       <div class="flex flex-col items-center gap-4">
-      <div class="relative canvasContainer">
+        <span class="italic"> Left click: Add a red point, Shift+Left Click: Add a blue point, Ctrl+Click: remove a point.</span>  
+
+      <div class="relative canvasContainer w-full">
 
         <ng-container *ngFor="let point of dataset.data; ; index as i">
           <div class="absolute datapoint" [ngStyle]="dataset.getCSSForPoint(i)" (click)="removePoint($event, i)">
@@ -151,11 +171,16 @@
           Your browser does not support the HTML5 canvas tag.
         </canvas>
       </div>
+      <span class="font-semibold">Probability of belonging to the blue class</span>
+      <div class="w-full flex flex-row gap-1 items-center">
+        p=0
+      <canvas #legendHeatmap [width]="this.gridResolution" [height]="'1px'" class="w-full h-[32px]"> </canvas>
+      p=1.0
+    </div>
       <span *ngIf="dataset"> {{this.correctlyClassified}} / {{getDatasetLength()}} points accurately classified ({{(100*this.correctlyClassified / getDatasetLength()).toFixed(1)}}%)</span>
-      </div>
+    </div>
     </div>
 
-    <!-- <div #heatmap echarts [options]="this.heatmapOptions" class="w-1/2 aspect-square" (click)="pauseTraining()" (chartClick)="addPoint($event)"></div> -->
 
   </ng-container>
 
