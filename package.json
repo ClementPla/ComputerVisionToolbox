@@ -37,8 +37,6 @@
     "@angular/cli": "^14.2.4",
     "@angular/compiler-cli": "^14.2.4",
     "@nrwl/angular": "^15.9.7",
-    "@nrwl/nx-cloud": "latest",
-    "@nrwl/workspace": "15.9.4",
     "@schematics/angular": "^14.2.4",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
