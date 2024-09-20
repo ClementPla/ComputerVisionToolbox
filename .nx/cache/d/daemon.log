@@ -1,0 +1,132 @@
+[NX Daemon Server] - 2024-09-20T21:15:28.871Z - Started listening on: \\.\pipe\nx\C:\Users\cleme\AppData\Local\Temp\db7e5271a356f5d0e594\d.sock
+[NX Daemon Server] - 2024-09-20T21:15:28.877Z - [WATCHER]: Subscribed to changes within: c:\Users\cleme\Documents\Projects\ComputerVisionToolbox
+[NX Daemon Server] - 2024-09-20T21:15:28.885Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-09-20T21:15:28.887Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-09-20T21:15:28.887Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-09-20T21:15:28.889Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2024-09-20T21:15:29.004Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:29.142Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2024-09-20T21:15:29.143Z - Time taken for 'total for creating and serializing project graph' 252.63600000000008ms
+[NX Daemon Server] - 2024-09-20T21:15:29.146Z - [WATCHER]: .nx/cache/lockfile.hash was modified
+[NX Daemon Server] - 2024-09-20T21:15:29.147Z - Done responding to the client project-graph
+[NX Daemon Server] - 2024-09-20T21:15:29.147Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-09-20T21:15:29.259Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:29.281Z - [WATCHER]: .nx/cache/nxdeps.json was modified
+[NX Daemon Server] - 2024-09-20T21:15:29.282Z - Time taken for 'hash changed files from watcher' 6.83420000000001ms
+[NX Daemon Server] - 2024-09-20T21:15:29.392Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:29.498Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:29.518Z - Time taken for 'hash changed files from watcher' 9.903900000000021ms
+[NX Daemon Server] - 2024-09-20T21:15:29.578Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:29.995Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:30.012Z - Time taken for 'hash changed files from watcher' 7.910200000000032ms
+[NX Daemon Server] - 2024-09-20T21:15:30.111Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:30.927Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:30.947Z - Time taken for 'hash changed files from watcher' 5.582499999999982ms
+[NX Daemon Server] - 2024-09-20T21:15:30.998Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:32.610Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:32.626Z - Time taken for 'hash changed files from watcher' 7.571200000000317ms
+[NX Daemon Server] - 2024-09-20T21:15:32.712Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:35.932Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:35.947Z - Time taken for 'hash changed files from watcher' 5.0046000000002095ms
+[NX Daemon Server] - 2024-09-20T21:15:36.065Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:42.477Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:42.492Z - Time taken for 'hash changed files from watcher' 5.0560999999997875ms
+[NX Daemon Server] - 2024-09-20T21:15:42.580Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:49.003Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:49.021Z - Time taken for 'hash changed files from watcher' 7.938500000000204ms
+[NX Daemon Server] - 2024-09-20T21:15:49.075Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:15:55.498Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:15:55.516Z - Time taken for 'hash changed files from watcher' 8.27639999999883ms
+[NX Daemon Server] - 2024-09-20T21:15:55.567Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:02.000Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:02.018Z - Time taken for 'hash changed files from watcher' 17.90780000000086ms
+[NX Daemon Server] - 2024-09-20T21:16:02.260Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:08.690Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:08.721Z - Time taken for 'hash changed files from watcher' 19.55220000000554ms
+[NX Daemon Server] - 2024-09-20T21:16:08.776Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:15.222Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:15.258Z - Time taken for 'hash changed files from watcher' 16.315999999998894ms
+[NX Daemon Server] - 2024-09-20T21:16:15.351Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:21.768Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:21.797Z - Time taken for 'hash changed files from watcher' 8.184800000002724ms
+[NX Daemon Server] - 2024-09-20T21:16:22.546Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:29.002Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:29.053Z - Time taken for 'hash changed files from watcher' 22.959500000004482ms
+[NX Daemon Server] - 2024-09-20T21:16:29.254Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:35.676Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:35.713Z - Time taken for 'hash changed files from watcher' 9.713799999997718ms
+[NX Daemon Server] - 2024-09-20T21:16:36.204Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:42.644Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:42.677Z - Time taken for 'hash changed files from watcher' 10.458200000008219ms
+[NX Daemon Server] - 2024-09-20T21:16:42.739Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:49.157Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:49.187Z - Time taken for 'hash changed files from watcher' 8.253100000001723ms
+[NX Daemon Server] - 2024-09-20T21:16:49.239Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:16:55.658Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:16:55.677Z - Time taken for 'hash changed files from watcher' 8.591399999990244ms
+[NX Daemon Server] - 2024-09-20T21:16:55.741Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:17:02.162Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:17:02.190Z - Time taken for 'hash changed files from watcher' 9.174400000003516ms
+[NX Daemon Server] - 2024-09-20T21:17:02.240Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:17:08.660Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:17:08.722Z - Time taken for 'hash changed files from watcher' 7.405100000003586ms
+[NX Daemon Server] - 2024-09-20T21:17:08.744Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:17:15.170Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:17:15.192Z - Time taken for 'hash changed files from watcher' 7.089000000007218ms
+[NX Daemon Server] - 2024-09-20T21:17:15.257Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:17:21.674Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:17:21.693Z - Time taken for 'hash changed files from watcher' 6.085800000000745ms
+[NX Daemon Server] - 2024-09-20T21:17:21.745Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:17:25.592Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:25.655Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:25.716Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:25.778Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:25.856Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:25.919Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:25.981Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.043Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.107Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.168Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.230Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.291Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.354Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.415Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.478Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.547Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.603Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.666Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.729Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.790Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.853Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.917Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:26.980Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.058Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.123Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.186Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.249Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.314Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.376Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.440Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.504Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.576Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.631Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.695Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.771Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.879Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:27.944Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.007Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.069Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.146Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.215Z - [REQUEST]: Updated file-hasher based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-09-20T21:17:28.285Z - Time taken for 'hash changed files from watcher' 12.452299999989918ms
+[NX Daemon Server] - 2024-09-20T21:17:28.352Z - [WATCHER]: 0 file(s) created or restored, 3 file(s) modified, 1 file(s) deleted
+[NX Daemon Server] - 2024-09-20T21:17:28.415Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.477Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.539Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.602Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.668Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.728Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.792Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.854Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.918Z - [WATCHER]: .nx/cache/d/daemon.log was modified
+[NX Daemon Server] - 2024-09-20T21:17:28.981Z - [WATCHER]: .nx/cache/d/daemon.log was modified
