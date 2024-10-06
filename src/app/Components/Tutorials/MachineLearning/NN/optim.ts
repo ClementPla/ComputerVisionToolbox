@@ -1,3 +1,4 @@
+import { clip_grad } from "./math";
 import { Network } from "./network";
 
 export abstract class Optimizer {
@@ -42,6 +43,7 @@ export class SGD extends Optimizer {
         let params = this.model.parameters()
         for (let i = 0; i < params.length; i++) {
             let param = params[i]
+            param = clip_grad(param, -10, 10)
             if (this.weight_decay != 0) {
                 for (let j = 0; j < param.length(); j++) {
                     param.grad[j] += this.weight_decay * param.data[j]

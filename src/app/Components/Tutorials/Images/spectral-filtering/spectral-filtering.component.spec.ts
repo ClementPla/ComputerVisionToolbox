@@ -8,8 +8,8 @@ describe('SpectralFilteringComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SpectralFilteringComponent ]
-    })
+    declarations: [SpectralFilteringComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(SpectralFilteringComponent);

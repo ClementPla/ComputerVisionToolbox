@@ -8,8 +8,8 @@ describe('FastFourierTransformComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FastFourierTransformComponent ]
-    })
+    declarations: [FastFourierTransformComponent]
+})
     .compileComponents();
   });
 

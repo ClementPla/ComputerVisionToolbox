@@ -1,5 +1,5 @@
 import {AfterContentChecked, AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, Input, OnInit, ViewChild } from '@angular/core';
-import { NgxOpenCVService, OpenCVState } from 'ngx-opencv';
+import { NgOpenCVService, OpenCVLoadResult } from 'ng-open-cv';
 import { DrawCanvasComponent } from '../draw-canvas/draw-canvas.component';
 import { TutorialTemplateComponent } from '../tutorial-template/tutorial-template.component';
 import { UIControlService } from 'src/app/Services/uicontrol.service';
@@ -17,24 +17,17 @@ export class TutorialTemplateImagesComponent extends TutorialTemplateComponent i
   @ContentChild('inputCanvas')
   public drawCanvasContained: DrawCanvasComponent;
 
-  // drawCanvas and drawCanvasContained refer to the same object but called from different classes (inherited or base)
   public profileOptions: any;
   public sideMenuContext = true;
-  constructor(protected ngxOpenCv:NgxOpenCVService, public uiservice: UIControlService, private cdr: ChangeDetectorRef) {
+  constructor(protected ngxOpenCv:NgOpenCVService, public uiservice: UIControlService, private cdr: ChangeDetectorRef) {
     super()
   }
 
   ngAfterViewInit(): void {
-    this.ngxOpenCv.cvState.subscribe((cvState: OpenCVState) => {
-      // do something with the state string
-      this.cvState = cvState.state;
-      if (cvState.error) {
-        // handle errors
-      } else if (cvState.loading) {
-        // e.g. show loading indicator
-      } else if (cvState.ready) {
-
-      }
+    this.ngxOpenCv.isReady$.subscribe((val: OpenCVLoadResult) => {
+      console.log('OpenCV.js is ready', val);
+      this.cvState = val.toString();
+    
     });
     this.cdr.detectChanges();
 

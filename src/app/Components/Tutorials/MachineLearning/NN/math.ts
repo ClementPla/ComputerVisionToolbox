@@ -24,7 +24,6 @@ export function matmul(inputA: Tensor, inputB: Tensor, bias: Tensor | undefined)
     let A = inputA.shape[0]
     let B = inputA.shape[1]
     if(B !== inputB.shape[0]){
-        console.log(inputA.shape, inputB.shape)
         throw new Error('Matrix dimensions do not match, got ' + B + ' and ' + inputB.shape[0])
 
 
@@ -36,10 +35,17 @@ export function matmul(inputA: Tensor, inputB: Tensor, bias: Tensor | undefined)
             for(let k = 0; k < B; k++){
                 output.data[i * C + j]  += inputA.data[i * B + k] * inputB.data[k * C + j]
             }
-            if(bias){
+            if(bias !== undefined){
                 output.data[i * C + j] += bias.data[j]
             }
         }
     }
     return output
+}
+
+export function clip_grad(input: Tensor, min: number, max: number): Tensor{
+    for(let i = 0; i < input.length(); i++){
+        input.grad[i] = Math.min(max, Math.max(min, input.grad[i]))
+    }
+    return input
 }

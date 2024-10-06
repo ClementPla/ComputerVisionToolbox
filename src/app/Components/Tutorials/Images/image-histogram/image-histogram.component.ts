@@ -345,8 +345,8 @@ export class ImageHistogramComponent
 
   override ngAfterViewInit(): void {
     super.ngAfterViewInit();
-    this.ngxOpenCv.cvState.subscribe((cvState) => {
-      this.cvState = cvState.state;
+    this.ngxOpenCv.isReady$.subscribe((cvState) => {
+      this.cvState = cvState;
       if (cvState.ready) {
         this.updateHistogram();
       }

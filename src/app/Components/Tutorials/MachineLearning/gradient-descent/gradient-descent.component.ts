@@ -1,23 +1,17 @@
-import { AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial';
 
 import { FullyConnected } from '../NN/fc';
 
 import { Network } from '../NN/network';
 import { Tensor } from '../NN/tensor';
-import { Activation, Identity, RELU, Sigmoid, Softmax, TanH } from '../NN/activation';
+import { Identity, RELU, Sigmoid, TanH } from '../NN/activation';
 import { ECharts, EChartsOption } from 'echarts';
 import { Datapoint, Dataset } from '../NN/dataset';
 import { Trainer } from '../NN/trainer';
 import { CrossEntropyLoss, MSELoss } from '../NN/loss';
 import { SGD } from '../NN/optim';
 import { spectral } from 'src/app/utils/colormap';
-
-interface Point {
-  x: number;
-  y: number;
-  label: number;
-}
 
 
 @Component({
@@ -34,7 +28,7 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
 
   model: Network;
   dataset: Dataset = new Dataset();
-  gridResolution: number = 25;
+  gridResolution: number = 15;
   trainer: Trainer;
   correctlyClassified: number = 0;
 
@@ -125,7 +119,7 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
       if (this.isTraining) {
         this.updateChart()
       }
-    }, 50)
+    }, 75)
 
     setInterval(() => {
       if (this.isTraining) {
@@ -476,15 +470,22 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
     if (this.batch_size) {
       if (this.isTraining) {
         this.trainer.stopTraining()
-        this.trainer.train(this.batch_size)
+
+        setTimeout(() => {
+          this.restartTraining()
+        }, 0)
       }
     }
   }
 
   resetDataset() {
+    
     if (this.n_points === undefined || this.batch_size === undefined) {
       return
     }
+    
+    this.batch_size = Math.min(this.n_points, this.batch_size)
+
     let dataset = new Dataset()
     if (this.datasetType == 'circular') {
       dataset.createCircularPoints(this.n_points);
@@ -503,6 +504,7 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
         this.trainer.train(this.batch_size)
       }
     }
+
     if (this.model) {
       this.updateChart()
     }
@@ -522,6 +524,9 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
   }
 
   colormap(x: number) {
+    if(isNaN(x)){
+      x = 0
+    }
     let l = spectral.length
     let idx = Math.floor(x * l)
     idx = Math.min(l - 1, idx)

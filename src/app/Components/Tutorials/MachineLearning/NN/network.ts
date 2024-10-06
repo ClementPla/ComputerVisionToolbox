@@ -25,15 +25,17 @@ export class Network {
         this.layers.splice(position, 1);
     }
 
-    forward(input: Tensor | Tensor[]): Tensor {
+    forward(input: Tensor | Tensor[] | null): Tensor {
         let activations = input;
         for (let i = 0; i < this.layers.length; i++) {
-
-
             activations = this.layers[i].forward(activations);
         }
         if (activations instanceof Array) {
             activations = activations[0];
+        }
+
+        if (activations === null) {
+            throw new Error("Activations cannot be null");
         }
         return activations;
     }
@@ -56,7 +58,7 @@ export class Network {
         }
     }
 
-    backward(output: Tensor) {
+    backward(output: Tensor | null) {
         for (let i = this.layers.length - 1; i >= 0; i--) {
             output = this.layers[i].backward(output);
         }

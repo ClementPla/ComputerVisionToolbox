@@ -8,8 +8,8 @@ describe('GradientDescentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GradientDescentComponent ]
-    })
+    declarations: [GradientDescentComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(GradientDescentComponent);

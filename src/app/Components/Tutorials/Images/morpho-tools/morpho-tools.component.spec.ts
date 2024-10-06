@@ -8,8 +8,8 @@ describe('MorphoToolsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MorphoToolsComponent ]
-    })
+    declarations: [MorphoToolsComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(MorphoToolsComponent);

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NgxOpenCVService, OpenCVState} from 'ngx-opencv';
+import { NgxOpenCVService} from 'ngx-opencv';
 
 @Injectable({
   providedIn: 'root'

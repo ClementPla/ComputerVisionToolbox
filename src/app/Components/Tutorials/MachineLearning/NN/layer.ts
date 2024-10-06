@@ -7,9 +7,9 @@ export abstract class Layer{
     constructor() {
         this.ctx = [];
     }
-    abstract forward(input: Tensor | Tensor[]): Tensor;
+    abstract forward(input: Tensor | Tensor[] | null): Tensor;
 
-    abstract backward(gradient: Tensor): Tensor;
+    abstract backward(gradient: Tensor| null): Tensor;
 
     parameters(): Tensor[] | null{
         return null;

@@ -8,8 +8,8 @@ describe('WeightsLossComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ WeightsLossComponent ]
-    })
+    declarations: [WeightsLossComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(WeightsLossComponent);

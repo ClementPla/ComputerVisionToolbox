@@ -8,8 +8,8 @@ describe('HandleComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HandleComponent ]
-    })
+    declarations: [HandleComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(HandleComponent);

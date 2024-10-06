@@ -11,6 +11,7 @@ import { SpatialFilteringComponent } from './Components/Tutorials/Images/spatial
 import { SpectralFilteringComponent } from './Components/Tutorials/Images/spectral-filtering/spectral-filtering.component';
 import { PSNRComponent } from './Components/Tutorials/Images/psnr/psnr.component';
 import { GradientDescentComponent } from './Components/Tutorials/MachineLearning/gradient-descent/gradient-descent.component';
+import { OptimizerComponent } from './Components/Tutorials/MachineLearning/optimizer/optimizer.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch:'full'},
@@ -24,7 +25,8 @@ const routes: Routes = [
   {path:'sampling', component:SamplingComponent},
   {path:'spectralFiltering', component:SpectralFilteringComponent},
   {path:'PSNR', component:PSNRComponent},
-  {path:'gradientDescent', component:GradientDescentComponent}
+  {path:'gradientDescent', component:GradientDescentComponent},
+  {path: 'optimizer', component: OptimizerComponent}
 
 ];
 @NgModule({

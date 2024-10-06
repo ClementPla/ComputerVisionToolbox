@@ -56,9 +56,7 @@ export class CrossEntropyLoss extends Layer {
             }
 
         }
-        loss.data[0] *= -1;
-        loss.data[0] /= B;
-
+        loss.data[0] /= -Math.max(B,1);
         return loss
     }
 

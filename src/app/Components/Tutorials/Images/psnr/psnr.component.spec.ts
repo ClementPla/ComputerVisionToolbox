@@ -8,8 +8,8 @@ describe('PSNRComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PSNRComponent ]
-    })
+    declarations: [PSNRComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(PSNRComponent);

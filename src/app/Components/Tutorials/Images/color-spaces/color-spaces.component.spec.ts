@@ -8,8 +8,8 @@ describe('ColorSpacesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ColorSpacesComponent ]
-    })
+    declarations: [ColorSpacesComponent]
+})
     .compileComponents();
   });
 

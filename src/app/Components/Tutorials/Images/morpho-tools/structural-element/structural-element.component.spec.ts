@@ -8,8 +8,8 @@ describe('StructuralElementComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StructuralElementComponent ]
-    })
+    declarations: [StructuralElementComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(StructuralElementComponent);

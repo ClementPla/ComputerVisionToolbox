@@ -8,8 +8,8 @@ describe('SpatialFilteringComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SpatialFilteringComponent ]
-    })
+    declarations: [SpatialFilteringComponent]
+})
     .compileComponents();
   });
 

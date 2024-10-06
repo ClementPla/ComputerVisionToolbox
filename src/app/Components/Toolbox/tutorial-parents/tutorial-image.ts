@@ -1,14 +1,15 @@
 import {AfterContentChecked, AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, Directive, Input, OnInit, ViewChild } from '@angular/core';
-import { NgxOpenCVService, OpenCVState } from 'ngx-opencv';
+import { NgOpenCVService, OpenCVLoadResult } from 'ng-open-cv';
 import { DrawCanvasComponent } from '../draw-canvas/draw-canvas.component';
 import { TutorialClass } from './tutorial';
 import { UIControlService } from 'src/app/Services/uicontrol.service';
+import { min } from 'rxjs';
 
 @Directive({
 })
 export class TutorialImageClass extends TutorialClass implements AfterViewInit {
 
-  cvState: string;
+  cvState: OpenCVLoadResult;
 
   @ContentChild('outputCanvas')
   protected outputCanvasContained: DrawCanvasComponent; // This is the same thing as the ViewChild, but called from the Parent Class
@@ -25,14 +26,14 @@ export class TutorialImageClass extends TutorialClass implements AfterViewInit {
   public sideMenuContext = true;
 
 
-  constructor(protected ngxOpenCv:NgxOpenCVService, public uiservice: UIControlService, private cdr: ChangeDetectorRef) {
+  constructor(protected ngxOpenCv:NgOpenCVService, public uiservice: UIControlService, private cdr: ChangeDetectorRef) {
     super()
   }
 
   ngAfterViewInit(): void {
-    this.ngxOpenCv.cvState.subscribe((cvState: OpenCVState) => {
+    this.ngxOpenCv.isReady$.subscribe((cvState: OpenCVLoadResult) => {
       // do something with the state string
-      this.cvState = cvState.state;
+      this.cvState = cvState;
       if (cvState.error) {
         // handle errors
       } else if (cvState.loading) {
@@ -97,6 +98,8 @@ export class TutorialImageClass extends TutorialClass implements AfterViewInit {
       yAxis: [
         {
           type: 'value',
+          min: 0,
+          max: 275,
         },
       ],
       series: [

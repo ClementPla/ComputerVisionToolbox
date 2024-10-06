@@ -8,8 +8,8 @@ describe('NeuralNetworkComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NeuralNetworkComponent ]
-    })
+    declarations: [NeuralNetworkComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(NeuralNetworkComponent);

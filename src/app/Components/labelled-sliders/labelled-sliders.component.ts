@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, AfterContentInit} from '@angular/core';
+
 import { MatSliderChange } from '@angular/material/slider';
 
 @Component({

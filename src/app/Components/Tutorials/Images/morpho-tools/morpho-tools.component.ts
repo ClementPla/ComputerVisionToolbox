@@ -5,7 +5,7 @@ import {
   ElementRef,
   AfterViewInit,
 } from '@angular/core';
-import { OpenCVState } from 'ngx-opencv';
+import { OpenCVLoadResult } from 'ng-open-cv';
 import { __values } from 'tslib';
 import { StructuralElement } from './structuralElement';
 import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
@@ -35,9 +35,9 @@ export class MorphoToolsComponent
   }
 
   updateVisu() {
-    this.ngxOpenCv.cvState.subscribe((cvState: OpenCVState) => {
+    this.ngxOpenCv.isReady$.subscribe((cvState: OpenCVLoadResult) => {
       // do something with the state string
-      this.cvState = cvState.state;
+      this.cvState = cvState;
       if (cvState.ready) {
         let mat = this.getStructuringMat(
           this.ksize,

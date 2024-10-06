@@ -8,8 +8,8 @@ describe('ROIComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ROIComponent ]
-    })
+    declarations: [ROIComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(ROIComponent);
