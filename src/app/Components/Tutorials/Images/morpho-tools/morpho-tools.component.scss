@@ -1,0 +1,24 @@
+
+.canvas {
+  width: 45%;
+  min-width: 256px;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.structuralElementVisu {
+  width: 128px;
+  aspect-ratio: 1;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  margin: 1em;
+}
+
+.profile-graph{
+  min-width: 300px;
+  padding: 0em 0.5em;
+}

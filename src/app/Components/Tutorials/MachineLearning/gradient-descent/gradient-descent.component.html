@@ -1,0 +1,192 @@
+<app-tutorial-template [rightDrawer]="true">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-2">
+      <button mat-raised-button class="w-full" color="primary" (click)="switchTraining()">
+        {{isTraining? 'Pause training': 'Start training'}}
+      </button>
+      <button mat-raised-button class="w-full" color="primary" (click)="resetModel()">
+        Reset model
+      </button>
+      <mat-accordion multi>
+        <mat-expansion-panel expanded>
+          <mat-expansion-panel-header>
+            <mat-panel-title> Data </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="flex flex-col gap-1">
+            <span>Distribution</span>
+            <mat-button-toggle-group [(ngModel)]="datasetType" (change)="resetDataset()" class="w-full justify-stretch">
+              <mat-button-toggle value="circular" class="flex-1">
+                Circular
+              </mat-button-toggle>
+              <mat-button-toggle value="linear" class="flex-1">
+                Linear
+              </mat-button-toggle>
+              <mat-button-toggle value="spiral" class="flex-1">
+                Spiral
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+
+            <app-labelled-sliders [min]="2" [max]="256" [step]="1" [title]="'Number of points'" [(value)]="n_points"
+              (valueChange)="resetDataset()">
+            </app-labelled-sliders>
+
+            <app-labelled-sliders [min]="1" [max]="n_points" [title]="'Batch size'" [(value)]="batch_size"
+              (valueChange)="updateBatchSize()">
+            </app-labelled-sliders>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel expanded>
+
+          <mat-expansion-panel-header>
+            <mat-panel-title> Network </mat-panel-title>
+
+          </mat-expansion-panel-header>
+          <div class="flex flex-col gap-1">
+
+            <app-labelled-sliders [min]="0" [max]="6" [title]="'Number of hidden layers'" [(value)]="n_layers"
+              (valueChange)="changeNumberLayer()">
+            </app-labelled-sliders>
+
+            <app-labelled-sliders [min]="4" [max]="64" [title]="'Number of neurons per layer'" [(value)]="n_neurons"
+              (valueChange)="changeNumberNeurons()">
+            </app-labelled-sliders>
+            <div class="flex flex-col gap-1">
+              <span>Activation function</span>
+            <mat-button-toggle-group [(ngModel)]="currentActivation" (change)="changeActivation()">
+              <mat-button-toggle value="tanh">
+                TanH
+              </mat-button-toggle>
+              <mat-button-toggle value="relu">
+                RELU
+              </mat-button-toggle>
+              <mat-button-toggle value="sigmoid">
+                Sigmoid
+              </mat-button-toggle>
+              <mat-button-toggle value="identity">
+                Identity
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+            </div>
+
+
+
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+          <mat-expansion-panel-header>
+            <mat-panel-title> Training </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="flex flex-col gap-1">
+            <app-labelled-sliders [min]="0.0001" [max]="0.5" [step]="0.001" [title]="'Learning rate'" [(value)]="lr"
+              (valueChange)="changeLearningRate()">
+            </app-labelled-sliders>
+
+            <app-labelled-sliders [min]="0." [max]="0.1" [step]="0.00001" [title]="'Weight decay'" [(value)]="weight_decay"
+              (valueChange)="changeWeightDecay()">
+            </app-labelled-sliders>
+
+            <span>Optimizer</span>
+            <mat-button-toggle-group [(ngModel)]="optimizerType" (change)="changeOptimizer()" class="mb-2">
+              <mat-button-toggle value="sgd" class="flex-1">
+                SGD
+              </mat-button-toggle>
+              <mat-button-toggle value="adam" class="flex-1">
+                Adam
+              </mat-button-toggle>
+              <mat-button-toggle value="RMSPROP" class="flex-1">
+                RMSPROP
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+
+            <button mat-raised-button class="w-full" color="primary" (click)="trainer.optimizer.reset_momentums()">
+              Reset momentums
+            </button>
+
+          </div>
+        </mat-expansion-panel>
+        
+      </mat-accordion>
+     
+    </div>
+
+
+
+
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+
+
+    <div class="flex gap-2 items-center">
+      <div class="w-1/2 m-4">
+        <h2>Context</h2>
+        <p>
+          In this setup, each datapoint lies in a 2D space. The color of the datapoint represents the class it belongs to.
+          The goal of the neural network is to learn the decision boundary that separates the two classes in the 2D space.
+          
+        </p>
+        <p>
+          The neural network receives the 2D coordinates of the datapoint as input and outputs the probability of the datapoint belonging to the blue class.
+          The datapoints are randomly generated following different distributions: circular, linear or spiral.
+        </p>
+        <p>
+          The neural network is trained using the gradient descent algorithm. The loss function is the binary cross entropy loss.
+          The network is trained using the backpropagation algorithm.
+        </p>
+        
+        <h2>Model</h2>
+        <p>
+          You can visualize the weight's norms of the network's layers evolving over time.
+        </p>
+        <mat-accordion>
+
+          <mat-expansion-panel *ngFor="let layer of model.layers; index as i" [hideToggle]="layer.description().length == 0" [disabled]="layer.description().length === 0">
+            <mat-expansion-panel-header >
+              <mat-panel-title>
+                {{layer.getName()}}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="flex flex-col gap-1">
+              <ng-container *ngIf="layer.description().length>0">
+                <div *ngIf="allParamsNorms" #paramsNorms echarts [options]="allParamsNorms[getClosestLayer(i)]"
+                (chartInit)="paramsNormsEcharts.push($event)"
+                ></div>
+              </ng-container>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+      <div class="flex flex-col items-center gap-4">
+        <span class="italic"> Left click: Add a red point, Shift+Left Click: Add a blue point, Ctrl+Click: remove a point.</span>  
+
+      <div class="relative canvasContainer w-full">
+
+        <ng-container *ngFor="let point of dataset.data; ; index as i">
+          <div class="absolute datapoint" [ngStyle]="dataset.getCSSForPoint(i)" (click)="removePoint($event, i)">
+          </div>
+        </ng-container>
+        <canvas #heatmapCanvas [width]="this.gridResolution" [height]="this.gridResolution"
+        (click)="addPoint($event)"
+          class="w-full aspect-square absolute">
+          Your browser does not support the HTML5 canvas tag.
+        </canvas>
+      </div>
+      <span class="font-semibold">Probability of belonging to the blue class</span>
+      <div class="w-full flex flex-row gap-1 items-center">
+        p=0
+      <canvas #legendHeatmap [width]="this.gridResolution" [height]="'1px'" class="w-full h-[32px]"> </canvas>
+      p=1.0
+    </div>
+      <span *ngIf="dataset"> {{this.correctlyClassified}} / {{getDatasetLength()}} points accurately classified ({{(100*this.correctlyClassified / getDatasetLength()).toFixed(1)}}%)</span>
+    </div>
+    </div>
+
+
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerRight]">
+    <div echarts [options]="this.lossOptions" class="w-80 aspect-square"></div>
+  </ng-container>
+
+
+</app-tutorial-template>

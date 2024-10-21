@@ -1,0 +1,36 @@
+<div class="canvas-container" (mousemove)="updateHandleDragPos($event)"
+  [style.cursor]="this.drawable ? 'none' : 'default'">
+  <p *ngIf="title" class="title select-none">{{ title }}</p>
+  <span *ngIf="BWOption" class="BW-toggle toggle">
+    <mat-slide-toggle [(ngModel)]="isBWChecked" color="primary" (change)="BWToggle()">B&W</mat-slide-toggle>
+  </span>
+
+  <span *ngIf="profileOption" class="Profile-toggle toggle">
+    <mat-slide-toggle [(ngModel)]="profile" color="primary" (change)="updateCanvasUI()">profile</mat-slide-toggle>
+  </span>
+
+  <div #cursor class="cursor" *ngIf="this.drawable" [style.top.px]="cursorPosition.y" [style.left.px]="cursorPosition.x"
+    [style.width.px]="getCursorTransform()">
+    <div class="cursor-radius" [style.border-color]="drawColor"></div>
+    <mat-icon>brush</mat-icon>
+  </div>
+  <canvas #canvas id="canvasVisu" [ngClass]="{ BWFilter: isBWChecked || OnlyBW }"></canvas>
+
+  <!-- UI Canvas -->
+  <canvas #canvasUI id="canvasUI" [width]="UIwidth" class="pointer-events-none"></canvas>
+
+  <!-- Profile Handles -->
+  <div [ngClass]="{'hidden': !this.profile}">
+    <app-handle #handleProfile class="handle" [handlePos]="{x: 50, y:100}" [scale]="getScreenToCanvasScale()">
+    </app-handle>
+    <app-handle #handleProfile class="handle" [handlePos]="{x: 250, y:100}" [scale]="getScreenToCanvasScale()">
+    </app-handle>
+  </div>
+
+  <!-- ROI HANDLE -->
+
+  <app-roi #ROI [point1]="r.initial1" [point2]="r.initial2" [scale]="getScreenToCanvasScale()"
+    [property]="r" *ngFor="let r of roi">
+  </app-roi>
+
+</div>

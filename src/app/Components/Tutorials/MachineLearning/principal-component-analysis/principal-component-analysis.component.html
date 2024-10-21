@@ -1,0 +1,21 @@
+<app-tutorial-template [rightDrawer]="false">
+    <ng-container ngProjectAs="[drawerLeft]">
+
+        <app-labelled-sliders
+        [(value)]="covariance"
+        [min]="-5"
+        [max]="5"
+        [step]="0.1"
+        (valueChange)="generateData()">
+
+        </app-labelled-sliders>
+    </ng-container>
+    <ng-container ngProjectAs="[centerContent]">
+        <div class="grid grid-cols-2 ">
+            <div echarts [options]="option" class="aspect-square max-w-[512px] w-full"
+                (chartInit)="onChartInit($event)"></div>
+
+        </div>
+    </ng-container>
+
+</app-tutorial-template>

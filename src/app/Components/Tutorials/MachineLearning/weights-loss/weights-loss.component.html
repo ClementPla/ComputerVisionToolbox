@@ -1,0 +1,48 @@
+<app-tutorial-template [rightDrawer]="false">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <h3>
+      Tunable parameters
+    </h3>
+    <app-labelled-sliders
+    [max]="w_max"
+    [min]="w_min"
+    [step]="0.1"
+    [value]="w"
+    (input)="update_w($event)"
+    title="Slope">
+    </app-labelled-sliders>
+
+    <app-labelled-sliders
+    [max]="b_max"
+    [min]="b_min"
+    [step]="0.1"
+    [value]="b"
+    (input)="update_b($event)"
+    title="Intercept">
+    </app-labelled-sliders>
+
+    <h3>
+      Samples distribution
+    </h3>
+    <mat-button-toggle-group name="fontStyle" aria-label="Font Style" (change)="change_points_distributions($event)">
+      <mat-button-toggle value="linear"
+      [checked]="lin_separability">Linear</mat-button-toggle>
+      <mat-button-toggle value="non_linear">Circular</mat-button-toggle>
+
+    </mat-button-toggle-group>
+
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+    <div echarts [options]="data_chart" class="graph"
+(chartInit)="onChartInit($event)"
+></div>
+
+<div echarts [options]="option_3d_graph" class="graph"
+(chartInit)="onChartInit3D($event)"
+>
+</div>
+
+  </ng-container>
+
+
+</app-tutorial-template>

@@ -1,0 +1,57 @@
+<app-tutorial-template [rightDrawer]="true">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-2">
+      <button mat-raised-button class="w-full" color="primary" (click)="switchTraining()">
+        {{isTraining? 'Pause training': 'Start training'}}
+      </button>
+
+      <button mat-raised-button class="w-full" color="primary" (click)="resetToInitialPoint()">
+        Reset
+      </button>
+      <mat-divider></mat-divider>
+
+      <app-labelled-sliders [min]="0" [max]="0.3" [step]="0.001" [value]="lr" (valueChange)="changeLearningRate($event)"
+        [title]="'Learning rate'">
+
+
+      </app-labelled-sliders>
+      <mat-divider></mat-divider>
+      <span>Optimizer</span>
+      <mat-button-toggle-group [(ngModel)]="optimizerType" (change)="changeOptimizer()" class="mb-2">
+        <mat-button-toggle value="sgd" class="flex-1">
+          SGD
+        </mat-button-toggle>
+        <mat-button-toggle value="adam" class="flex-1">
+          Adam
+        </mat-button-toggle>
+        <mat-button-toggle value="RMSPROP" class="flex-1">
+          RMSPROP
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <button mat-raised-button class="w-full" color="primary" (click)="this.optim.reset_momentums()">
+        Reset momentums
+      </button>
+
+      <mat-divider></mat-divider>
+
+      <mat-checkbox [(ngModel)]="noisyGradient">
+        Noisy gradient
+      </mat-checkbox>
+
+
+
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="grid grid-cols-2 w-full">
+      <div echarts [options]="option" (chartClick)="onChartClick($event)" [merge]="data" class="graph"
+        (chartInit)="onChartInit($event)"></div>
+
+      <div echarts [options]="lossPlot" (chartInit)="onLossChartInit($event)" class="graph"></div>
+    </div>
+
+  </ng-container>
+
+</app-tutorial-template>

@@ -1,0 +1,138 @@
+<app-tutorial-template-images>
+  Fourier Transform
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <mat-button-toggle-group name="representationNorm" [(ngModel)]="repsentationNorm"
+      (change)="updateFFT()">
+      <mat-button-toggle value="amplitude">A</mat-button-toggle>
+      <mat-button-toggle value="logAmplitude">log(A)</mat-button-toggle>
+      <mat-button-toggle value="logAmplitudeOne">log(1+A)</mat-button-toggle>
+
+    </mat-button-toggle-group>
+    <hr/>
+
+    <app-labelled-sliders #brushSizeSlider title="Brush Size">
+    </app-labelled-sliders>
+    <hr />
+
+    <button
+      class="fillWidth"
+      mat-raised-button
+      color="primary"
+      (click)="drawGaussian()"
+    >
+      Draw Gaussian
+    </button>
+    <mat-slide-toggle
+      #toggleAxis
+      class="example-margin"
+      color="primary"
+      labelPosition="before"
+    >
+      Independant axis
+    </mat-slide-toggle>
+    <ng-container *ngIf="toggleAxis.checked; else singleGaussAxis">
+      <app-labelled-sliders
+        title="Gaussian STD X"
+        [min]="0.5"
+        [max]="128"
+        [step]="0.5"
+        [(value)]="this.gaussStdX"
+        thumbLabel
+        tickInterval="auto"
+        (valueChange)="drawGaussian()"
+      >
+      </app-labelled-sliders>
+
+      <app-labelled-sliders
+        title="Gaussian STD Y"
+        [min]="0.5"
+        [max]="128"
+        [step]="0.5"
+        [(value)]="this.gaussStdY"
+        thumbLabel
+        tickInterval="auto"
+        (valueChange)="drawGaussian()"
+      >
+      </app-labelled-sliders>
+    </ng-container>
+    <ng-template #singleGaussAxis>
+      <app-labelled-sliders
+        title="Gaussian STD"
+        [min]="0.5"
+        [max]="128"
+        [step]="0.5"
+        [(value)]="this.gaussStdY"
+        [(value)]="this.gaussStdX"
+        thumbLabel
+        tickInterval="auto"
+        (valueChange)="drawGaussian()"
+      >
+      </app-labelled-sliders>
+    </ng-template>
+
+    <hr />
+
+    <button
+      class="fillWidth"
+      mat-raised-button
+      color="primary"
+      (click)="drawSin()"
+    >
+      Draw sin(x)
+    </button>
+
+    <app-labelled-sliders
+      title="Angle"
+      [min]="0"
+      [max]="180"
+      [step]="2.5"
+      [(value)]="this.angle"
+      thumbLabel
+      tickInterval="auto"
+      (valueChange)="drawSin()"
+    >
+    </app-labelled-sliders>
+
+    <app-labelled-sliders
+      title="Frequency"
+      [min]="0"
+      [max]="256"
+      [step]="1.0"
+      [(value)]="this.frequency"
+      thumbLabel
+      tickInterval="auto"
+      (valueChange)="drawSin()"
+    >
+    </app-labelled-sliders>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerRight]">
+
+    <h2>Profile</h2>
+    <div echarts [options]="profileOptions" class="profile-graph"></div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <app-draw-canvas
+      #inputCanvas
+      class="canvas"
+      [width]="256"
+      (drawingEnded)="updateFFT()"
+      [drawable]="true"
+      [OnlyBW]="true"
+      [brushRadius]="brushSizeSlider.value"
+      title="Canvas"
+    ></app-draw-canvas>
+
+    <app-draw-canvas
+      #outputCanvas
+      [drawable]="false"
+      class="canvas"
+      title="Fourier Transform"
+      [profileOption]="true"
+      (profileChanged)="updateProfile()"
+    >
+    </app-draw-canvas>
+  </ng-container>
+</app-tutorial-template-images>

@@ -1,0 +1,84 @@
+<app-tutorial-template-images>
+  Morphological Transformations
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <app-labelled-sliders #brushSizeSlider title="Brush Size">
+    </app-labelled-sliders>
+
+    <hr />
+
+    <app-labelled-sliders
+      [min]="3"
+      [max]="25"
+      [step]="2"
+      [title]="'Element size'"
+      [(value)]="ksize"
+      (valueChange)="updateVisu()"
+    >
+    </app-labelled-sliders>
+    <span>
+      <mat-button-toggle-group
+        [(ngModel)]="structuralElementType"
+        (change)="updateVisu()"
+      >
+        <mat-button-toggle value="circle">
+          <mat-icon>toll</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="square">
+          <mat-icon>crop_square</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="cross"
+          ><mat-icon>games</mat-icon></mat-button-toggle
+        >
+      </mat-button-toggle-group>
+    </span>
+    <canvas #elementCanvasVisu class="structuralElementVisu"> </canvas>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="addFilter()"
+      class="fillWidth"
+    >
+      Add
+    </button>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerRight]">
+    <h2>Profile</h2>
+
+    <div echarts [options]="profileOptions" class="profile-graph"></div>
+
+    <h2>Active filters</h2>
+    <hr />
+    <app-structural-element
+      *ngFor="let kernel of listKernels"
+      [kernel]="kernel"
+      (updateFilters)="updateFilters()"
+    >
+    </app-structural-element>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <app-draw-canvas
+      [width]="width"
+      class="canvas"
+      #inputCanvas
+      (drawingEnded)="applyFilter()"
+      [drawable]="true"
+      [BWOption]="false"
+      [OnlyBW]="true"
+      [brushRadius]="brushSizeSlider.value"
+      title="Canvas"
+    ></app-draw-canvas>
+    <app-draw-canvas
+      #outputCanvas
+      class="canvas"
+      [width]="width"
+      [profileOption]="true"
+      [drawable]="false"
+      title="Result"
+      (profileChanged)="updateProfile()"
+    >
+    </app-draw-canvas>
+  </ng-container>
+</app-tutorial-template-images>

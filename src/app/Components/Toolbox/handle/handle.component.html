@@ -1,0 +1,11 @@
+<div class="handle" (mousedown)="startHandleDrag($event, 1)" (touchstart)="startHandleDrag($event, 1)"
+    [ngClass]="{'cornerHandle': !isAnchor, 'anchorHandle animate-pulse': isAnchor}"
+    (touchstop)="stopHandleDrag()" (mouseup)="stopHandleDrag()" 
+    [style.top.px]="handlePos.y"
+    [style.left.px]="handlePos.x"
+    [style.--width.px]="handleSize"
+    [style.--color]="handleColor"
+    >
+    <p class="select-none pointer-events-none" [ngClass]="{'hidden': !showCoordinates}">({{getLabelCoordinates().x}},{{getLabelCoordinates().y}})</p>
+
+</div>

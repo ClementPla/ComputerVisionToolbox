@@ -1,0 +1,44 @@
+canvas {
+  width: 128px;
+  aspect-ratio: 1;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+  border-radius: 0.5em;
+}
+.title-span {
+  margin: auto;
+}
+
+tr:nth-child(odd) {
+  background-color: rgb(100, 100, 100);
+}
+.horizontal-flex {
+  width: 100%;
+}
+tr:nth-child(even) {
+  background-color: rgb(111, 155, 117);
+}
+td {
+  font-size: small;
+}
+
+.center {
+  align-items: center;
+  gap: 1em;
+}
+.deactivated:not(button){
+  filter: brightness(0.7);
+  border: solid white 1px;
+}
+.rounded-table {
+  border-radius: 0.75em;
+  overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+}
+
+button{
+  transform: scale(0.5);
+}

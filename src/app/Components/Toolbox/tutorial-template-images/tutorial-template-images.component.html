@@ -1,0 +1,54 @@
+<div class="loading" *ngIf="this.cvState=='loading'">
+  <mat-spinner color="primary" [diameter]="300"></mat-spinner>
+</div>
+
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <button mat-icon-button class="example-icon" *ngIf="leftDrawer" (click)="drawerLeft.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <a routerLink="/home" class="show-smallscreen">
+      <button mat-icon-button class="example-icon">
+        <mat-icon>home</mat-icon>
+      </button>
+    </a>
+    <span>
+      <ng-content></ng-content>
+    </span>
+    <button mat-icon-button class="example-icon" *ngIf="rightDrawer" (click)="drawerRight.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<mat-drawer-container>
+
+
+  <mat-drawer #drawerLeft mode="side" [opened]="leftDrawer">
+    <div class="vertical-flex drawer">
+
+      <ng-container *ngIf="!uiservice.showImagePreset">
+        <app-loading-buttons (loadingEvent)="loadSelectedFile($event)">
+        </app-loading-buttons>
+        <hr />
+        <button class="fillWidth" mat-raised-button color="warn" (click)="drawCanvasContained.clearCanvas()">
+          Clear
+        </button>
+        <hr />
+        <ng-content select="[drawerLeft]"></ng-content>
+      </ng-container>
+      <ng-container *ngIf="uiservice.showImagePreset">
+        <app-image-presets (presetEvent)="loadSelectedFileFromPath($event)"></app-image-presets>
+      </ng-container>
+    </div>
+
+  </mat-drawer>
+  <mat-drawer #drawerRight mode="side" [opened]="rightDrawer" position="end">
+    <div class="vertical-flex drawer"></div>
+    <ng-content select="[drawerRight]"></ng-content>
+  </mat-drawer>
+
+  <div class="horizontal-flex drawer-container">
+    <ng-content select="[centerContent]"></ng-content>
+  </div>
+</mat-drawer-container>

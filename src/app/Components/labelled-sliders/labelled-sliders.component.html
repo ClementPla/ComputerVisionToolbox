@@ -1,0 +1,24 @@
+<div class="vertical-flex">
+  <mat-form-field appearance="fill">
+    <mat-label>{{ title }}</mat-label>
+    <input
+      matInput
+      type="text"
+      readonly="true"
+      [(ngModel)]="value"
+    />
+  </mat-form-field>
+  <mat-slider
+    #slider
+    [min]="min"
+    [max]="max"
+    [step]="step"
+    thumbLabel
+    tickInterval="auto"
+  >
+
+  <input matSliderThumb [(ngModel)]="value" (valueChange)="onChange($event)"
+  #slider>
+
+</mat-slider>
+</div>

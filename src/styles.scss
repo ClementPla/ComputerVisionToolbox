@@ -1,0 +1,84 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add global styles to this file, and also import other style files */
+
+
+
+:root {
+    --clr-neutral-900: hsl(207, 19%, 9%);
+    --clr-neutral-400: hsl(207, 19%, 61%);
+    --clr-neutral-100: hsl(0,0%,100%);
+    --clr-accent-400: hsl(142, 90%, 61%);
+    --card-width:35ch;
+  }
+  
+  html, body { height: 100%; }
+  body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+  
+  
+  .horizontal-flex{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .vertical-flex{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+  
+  mat-drawer-container{
+    height: calc(100vh - 2 * 64px) ; // We remove twice the side of the toolbar
+  }
+  
+  @media (max-width:800px) {
+    mat-drawer-container{
+      height: calc(100vh - 64px) ; // We remove twice the side of the toolbar
+    }
+  
+  }
+  
+  .main-canvas{
+    border: solid 1px white;
+    margin: 1em 1em;
+    border-radius: 0.25em;
+    overflow: hidden;
+    aspect-ratio: 1;
+    min-width: 256px;
+    width: 33%;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  }
+  
+  .center-content{
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  hr {
+    display: block;
+    margin: 10px 0 10px 0;
+    border-top: 1px solid rgba(0, 0, 0, .12);
+    width: 100%
+  }
+  
+  .fillWidth{
+    width: 100% !important;
+  }
+  
+  @media (max-width:767px) {
+    .hide-smallscreen{
+      display: none !important;
+    }
+  }
+  
+  @media (min-width:768px){
+    .show-smallscreen{
+      display: none !important;
+    }
+  }
+  

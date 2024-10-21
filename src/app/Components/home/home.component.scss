@@ -1,0 +1,47 @@
+a {
+  color: inherit; /* blue colors for links too */
+  text-decoration: inherit; /* no underline */
+}
+
+h2 {
+  border: solid white 2px;
+  width: fit-content;
+  border-radius: 2em;
+  padding: 0 1em;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    gap: 1em;
+    margin: 0 1em;
+  }
+}
+
+.home{
+  background-color: var(--mat-sidenav-content-background-color);
+}
+
+
+
+@keyframes rotate {
+  from {transform: rotate3d(0,1,0,90deg);
+  opacity: 0.1;
+}
+  to {transform: rotate3d(0,1,0,0deg);
+    opacity: 1.0;}
+}
+
+.section :nth-child(n){
+  animation-name: rotate;
+  animation-duration: 0.2s;
+  animation-direction: normal;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out
+}
+
+@for $i from 1 through 25 {
+.section :nth-child(#{$i}n){
+  animation-delay: #{$i * 0.1}s;
+  }
+}

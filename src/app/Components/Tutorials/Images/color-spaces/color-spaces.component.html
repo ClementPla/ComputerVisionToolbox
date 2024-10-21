@@ -1,0 +1,80 @@
+<app-tutorial-template-images
+[rightDrawer]="false">
+
+  Colorspaces
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <app-labelled-sliders #brushSizeSlider title="Brush Size">
+    </app-labelled-sliders>
+
+    <hr/>
+    <h2>Brush color</h2>
+
+      <input [(colorPicker)]="color"
+      [cpDialogDisplay]="'inline'"
+      [cpToggle]="true"
+      [cpFallbackColor]="'#ffffff'"
+      [cpDisableInput]="true"
+      [style.background]="color"/>
+    <hr/>
+    <h2>Colorspace</h2>
+
+    <mat-form-field class="fillWidth">
+      <mat-label>Choose a colorspace</mat-label>
+      <mat-select [(ngModel)]="colorspace" (colorPickerChange)="updateColorSpace()">
+        <mat-option value="RGB">RGB</mat-option>
+        <mat-option value="HSV">HSV</mat-option>
+        <mat-option value="LAB">LAB</mat-option>
+        <mat-option value="YCrCb">YCrCb</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <app-draw-canvas
+    class="main-canvas"
+    [width]="256"
+    [drawColor]="color"
+    #inputCanvas
+    (drawingEnded)="updateColorSpace()"
+    [drawable]="true"
+    [brushRadius]="brushSizeSlider.value"
+    title="Canvas"
+    [BWOption]="true"
+  >
+  </app-draw-canvas>
+  <div class="horizontal-flex canvas-grid">
+    <app-draw-canvas
+      #canvas1
+      [width]="256"
+      [drawColor]="color"
+      class="grid-item"
+      title="Red"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      (drawingEnded)="updateInput()"
+    ></app-draw-canvas>
+    <app-draw-canvas
+      #canvas2
+      [width]="256"
+      [drawColor]="color"
+      class="grid-item"
+      title="Green"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      (drawingEnded)="updateInput()"
+    ></app-draw-canvas>
+    <app-draw-canvas
+      #canvas3
+      [width]="256"
+      [drawColor]="color"
+      class="grid-item"
+      title="Blue"
+      [drawable]="true"
+      [brushRadius]="brushSizeSlider.value"
+      (drawingEnded)="updateInput()"
+    ></app-draw-canvas>
+  </div>
+  </ng-container>
+
+</app-tutorial-template-images>

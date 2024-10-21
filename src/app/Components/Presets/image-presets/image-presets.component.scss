@@ -1,0 +1,19 @@
+.horizontal-align{
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+.horizontal-align >*:first-child{
+  align-self: flex-start;
+}
+
+.filler{
+  flex-grow: 1;
+}
+.horizontal-align >*:last-child{
+  align-self: flex-end;
+}
+
+.rounded{
+  border-radius: 50%;
+}
