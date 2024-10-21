@@ -22,3 +22,36 @@ export function gaussianRandom(mean=0, stdev=1) {
   // Transform to the desired mean and standard deviation:
   return z * stdev + mean;
 }
+
+export function arange(start:number, stop:number, step:number):Array<number>{
+  let arr = []
+  for(let i = start; i < stop; i+=step){
+    arr.push(i)
+  }
+  return arr
+}
+
+export function linspace(start:number, stop:number, num:number):Array<number>{
+  let step = (stop - start) / (num - 1)
+  return arange(start, stop + step, step)
+}
+
+export function choice(arr:Array<any>, n: number, replace: boolean=false):any{
+  let res = []
+  let indices = arange(0, arr.length, 1)
+  if(replace){
+    for(let i = 0; i < n; i++){
+      res.push(arr[indices[Math.floor(Math.random() * indices.length)]])
+    }
+
+  }
+  else{
+    for(let i = 0; i < n; i++){
+      let idx = Math.floor(Math.random() * indices.length)
+      res.push(arr[idx])
+      indices.splice(idx, 1)
+    }
+  }
+  return res
+
+}

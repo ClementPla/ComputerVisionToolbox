@@ -10,7 +10,7 @@ export class FullyConnected extends Layer {
     constructor(inputDim: number, outputDim: number, bias: boolean = true) {
         super();
         this.weights = new Tensor([inputDim, outputDim]);
-        let xavier = 3*Math.sqrt(2 / (inputDim + outputDim));
+        let xavier = Math.sqrt(2 / (inputDim + outputDim));
 
         this.weights.data = this.weights.data.map(() => xavier * (2 * Math.random() - 1));
         this.hasBias = bias;

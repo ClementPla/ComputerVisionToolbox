@@ -13,8 +13,12 @@
     "@angular/platform-browser": "14.2.4",
     "@angular/platform-browser-dynamic": "14.2.4",
     "@angular/router": "14.2.4",
+    "@types/multivariate-normal": "^0.1.4",
+    "@types/numeric": "^1.2.6",
     "echarts": "^5.5.1",
     "echarts-gl": "^2.0.9",
+    "mathjax-angular": "^2.2.1",
+    "mathjs": "^13.2.0",
     "ml-fft": "^1.3.5",
     "ng-open-cv": "^0.3.1",
     "ngx-echarts": "^14.0.0",
@@ -264,19 +268,19 @@
           },
           {
             "file": ".nx/cache/d/daemon.log",
-            "hash": "8488393599496344674"
+            "hash": "10683508495208446216"
           },
           {
             "file": ".nx/cache/d/server-process.json",
-            "hash": "5493420064589880006"
+            "hash": "10866308774017490970"
           },
           {
             "file": ".nx/cache/lockfile.hash",
-            "hash": "8295457132268805601"
+            "hash": "5893233522987596588"
           },
           {
             "file": ".nx/cache/nxdeps.json",
-            "hash": "11473641319367026278"
+            "hash": "16678296649003203004"
           },
           {
             "file": ".vscode/extensions.json",
@@ -339,11 +343,11 @@
           },
           {
             "file": "package-lock.json",
-            "hash": "15989113669945132067"
+            "hash": "12120008141460849386"
           },
           {
             "file": "package.json",
-            "hash": "16353083071633012374",
+            "hash": "12296067515963469809",
             "dependencies": [
               {
                 "source": "cv-toolbox",
@@ -402,12 +406,32 @@
               },
               {
                 "source": "cv-toolbox",
+                "target": "npm:@types/multivariate-normal",
+                "type": "static"
+              },
+              {
+                "source": "cv-toolbox",
+                "target": "npm:@types/numeric",
+                "type": "static"
+              },
+              {
+                "source": "cv-toolbox",
                 "target": "npm:echarts",
                 "type": "static"
               },
               {
                 "source": "cv-toolbox",
                 "target": "npm:echarts-gl",
+                "type": "static"
+              },
+              {
+                "source": "cv-toolbox",
+                "target": "npm:mathjax-angular",
+                "type": "static"
+              },
+              {
+                "source": "cv-toolbox",
+                "target": "npm:mathjs",
                 "type": "static"
               },
               {
@@ -579,7 +603,7 @@
           },
           {
             "file": "src/app/app-routing.module.ts",
-            "hash": "12656979659922631810",
+            "hash": "18024430388662435458",
             "dependencies": [
               {
                 "source": "cv-toolbox",
@@ -630,7 +654,7 @@
           },
           {
             "file": "src/app/app.module.ts",
-            "hash": "5953502276638123183",
+            "hash": "2327360909980156511",
             "dependencies": [
               {
                 "source": "cv-toolbox",
@@ -711,7 +735,7 @@
           },
           {
             "file": "src/app/Components/home/home.component.html",
-            "hash": "13419669693209518771"
+            "hash": "12693839141697416271"
           },
           {
             "file": "src/app/Components/home/home.component.scss",
@@ -899,6 +923,36 @@
               {
                 "target": "npm:@angular/core",
                 "source": "cv-toolbox",
+                "type": "static"
+              }
+            ]
+          },
+          {
+            "file": "src/app/Components/Toolbox/math-jax-paragraph/math-jax-paragraph.component.html",
+            "hash": "8082387123870164357"
+          },
+          {
+            "file": "src/app/Components/Toolbox/math-jax-paragraph/math-jax-paragraph.component.scss",
+            "hash": "3244421341483603138"
+          },
+          {
+            "file": "src/app/Components/Toolbox/math-jax-paragraph/math-jax-paragraph.component.spec.ts",
+            "hash": "10596948136287441331",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:@angular/core",
+                "type": "static"
+              }
+            ]
+          },
+          {
+            "file": "src/app/Components/Toolbox/math-jax-paragraph/math-jax-paragraph.component.ts",
+            "hash": "5174949705759110612",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:@angular/core",
                 "type": "static"
               }
             ]
@@ -1378,12 +1432,16 @@
             "hash": "12520933096168973575"
           },
           {
+            "file": "src/app/Components/Tutorials/MachineLearning/NN/conv.ts",
+            "hash": "10797919403702074867"
+          },
+          {
             "file": "src/app/Components/Tutorials/MachineLearning/NN/dataset.ts",
             "hash": "14262477892929465684"
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/NN/fc.ts",
-            "hash": "8950895818203414567"
+            "hash": "6551187870849611385"
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/NN/layer.ts",
@@ -1395,7 +1453,7 @@
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/NN/math.ts",
-            "hash": "8482938544594713205"
+            "hash": "11317207957543801888"
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/NN/network.ts",
@@ -1406,8 +1464,12 @@
             "hash": "7797265612244883712"
           },
           {
+            "file": "src/app/Components/Tutorials/MachineLearning/NN/pooling.ts",
+            "hash": "4001530724510258223"
+          },
+          {
             "file": "src/app/Components/Tutorials/MachineLearning/NN/tensor.ts",
-            "hash": "16208648851186792822"
+            "hash": "6863430293332934383"
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/NN/trainer.ts",
@@ -1415,11 +1477,11 @@
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/optimizer/optimizer.component.html",
-            "hash": "736920778336070492"
+            "hash": "1156009962597074125"
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/optimizer/optimizer.component.scss",
-            "hash": "9953698393748663814"
+            "hash": "15947519755767450796"
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/optimizer/optimizer.component.spec.ts",
@@ -1456,6 +1518,76 @@
           {
             "file": "src/app/Components/Tutorials/MachineLearning/optimizer/toy_model.ts",
             "hash": "9474193462811580055"
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/principal-component-analysis/principal-component-analysis.component.html",
+            "hash": "9295152803642265348"
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/principal-component-analysis/principal-component-analysis.component.scss",
+            "hash": "3244421341483603138"
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/principal-component-analysis/principal-component-analysis.component.spec.ts",
+            "hash": "431133973692361483",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:@angular/core",
+                "type": "static"
+              }
+            ]
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/principal-component-analysis/principal-component-analysis.component.ts",
+            "hash": "6104061667080410251",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:@angular/core",
+                "type": "static"
+              },
+              {
+                "source": "cv-toolbox",
+                "target": "npm:echarts",
+                "type": "static"
+              }
+            ]
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/regression/regression.component.html",
+            "hash": "17812598709211972354"
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/regression/regression.component.scss",
+            "hash": "3244421341483603138"
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/regression/regression.component.spec.ts",
+            "hash": "15217395296929783420",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:@angular/core",
+                "type": "static"
+              }
+            ]
+          },
+          {
+            "file": "src/app/Components/Tutorials/MachineLearning/regression/regression.component.ts",
+            "hash": "5687802657146966624",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:@angular/core",
+                "type": "static"
+              },
+              {
+                "source": "cv-toolbox",
+                "target": "npm:echarts",
+                "type": "static"
+              }
+            ]
           },
           {
             "file": "src/app/Components/Tutorials/MachineLearning/Visu/neural-network/neural-network.component.html",
@@ -1657,12 +1789,34 @@
             "hash": "10263088980090948005"
           },
           {
+            "file": "src/app/utils/linalg.ts",
+            "hash": "10625075283348785123",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:mathjs",
+                "type": "static"
+              }
+            ]
+          },
+          {
             "file": "src/app/utils/math.ts",
-            "hash": "11928180638894409361"
+            "hash": "5747998776994229149"
+          },
+          {
+            "file": "src/app/utils/matrix.ts",
+            "hash": "2215614437894940954"
           },
           {
             "file": "src/app/utils/sampling.ts",
-            "hash": "6445998841225306779"
+            "hash": "11233772613115112806",
+            "dependencies": [
+              {
+                "source": "cv-toolbox",
+                "target": "npm:echarts",
+                "type": "static"
+              }
+            ]
           },
           {
             "file": "src/assets/.gitkeep",
@@ -1726,7 +1880,7 @@
           },
           {
             "file": "src/assets/images/home-cards/gradient_descent.png",
-            "hash": "1611214998110637944"
+            "hash": "6505195876059123536"
           },
           {
             "file": "src/assets/images/home-cards/histogram.jpg",
@@ -1739,6 +1893,10 @@
           {
             "file": "src/assets/images/home-cards/morphology.jpg",
             "hash": "11368752751727734175"
+          },
+          {
+            "file": "src/assets/images/home-cards/neural_network.png",
+            "hash": "1611214998110637944"
           },
           {
             "file": "src/assets/images/home-cards/sampling.png",
@@ -1835,6 +1993,10 @@
                 "type": "static"
               }
             ]
+          },
+          {
+            "file": "src/test/eigen.ipynb",
+            "hash": "15191329227056363852"
           },
           {
             "file": "src/typing.d.ts",
@@ -3209,6 +3371,15 @@
         "version": "7.18.9",
         "packageName": "@babel/runtime",
         "hash": "sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw=="
+      }
+    },
+    "npm:@babel/runtime@7.25.7": {
+      "type": "npm",
+      "name": "npm:@babel/runtime@7.25.7",
+      "data": {
+        "version": "7.25.7",
+        "packageName": "@babel/runtime",
+        "hash": "sha512-FjoyLe754PMiYsFaN5C94ttGiOmBNYTf6pLr4xXHAT5uctHb092PBszndLDR5XA/jghQvn4n7JMHl7dmTgbm9w=="
       }
     },
     "npm:@babel/traverse": {
@@ -4840,6 +5011,15 @@
         "hash": "sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w=="
       }
     },
+    "npm:@types/multivariate-normal": {
+      "type": "npm",
+      "name": "npm:@types/multivariate-normal",
+      "data": {
+        "version": "0.1.4",
+        "packageName": "@types/multivariate-normal",
+        "hash": "sha512-jxGr3o5ocpl8+8SsriJukYAVdCFVpkEYJBTPvFseuCLaYhaL4L+/vDvpeA13ThmGtIUBHwIVacOPx53cFXjKuw=="
+      }
+    },
     "npm:@types/node": {
       "type": "npm",
       "name": "npm:@types/node",
@@ -4856,6 +5036,15 @@
         "version": "1.3.11",
         "packageName": "@types/node-forge",
         "hash": "sha512-FQx220y22OKNTqaByeBGqHWYz4cl94tpcxeFdvBo3wjG6XPBuZ0BNgNZRV5J5TFmmcsJ4IzsLkmGRiQbnYsBEQ=="
+      }
+    },
+    "npm:@types/numeric": {
+      "type": "npm",
+      "name": "npm:@types/numeric",
+      "data": {
+        "version": "1.2.6",
+        "packageName": "@types/numeric",
+        "hash": "sha512-gwEJEbdln8bWuYu//lspka5Hk+CFwFynDrGP2GAdp4sM1XuPbaKsBWmU0qkxHGGxShKjV1bouKTwHmtaQ9O97Q=="
       }
     },
     "npm:@types/parse-json": {
@@ -6145,6 +6334,15 @@
         "hash": "sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg=="
       }
     },
+    "npm:complex.js": {
+      "type": "npm",
+      "name": "npm:complex.js",
+      "data": {
+        "version": "2.3.0",
+        "packageName": "complex.js",
+        "hash": "sha512-wWHzifVdUPbPBhh+ObvpVGIzrAQjTvmnnEJKBfLW5YbyAB6OXQ0r+Q92fByMIrSSlxUuCujqxriJSR6R/kVxPA=="
+      }
+    },
     "npm:compressible": {
       "type": "npm",
       "name": "npm:compressible",
@@ -7295,6 +7493,15 @@
         "version": "1.0.3",
         "packageName": "escape-html",
         "hash": "sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow=="
+      }
+    },
+    "npm:escape-latex": {
+      "type": "npm",
+      "name": "npm:escape-latex",
+      "data": {
+        "version": "1.2.0",
+        "packageName": "escape-latex",
+        "hash": "sha512-nV5aVWW1K0wEiUIEdZ4erkGGH8mDxGyxSeqPzRNtWP7ataw+/olFObw7hujFWlVjNsaDFw5VZ5NzVSIqRgfTiw=="
       }
     },
     "npm:escape-string-regexp": {
@@ -8773,6 +8980,15 @@
         "hash": "sha512-Hu1dmuoGcZ7AfyynN3LsfruwMbxMALMka+YtZeGoLuDEySVmVAPaonkNoBRIw/ectu8b9tVQCJNgp4a4knp+tg=="
       }
     },
+    "npm:javascript-natural-sort": {
+      "type": "npm",
+      "name": "npm:javascript-natural-sort",
+      "data": {
+        "version": "0.7.1",
+        "packageName": "javascript-natural-sort",
+        "hash": "sha512-nO6jcEfZWQXDhOiBtG2KvKyEptz7RVbpGP4vTD2hLBdmNQSsCiicO2Ioinv6UI4y9ukqnBpy+XZ9H6uLNgJTlw=="
+      }
+    },
     "npm:jest-circus": {
       "type": "npm",
       "name": "npm:jest-circus",
@@ -9401,6 +9617,42 @@
         "version": "1.0.12",
         "packageName": "makeerror",
         "hash": "sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg=="
+      }
+    },
+    "npm:mathjax-angular": {
+      "type": "npm",
+      "name": "npm:mathjax-angular",
+      "data": {
+        "version": "2.2.1",
+        "packageName": "mathjax-angular",
+        "hash": "sha512-ndXIzO0MyedTH6BhZYJaQT10RaRyeieCj1L8mQWS3kwLD2cM/I69kKz21RJL6FMMDiXamtzVS6U5iEsXX0xN9g=="
+      }
+    },
+    "npm:mathjs": {
+      "type": "npm",
+      "name": "npm:mathjs",
+      "data": {
+        "version": "13.2.0",
+        "packageName": "mathjs",
+        "hash": "sha512-P5PZoiUX2Tkghkv3tsSqlK0B9My/ErKapv1j6wdxd0MOrYQ30cnGE4LH/kzYB2gA5rN46Njqc4cFgJjaxgijoQ=="
+      }
+    },
+    "npm:regenerator-runtime@0.14.1": {
+      "type": "npm",
+      "name": "npm:regenerator-runtime@0.14.1",
+      "data": {
+        "version": "0.14.1",
+        "packageName": "regenerator-runtime",
+        "hash": "sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw=="
+      }
+    },
+    "npm:regenerator-runtime": {
+      "type": "npm",
+      "name": "npm:regenerator-runtime",
+      "data": {
+        "version": "0.13.9",
+        "packageName": "regenerator-runtime",
+        "hash": "sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA=="
       }
     },
     "npm:media-typer": {
@@ -10780,15 +11032,6 @@
         "hash": "sha512-DqHn3DwbmmPVzeKj9woBadqmXxLvQoQIwu7nopMc72ztvxVmVk2SBhSnx67zuye5TP+lJsb/TBQsjLKhnDf3MA=="
       }
     },
-    "npm:regenerator-runtime": {
-      "type": "npm",
-      "name": "npm:regenerator-runtime",
-      "data": {
-        "version": "0.13.9",
-        "packageName": "regenerator-runtime",
-        "hash": "sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA=="
-      }
-    },
     "npm:regenerator-transform": {
       "type": "npm",
       "name": "npm:regenerator-transform",
@@ -11003,6 +11246,15 @@
         "version": "3.0.1",
         "packageName": "secure-compare",
         "hash": "sha512-AckIIV90rPDcBcglUwXPF3kg0P0qmPsPXAj6BBEENQE1p5yA1xfmDJzfi1Tappj37Pv2mVbKpL3Z1T+Nn7k1Qw=="
+      }
+    },
+    "npm:seedrandom": {
+      "type": "npm",
+      "name": "npm:seedrandom",
+      "data": {
+        "version": "3.0.5",
+        "packageName": "seedrandom",
+        "hash": "sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg=="
       }
     },
     "npm:select-hose": {
@@ -11491,6 +11743,15 @@
         "hash": "sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA=="
       }
     },
+    "npm:tiny-emitter": {
+      "type": "npm",
+      "name": "npm:tiny-emitter",
+      "data": {
+        "version": "2.1.0",
+        "packageName": "tiny-emitter",
+        "hash": "sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q=="
+      }
+    },
     "npm:tmpl": {
       "type": "npm",
       "name": "npm:tmpl",
@@ -11633,6 +11894,15 @@
         "version": "1.0.9",
         "packageName": "typed-assert",
         "hash": "sha512-KNNZtayBCtmnNmbo5mG47p1XsCyrx6iVqomjcZnec/1Y5GGARaxPs6r49RnSPeUP3YjNYiU9sQHAtY4BBvnZwg=="
+      }
+    },
+    "npm:typed-function": {
+      "type": "npm",
+      "name": "npm:typed-function",
+      "data": {
+        "version": "4.2.1",
+        "packageName": "typed-function",
+        "hash": "sha512-EGjWssW7Tsk4DGfE+5yluuljS1OGYWiI1J6e8puZz9nTMM51Oug8CD5Zo4gWMsOhq5BI+1bF+rWTm4Vbj3ivRA=="
       }
     },
     "npm:typedarray-to-buffer": {
@@ -12166,6 +12436,16 @@
       },
       {
         "source": "cv-toolbox",
+        "target": "npm:@types/multivariate-normal",
+        "type": "static"
+      },
+      {
+        "source": "cv-toolbox",
+        "target": "npm:@types/numeric",
+        "type": "static"
+      },
+      {
+        "source": "cv-toolbox",
         "target": "npm:echarts",
         "type": "static"
       },
@@ -12177,6 +12457,16 @@
       {
         "source": "cv-toolbox",
         "target": "npm:echarts-gl",
+        "type": "static"
+      },
+      {
+        "source": "cv-toolbox",
+        "target": "npm:mathjax-angular",
+        "type": "static"
+      },
+      {
+        "source": "cv-toolbox",
+        "target": "npm:mathjs",
         "type": "static"
       },
       {
@@ -22755,6 +23045,67 @@
       {
         "source": "npm:makeerror",
         "target": "npm:tmpl",
+        "type": "static"
+      }
+    ],
+    "npm:mathjax-angular": [
+      {
+        "source": "npm:mathjax-angular",
+        "target": "npm:tslib",
+        "type": "static"
+      }
+    ],
+    "npm:mathjs": [
+      {
+        "source": "npm:mathjs",
+        "target": "npm:@babel/runtime@7.25.7",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:complex.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:decimal.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:escape-latex",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:fraction.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:javascript-natural-sort",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:seedrandom",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:tiny-emitter",
+        "type": "static"
+      },
+      {
+        "source": "npm:mathjs",
+        "target": "npm:typed-function",
+        "type": "static"
+      }
+    ],
+    "npm:@babel/runtime@7.25.7": [
+      {
+        "source": "npm:@babel/runtime@7.25.7",
+        "target": "npm:regenerator-runtime@0.14.1",
         "type": "static"
       }
     ],
