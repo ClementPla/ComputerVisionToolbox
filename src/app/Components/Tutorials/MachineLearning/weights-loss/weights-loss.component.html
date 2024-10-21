@@ -8,7 +8,7 @@
     [min]="w_min"
     [step]="0.1"
     [value]="w"
-    (input)="update_w($event)"
+    (valueChange)="update_w($event)"
     title="Slope">
     </app-labelled-sliders>
 
@@ -17,7 +17,7 @@
     [min]="b_min"
     [step]="0.1"
     [value]="b"
-    (input)="update_b($event)"
+    (valueChange)="update_b($event)"
     title="Intercept">
     </app-labelled-sliders>
 

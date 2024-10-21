@@ -11,6 +11,7 @@ import { SpectralFilteringComponent } from './Components/Tutorials/Images/spectr
 import { PSNRComponent } from './Components/Tutorials/Images/psnr/psnr.component';
 import { GradientDescentComponent } from './Components/Tutorials/MachineLearning/gradient-descent/gradient-descent.component';
 import { OptimizerComponent } from './Components/Tutorials/MachineLearning/optimizer/optimizer.component';
+import { CNNComponent } from './Components/Tutorials/MachineLearning/cnn/cnn.component';
 
 export const routeConfig: Routes = [
     {path: '', redirectTo: 'home', pathMatch:'full'},
@@ -25,5 +26,6 @@ export const routeConfig: Routes = [
     {path:'spectralFiltering', component:SpectralFilteringComponent},
     {path:'PSNR', component:PSNRComponent},
     {path:'gradientDescent', component:GradientDescentComponent},
+    {path:'CNN', component: CNNComponent}
   
   ];

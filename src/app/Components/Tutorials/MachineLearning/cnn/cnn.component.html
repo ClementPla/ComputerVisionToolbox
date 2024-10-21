@@ -1,0 +1,34 @@
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="false">
+
+    <ng-container ngProjectAs="[centerContent]">
+        <div class="flex flex-col items-center gap-3">
+        <app-draw-canvas #drawCanvas
+
+        (drawingEnded)="onDrawingEnded($event)"
+        class="w-[512px] aspect-square crisp-edges border-2 border-gray-500"
+        [brushRadius]="1"
+        [width]="28"
+        [OnlyBW]="true"
+        >
+
+        </app-draw-canvas>
+        <button mat-raised-button color="primary" (click)="drawCanvas.clearCanvas()">Clear</button>
+
+        <div class="flex flex-row gap-1 h-[64px]">
+            <div *ngFor="let p of probas, index as i"
+            class="w-[24px] h-[64px] bg-green-500 text-white text-center"
+            [style.height.%]="p*100"
+            >
+            
+            {{i}}
+    
+            </div>
+    
+        </div>
+    </div>
+
+    </ng-container>
+    MNIST Demo
+
+    
+</app-tutorial-template>
