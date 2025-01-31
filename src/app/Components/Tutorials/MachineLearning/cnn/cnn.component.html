@@ -1,12 +1,31 @@
-<app-tutorial-template [rightDrawer]="false" [leftDrawer]="false">
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true">
+    <ng-container ngProjectAs="[drawerLeft]">
+        <mat-checkbox #antialiased color="primary"
+        [checked]="true"
+        >Use antialiasing</mat-checkbox>
 
+        <app-labelled-sliders
+        #brushSize
+        [title]="'Brush size'"
+        [min]="1"
+        [max]="10"
+        [step]="1"
+        [value]="3"
+
+        >
+
+        </app-labelled-sliders>
+    </ng-container>
     <ng-container ngProjectAs="[centerContent]">
         <div class="flex flex-col items-center gap-3">
+
+
         <app-draw-canvas #drawCanvas
 
         (drawingEnded)="onDrawingEnded($event)"
         class="w-[512px] aspect-square crisp-edges border-2 border-gray-500"
-        [brushRadius]="1"
+        [antialiasing]="antialiased.checked"
+        [brushRadius]="brushSize.value"
         [width]="28"
         [OnlyBW]="true"
         >
@@ -14,17 +33,28 @@
         </app-draw-canvas>
         <button mat-raised-button color="primary" (click)="drawCanvas.clearCanvas()">Clear</button>
 
-        <div class="flex flex-row gap-1 h-[64px]">
+        <i>What the network "sees":</i>
+        <app-draw-canvas #drawCanvas2
+        [brushRadius]="1"
+        [drawable]="false"
+        class="w-[28px] aspect-square crisp-edges border-2 border-gray-500"
+
+        [width]="28">
+
+        </app-draw-canvas>
+        <div class="flex flex-row gap-1 h-[64px] border">
             <div *ngFor="let p of probas, index as i"
             class="w-[24px] h-[64px] bg-green-500 text-white text-center"
             [style.height.%]="p*100"
             >
             
             {{i}}
+            <p class="border">{{p | number: '1.1-1'}}</p>
     
             </div>
-    
+            
         </div>
+        <h2>Digit: {{predictedDigit}}</h2>
     </div>
 
     </ng-container>

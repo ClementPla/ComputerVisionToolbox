@@ -24,7 +24,7 @@ export class TutorialImageClass extends TutorialClass implements AfterViewInit {
   public sideMenuContext = true;
 
 
-  constructor(protected ngxOpenCv:NgxOpenCVService, public uiservice: UIControlService, private cdr: ChangeDetectorRef) {
+  constructor(protected ngxOpenCv:NgxOpenCVService, public uiservice: UIControlService, protected cdr: ChangeDetectorRef) {
     super()
   }
 

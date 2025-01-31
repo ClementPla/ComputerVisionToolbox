@@ -1,4 +1,4 @@
-import { Activation, Identity, RELU, Sigmoid, TanH } from "./activation";
+import { Activation, Identity, RELU, Sigmoid, Softmax, TanH } from "./activation";
 import { FullyConnected } from "./fc";
 import { Layer } from "./layer";
 import { argmax } from "./math";
@@ -96,6 +96,9 @@ export class Network {
                 else if (activation === "identity"){
                     act = new Identity();
                 }
+                else if (activation === "softmax"){
+                    act = new Softmax();
+                }
                 else {
                     act = new RELU();
                 }
@@ -129,7 +132,9 @@ export class Network {
                     for (let j = 0; j < min_dim; j++) {
                         for (let k = 0; k < min_dim2; k++) {
                             new_layer.weights.data[j * new_layer.weights.shape[1] + k] = current_layer.weights.data[j * current_layer.weights.shape[1] + k];
-                            new_layer.bias.data[j] = current_layer.bias.data[j];
+                            if(new_layer.bias){
+                                new_layer.bias.data[j] = current_layer.bias.data[j];
+                            }
                         }
                     }
                     this.layers[i] = new_layer;

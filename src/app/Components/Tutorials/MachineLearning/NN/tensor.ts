@@ -18,7 +18,16 @@ export class Tensor {
         return this.data.length;
     }
 
-    at(index: number) {
+    at(index: number| number[]) {
+        if (index instanceof Array) {
+            // Fix this for more than 2D tensors
+            let flatIndex = 0;
+            for (let i = 0; i < index.length; i++) {
+                let stride = this.shape.slice(i + 1).reduce((a, b) => a * b, 1);
+                flatIndex += index[i] * stride;
+            }
+            return this.data[flatIndex];
+        }
         return this.data[index];
     }
 

@@ -19,6 +19,7 @@ export class RegressionComponent implements OnInit {
   xs: number[] = linspace(0, this.T*2*Math.PI, 1000);
   equation: string;
   noise: number = 0.5;
+  train_points: number = 25;
   xi: number[] = choice(this.xs, 50);
   yi: number[] = this.xi.map(x => this.noisyTrueFunction(x));
   constructor() {
@@ -120,7 +121,7 @@ export class RegressionComponent implements OnInit {
   }
 
   resamplePoints(){
-    this.xi = choice(this.xs, 25);
+    this.xi = choice(this.xs, this.train_points);
     this.yi = this.xi.map(x => this.noisyTrueFunction(x));
     if (Array.isArray(this.graphData.series)) {
       (this.graphData.series[2] as any).data = this.xi.map((x, i) => [x, this.yi[i]]);

@@ -13,10 +13,15 @@ import { DrawCanvasComponent } from 'src/app/Components/Toolbox/draw-canvas/draw
 })
 export class CNNComponent extends TutorialImageClass implements OnInit{
   @ViewChild('drawCanvas') canvas: DrawCanvasComponent;
+  @ViewChild('drawCanvas2') canvas2: DrawCanvasComponent;
+
 
   session: ort.InferenceSession;
   isready: boolean = false;
   probas: Array<number> = new Array(10).fill(0);
+  maxProba: number = 0;
+  predictedDigit: number = 0;
+  useAntiAliasing: boolean = true;
   ngOnInit(): void {
     this.load_sessions();
 
@@ -28,6 +33,7 @@ export class CNNComponent extends TutorialImageClass implements OnInit{
   }
 
   async onDrawingEnded(event: boolean){
+    this.canvas2.drawArray(this.canvas.getArray());
     if(!this.isready){
       return;
     }
@@ -36,12 +42,7 @@ export class CNNComponent extends TutorialImageClass implements OnInit{
 
     let datafloat32 = []
     for(let i = 0; i < data.length; i+=4){
-      if(data[i]> 0 ){
-        datafloat32.push(1);
-      }
-      else{
-        datafloat32.push(0);
-      }
+      datafloat32.push(data[i] / 255);
     }
 
 
@@ -53,9 +54,16 @@ export class CNNComponent extends TutorialImageClass implements OnInit{
     const output = await this.session.run({'input.1': tensor});
 
     this.probas = []
+    this.maxProba = 0;
     for(let i = 0; i < output[27].data.length; i++){
       this.probas.push(output[27].data[i] as number);
+      this.maxProba = Math.max(this.maxProba, output[27].data[i] as number);
+      if(this.maxProba === output[27].data[i]){
+        this.predictedDigit = i;
+      }
     }
+
+    this.cdr.detectChanges();
 
 
     

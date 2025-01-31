@@ -28,14 +28,15 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
 
   model: Network;
   dataset: Dataset = new Dataset();
-  gridResolution: number = 15;
+  gridResolution: number = 28;
   trainer: Trainer;
   correctlyClassified: number = 0;
 
   trainTimeout: any;
   n_points = 150
-  n_layers = 2
-  n_neurons = 32
+  n_layers = 1
+  n_neurons = 8
+  fullMapUpdateInterval: number = 50
 
   allParamsNorms: EChartsOption[];
 
@@ -71,7 +72,7 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
       network.addLayer(new FullyConnected(this.n_neurons, this.n_neurons))
       network.addLayer(new RELU())
     }
-    network.addLayer(new FullyConnected(this.n_neurons, 2, true))
+    network.addLayer(new FullyConnected(this.n_neurons, 2, false))
     this.model = network
     this.model.changeActivation(this.currentActivation)
 
@@ -119,7 +120,7 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
       if (this.isTraining) {
         this.updateChart()
       }
-    }, 75)
+    }, this.fullMapUpdateInterval)
 
     setInterval(() => {
       if (this.isTraining) {
@@ -289,13 +290,15 @@ export class GradientDescentComponent extends TutorialClass implements OnInit, A
     }
     this.pauseTraining()
 
+    console.log(this.n_neurons)
+
     this.model.layers[0] = new FullyConnected(2, this.n_neurons)
     let hidden_layers = this.model.n_fc_layers() - 2
     for (let i = 0; i < hidden_layers; i++) {
       this.model.swap_fc_layers(i + 1, new FullyConnected(this.n_neurons, this.n_neurons))
     }
 
-    this.model.swap_fc_layers(this.n_layers + 1, new FullyConnected(this.n_neurons, 2, true))
+    this.model.swap_fc_layers(this.n_layers + 1, new FullyConnected(this.n_neurons, 2, false))
 
     this.trainer.optimizer.reset_momentums()
     if (this.isTraining) {

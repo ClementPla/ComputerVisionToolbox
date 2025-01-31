@@ -11,6 +11,16 @@
             >
 
             </app-labelled-sliders>
+            <app-labelled-sliders
+            [title]="'Number of points'"
+            [(value)]="this.train_points"
+            [max]="100"
+            [min]="1"
+            [step]="1"
+            (valueChange)="resamplePoints()"
+            >
+            </app-labelled-sliders>
+
 
             <app-labelled-sliders
             [title]='"Noise level"'

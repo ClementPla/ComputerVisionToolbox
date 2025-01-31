@@ -57,6 +57,7 @@ export class DrawCanvasComponent implements OnInit {
   @Input() BWOption: boolean = false;
   @Input() OnlyBW: boolean = false;
   @Input() profileOption: boolean = false
+  @Input() antialiasing: boolean = true;
 
   @Output() BWSet = new EventEmitter<boolean>();
   @Output() profileChanged = new EventEmitter<boolean>();
@@ -178,17 +179,53 @@ export class DrawCanvasComponent implements OnInit {
   }
 
   private draw(previousPos: Point2D, nextPosition: Point2D | null = null) {
-    this.ctx.beginPath();
-    this.ctx.moveTo(previousPos.x, previousPos.y);
-    if (nextPosition) {
-      this.ctx.lineTo(nextPosition.x, nextPosition.y);
-    } else {
-      this.ctx.lineTo(previousPos.x, previousPos.y);
-    }
-    this.ctx.lineWidth = this.brushRadius!;
+    this.ctx.imageSmoothingEnabled = this.antialiasing;
+
     this.ctx.strokeStyle = this.drawColor;
     this.ctx.lineCap = 'round';
-    this.ctx.stroke();
+    this.ctx.lineWidth = this.brushRadius!;
+    this.ctx.fillStyle = this.drawColor;
+
+    if (this.antialiasing) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(previousPos.x, previousPos.y);
+      if (nextPosition) {
+        this.ctx.lineTo(nextPosition.x, nextPosition.y);
+      } else {
+        this.ctx.lineTo(previousPos.x, previousPos.y);
+      }
+      this.ctx.stroke();
+
+    }
+    else {
+      if (nextPosition) {
+        this.drawLineNoAliasing(this.ctx, previousPos.x, previousPos.y, nextPosition.x, nextPosition.y);
+      }
+      else {
+        this.drawLineNoAliasing(this.ctx, previousPos.x, previousPos.y, previousPos.x, previousPos.y);
+      }
+      this.ctx.fill();
+    }
+
+  }
+
+  private DBP(x1: number, y1: number, x2: number, y2: number) {
+    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  }
+  // finds the angle of (x,y) on a plane from the origin
+  private getAngle(x: number, y: number) { return Math.atan(y / (x == 0 ? 0.01 : x)) + (x < 0 ? Math.PI : 0); }
+  // the function
+  private drawLineNoAliasing(ctx: CanvasRenderingContext2D, sx: number, sy: number, tx: number, ty: number) {
+    var dist = this.DBP(sx, sy, tx, ty); // length of line
+    var ang = this.getAngle(tx - sx, ty - sy); // angle of line
+    for (var i = 0; i < dist; i++) {
+      // for each point along the line
+      ctx.fillRect(
+        Math.round(sx + Math.cos(ang) * i)-0.5, // round for perfect pixels
+        Math.round(sy + Math.sin(ang) * i)-0.5, // thus no aliasing
+        this.brushRadius!, this.brushRadius! // fill in with brush size
+      );
+    }
   }
 
   private draw_callback() {
@@ -283,7 +320,7 @@ export class DrawCanvasComponent implements OnInit {
 
     let handles = this.handles.toArray();
     let rois = this.ROIs.toArray();
-    
+
     const x = pos.clientX - rect.left;
     const y = pos.clientY - rect.top;
     let redrawNeeded = false;
@@ -291,7 +328,7 @@ export class DrawCanvasComponent implements OnInit {
     handles.forEach((handle) => {
       handle.handleDrag = outOfBounds ? false : handle.handleDrag;
       if (handle.handleDrag) {
-        handle.moveTo(x, y, rect.width ,  rect.height);
+        handle.moveTo(x, y, rect.width, rect.height);
         redrawNeeded = true;
       }
 
@@ -316,13 +353,13 @@ export class DrawCanvasComponent implements OnInit {
           roi.update();
           redrawNeeded = true;
         })
-        
+
       }
-    
+
     })
 
 
-      this.updateCanvasUI();
+    this.updateCanvasUI();
 
 
   }
@@ -331,21 +368,21 @@ export class DrawCanvasComponent implements OnInit {
   updateCanvasUI() {
     this.ctxUI.clearRect(0, 0, this.UIwidth, this.UIwidth);
     // this.ctxUI.globalCompositeOperation = 'copy';
-    
-      requestAnimationFrame(() => { // We use setTimeout to be sure handles exist (wait for next frame)
-        
-        if (this.ROIs.length > 0) {
-          this.updateROI();
 
-        }
-        if (this.profile) {
-          this.updateProfile();
+    requestAnimationFrame(() => { // We use setTimeout to be sure handles exist (wait for next frame)
 
-        }
+      if (this.ROIs.length > 0) {
+        this.updateROI();
 
-      });
+      }
+      if (this.profile) {
+        this.updateProfile();
 
-      
+      }
+
+    });
+
+
 
   }
 
