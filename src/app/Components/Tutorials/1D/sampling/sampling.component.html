@@ -1,0 +1,45 @@
+<app-tutorial-template [rightDrawer]="false">
+  Sampling Frequency and Nyquist-Shannon Theorem
+  <ng-container ngProjectAs="[drawerLeft]">
+
+    <mat-label>Components</mat-label>
+
+    <p><mat-checkbox [checked]="y1" (change)="y1 = !y1; recompute()">Y1</mat-checkbox>
+      <app-labelled-sliders
+      [(value)]="y1Phase" (change)="recompute()" [min]="0" [max]="6.28" [step]="0.05"
+      >
+      </app-labelled-sliders>
+    </p>
+
+    <p><mat-checkbox [checked]="y2" (change)="y2 = !y2; recompute()">Y2</mat-checkbox>
+      <app-labelled-sliders [(value)]="y2Phase" (change)="recompute()" [min]="0" [max]="6.28" [step]="0.05">
+      </app-labelled-sliders>
+      </p>
+    
+      <p><mat-checkbox [checked]="y3" (change)="y3 = !y3; recompute()">Y3</mat-checkbox>
+      <app-labelled-sliders [(value)]="y3Phase" (change)="recompute()" [min]="0" [max]="6.28" [step]="0.05">
+      </app-labelled-sliders>
+      </p>
+
+    <p class="w-64">
+      The Nyquist-Shannon theorem states that a signal must be sampled at a rate of at least twice the highest frequency
+      component in the signal in order to be able to reconstruct the original signal from the samples. This is known as
+      the
+      Nyquist rate.
+    </p>
+
+    <app-labelled-sliders title="Sub sampling frequency" [value]="this.fe" (valueChange)="update_fe($event)" [max]="64"
+      [min]="0" [step]="0.1">
+    </app-labelled-sliders>
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+
+    <div class="grid md:grid-cols-2 w-full gap-2 p-2">
+      <div class="bg-white" echarts [options]="original_graph" (chartInit)="onOriginalChartInit($event)">
+      </div>
+      <div class="bg-white" echarts [options]="sampled_graph" (chartInit)="onSampledChartInit($event)"></div>
+      <div class="bg-white" echarts [options]="original_fft_graph" (chartInit)="onFFTChartInit($event)"></div>
+      <div class="bg-white" echarts [options]="sampled_fft_graph" (chartInit)="onSampledFFTChartInit($event)"></div>
+    </div>
+  </ng-container>
+</app-tutorial-template>
