@@ -1,7 +1,7 @@
 import { importProvidersFrom, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgxEchartsModule } from 'ngx-echarts';
-import "@angular/compiler";
+import '@angular/compiler';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -22,14 +22,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgxOpenCVModule, OpenCVConfig } from 'ngx-opencv';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {MatCheckboxModule} from '@angular/material/checkbox'; 
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {MatSelectModule} from '@angular/material/select';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatCardModule} from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 import { ColorPickerModule } from 'ngx-color-picker';
-
-
 
 import { MatSliderModule, MatSliderThumb } from '@angular/material/slider';
 import { HomeComponent } from './Components/home/home.component';
@@ -43,7 +41,7 @@ import { StructuralElementComponent } from './Components/Tutorials/Images/morpho
 import { TutorialTemplateImagesComponent } from './Components/Toolbox/tutorial-template-images/tutorial-template-images.component';
 import { ImageHistogramComponent } from './Components/Tutorials/Images/image-histogram/image-histogram.component';
 import { WeightsLossComponent } from './Components/Tutorials/MachineLearning/weights-loss/weights-loss.component';
-import { SamplingComponent } from './Components/Tutorials/OneDim/sampling/sampling.component';
+import { SamplingComponent } from './Components/Tutorials/1D/sampling/sampling.component';
 import { TutorialTemplateComponent } from './Components/Toolbox/tutorial-template/tutorial-template.component';
 import { LoadingButtonsComponent } from './Components/Toolbox/loading-buttons/loading-buttons.component';
 import { ImagePresetsComponent } from './Components/Presets/image-presets/image-presets.component';
@@ -63,10 +61,9 @@ const openCVConfig: OpenCVConfig = {
   openCVDirPath: 'assets/opencv',
 };
 
-
 @NgModule({
   declarations: [
-    GradientDescentComponent, 
+    GradientDescentComponent,
     AppComponent,
     FastFourierTransformComponent,
     DrawCanvasComponent,
@@ -93,11 +90,10 @@ const openCVConfig: OpenCVConfig = {
     PrincipalComponentAnalysisComponent,
     RegressionComponent,
     CNNComponent,
-
   ],
   imports: [
     NgxEchartsModule.forRoot({
-      echarts: () => import('echarts')
+      echarts: () => import('echarts'),
     }),
     // NgxOpenCVModule.forRoot(openCVConfig),
     MatCheckboxModule,
@@ -126,9 +122,9 @@ const openCVConfig: OpenCVConfig = {
     AppRoutingModule,
     BrowserAnimationsModule,
   ],
-  providers: [provideAnimationsAsync(), 
-    importProvidersFrom(NgxOpenCVModule.forRoot(openCVConfig))
-
+  providers: [
+    provideAnimationsAsync(),
+    importProvidersFrom(NgxOpenCVModule.forRoot(openCVConfig)),
   ],
   bootstrap: [AppComponent],
 })

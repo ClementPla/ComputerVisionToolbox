@@ -1,24 +1,30 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 import { TutorialClass } from '../../../Toolbox/tutorial-parents/tutorial';
 
 import { ECharts, EChartsOption } from 'echarts';
 import { ToyModel } from './toy_model';
 import { Adam, Optimizer, RMSProp, SGD } from '../NN/optim';
 
-
 @Component({
   selector: 'app-optimizer',
   templateUrl: './optimizer.component.html',
-  styleUrls: ['./optimizer.component.scss']
+  styleUrls: ['./optimizer.component.scss'],
 })
-export class OptimizerComponent extends TutorialClass implements OnInit, AfterViewInit {
-
+export class OptimizerComponent
+  extends TutorialClass
+  implements OnInit, AfterViewInit
+{
   max_steps = 100;
   simu_speed = 50;
   max_history = 25;
   step_size = 0.02;
   current_step = 0;
-  initial_xy = [0.5, 0.0]
+  initial_xy = [0.5, 0.0];
   min = -1;
   max = 1;
   noisyGradient: boolean = false;
@@ -36,7 +42,6 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
 
   model: ToyModel = new ToyModel();
   optim: Optimizer;
-
 
   option: EChartsOption = {
     // backgroundColor: '#fff',
@@ -61,10 +66,10 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
           '#fdae61',
           '#f46d43',
           '#d73027',
-          '#a50026'
+          '#a50026',
         ],
         // colorAlpha: [0.25, 1.0]
-      }
+      },
     },
     xAxis3D: {
       type: 'value',
@@ -74,40 +79,36 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
     yAxis3D: {
       type: 'value',
       min: this.min,
-      max: this.max
-
+      max: this.max,
     },
     zAxis3D: {
       type: 'value',
       show: false,
       min: -1,
-      max: 1
+      max: 1,
     },
     grid3D: {
       show: true,
       postEffect: {
-        enable: false
+        enable: false,
       },
-
     },
-
   };
 
   lossPlot: EChartsOption = {
     xAxis: {
-      type: 'value'
+      type: 'value',
     },
     yAxis: {
-      type: 'value'
+      type: 'value',
     },
     series: [
       {
         type: 'line',
-        data: []
-      }
-    ]
-
-  }
+        data: [],
+      },
+    ],
+  };
   data: any = {
     series: [
       {
@@ -117,45 +118,40 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
         visualMap: true,
         lineStyle: {
           width: 2,
-          border: 'black'
+          border: 'black',
         },
       },
       {
         type: 'scatter3D',
         zlevel: 10,
-        data: [
-          this.model.currentXYZ()
-        ],
+        data: [this.model.currentXYZ()],
         symbol: 'circle',
         symbolSize: 10,
         itemStyle: {
           color: 'black',
-          opacity: .5
+          opacity: 0.5,
         },
       },
       {
         type: 'surface',
         wireframe: {
-          show: false
+          show: false,
         },
-        dataShape: [Math.round((this.max - this.min) / this.step_size), Math.round((this.max - this.min) / this.step_size)]
-      }
-    ]
-  }
+        dataShape: [
+          Math.round((this.max - this.min) / this.step_size),
+          Math.round((this.max - this.min) / this.step_size),
+        ],
+      },
+    ],
+  };
   constructor(private cdr: ChangeDetectorRef) {
     super();
-    this.model.layer1.pos.data = [... this.initial_xy]
+    this.model.layer1.pos.data = [...this.initial_xy];
     this.changeOptimizer();
-
   }
 
-
-  ngOnInit(): void {
-
-  }
-  ngAfterViewInit(): void {
-
-  }
+  ngOnInit(): void {}
+  ngAfterViewInit(): void {}
 
   onChartInit(ec: ECharts) {
     this.echartInstance = ec;
@@ -173,7 +169,6 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
     requestAnimationFrame(() => {
       this.updateOption();
     });
-
   }
   onLossChartInit(ec: ECharts) {
     this.echartLossPlotInstance = ec;
@@ -188,18 +183,14 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
       let x = event.value[0];
       let y = event.value[1];
 
-      this.initial_xy = [x, y]
-      this.resetToInitialPoint()
-
+      this.initial_xy = [x, y];
+      this.resetToInitialPoint();
     }
     if (this.isTraining) {
       this.startTraining();
     }
-
-
   }
   changeLearningRate(event: any) {
-
     if (this.isTraining) {
       this.pauseTraining();
     }
@@ -216,15 +207,12 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
     }
     if (this.optimizerType === 'sgd') {
       this.optim = new SGD(this.model, this.lr, this.wc);
-    }
-    else if (this.optimizerType === 'Adam') {
+    } else if (this.optimizerType === 'Adam') {
       this.optim = new Adam(this.model, this.lr, this.wc);
-    }
-    else {
+    } else {
       this.optim = new RMSProp(this.model, this.lr, this.wc);
-
     }
-    this.optim.reset_momentums()
+    this.optim.reset_momentums();
     if (this.isTraining) {
       this.startTraining();
     }
@@ -261,8 +249,8 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
 
   step() {
     if (this.current_step >= this.max_steps) {
-      this.resetToInitialPoint()
-      return
+      this.resetToInitialPoint();
+      return;
     }
 
     this.model.backward();
@@ -270,56 +258,54 @@ export class OptimizerComponent extends TutorialClass implements OnInit, AfterVi
       this.model.noisify_gradient(5.0);
     }
     this.optim.step();
-    this.model.bound_check(this.min, this.max)
+    this.model.bound_check(this.min, this.max);
 
     this.history.push(this.model.currentXYZ(0.05));
 
-    this.current_step += 1
+    this.current_step += 1;
     this.updateOption();
-
   }
 
   resetToInitialPoint() {
-    this.model.layer1.pos.data = [... this.initial_xy]
-    this.optim.reset_momentums()
-    this.current_step = 0
-    this.history = []
-    this.updateOption()
-
+    this.model.layer1.pos.data = [...this.initial_xy];
+    this.optim.reset_momentums();
+    this.current_step = 0;
+    this.history = [];
+    this.updateOption();
   }
 
   updateOption() {
-
     this.data.series[1].data = [this.model.currentXYZ(0.05)];
 
-    let _history = []
-    for (let i = this.history.length - this.max_history; i < this.history.length; i++) {
-      _history.push(this.history[i])
+    let _history = [];
+    for (
+      let i = this.history.length - this.max_history;
+      i < this.history.length;
+      i++
+    ) {
+      _history.push(this.history[i]);
     }
     this.data.series[0].data = _history;
 
     const series = {
-      series: [this.data.series[0], this.data.series[1]]
-    }
+      series: [this.data.series[0], this.data.series[1]],
+    };
 
-    let _lossData: number[][] = []
-    this.history.forEach((value, index) =>{
-      _lossData.push([index, value[2]])
-    })
+    let _lossData: number[][] = [];
+    this.history.forEach((value, index) => {
+      _lossData.push([index, value[2]]);
+    });
     this.echartInstance.setOption(series, {
       notMerge: false,
       lazyUpdate: true,
-      silent: true
+      silent: true,
     });
-    this.echartLossPlotInstance.setOption({series:[
-      {
-        data: _lossData
-      }
-    ]})
-
-
-
-
+    this.echartLossPlotInstance.setOption({
+      series: [
+        {
+          data: _lossData,
+        },
+      ],
+    });
   }
-
 }
