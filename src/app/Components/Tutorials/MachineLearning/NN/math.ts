@@ -1,4 +1,4 @@
-import { Tensor } from './tensor';
+import { Tensor, Slice } from './tensor';
 
 export function argmax(input: Tensor): Tensor {
   let B = input.shape[0];
@@ -49,11 +49,60 @@ export function matmul(
   return output;
 }
 
-export function clip_grad(input: Tensor, min: number, max: number): Tensor {
-  for (let i = 0; i < input.length(); i++) {
-    input.grad[i] = Math.min(max, Math.max(min, input.grad[i]));
+export function strassen_matmul(inputA: Tensor, inputB: Tensor): Tensor {
+  let A = inputA.shape[0];
+  let B = inputA.shape[1];
+  if (B !== inputB.shape[0]) {
+    throw new Error(
+      'Matrix dimensions do not match, got ' + B + ' and ' + inputB.shape[0]
+    );
   }
-  return input;
+  let C = inputB.shape[1];
+  let output = new Tensor([A, C]);
+
+  // Base case for recursion
+  if (A <= 2 || B <= 2 || C <= 2) {
+    return matmul(inputA, inputB, undefined);
+  }
+
+  // Split matrices into quadrants
+  let midA = Math.floor(A / 2);
+  let midB = Math.floor(B / 2);
+  let midC = Math.floor(C / 2);
+  let A11 = inputA.slice([new Slice(0, 0, midA), new Slice(1, 0, midB)]);
+  let A12 = inputA.slice([new Slice(0, 0, midA), new Slice(1, midB, B)]);
+  let A21 = inputA.slice([new Slice(0, midA, A), new Slice(1, 0, midB)]);
+  let A22 = inputA.slice([new Slice(0, midA, A), new Slice(1, midB, B)]);
+  let B11 = inputB.slice([new Slice(0, 0, midB), new Slice(1, 0, midC)]);
+  let B12 = inputB.slice([new Slice(0, 0, midB), new Slice(1, midC, C)]);
+  let B21 = inputB.slice([new Slice(0, midB, B), new Slice(1, 0, midC)]);
+  let B22 = inputB.slice([new Slice(0, midB, B), new Slice(1, midC, C)]);
+
+  // Compute the 7 products using Strassen's formulas
+  let M1 = strassen_matmul(A11.add(A22), B11.add(B22));
+  let M2 = strassen_matmul(A21.add(A22), B11);
+  let M3 = strassen_matmul(A11, B12.sub(B22));
+  let M4 = strassen_matmul(A22, B21.sub(B11));
+  let M5 = strassen_matmul(A11.add(A12), B22);
+  let M6 = strassen_matmul(A21.sub(A11), B11.add(B12));
+  let M7 = strassen_matmul(A12.sub(A22), B21.add(B22));
+
+  // Combine the 7 products into the final output
+  let C11 = M1.add(M4).sub(M5).add(M7);
+  let C12 = M3.add(M5);
+  let C21 = M2.add(M4);
+  let C22 = M1.sub(M2).add(M3).add(M6);
+
+  // Place the quadrants into the output matrix
+  for (let i = 0; i < midA; i++) {
+    for (let j = 0; j < midC; j++) {
+      output.data[i * C + j] = C11.data[i * midC + j];
+      output.data[i * C + j + midC] = C12.data[i * midC + j];
+      output.data[(i + midA) * C + j] = C21.data[i * midC + j];
+      output.data[(i + midA) * C + j + midC] = C22.data[i * midC + j];
+    }
+  }
+  return output;
 }
 
 export function conv2D(
@@ -93,4 +142,15 @@ export function conv2D(
     }
   }
   return output;
+}
+
+export function clip_grad(tensor: Tensor, min: number, max: number) {
+  for (let i = 0; i < tensor.grad.length; i++) {
+    if (tensor.grad[i] < min) {
+      tensor.grad[i] = min;
+    } else if (tensor.grad[i] > max) {
+      tensor.grad[i] = max;
+    }
+  }
+  return tensor;
 }

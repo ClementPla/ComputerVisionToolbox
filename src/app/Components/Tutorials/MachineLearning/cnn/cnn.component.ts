@@ -1,7 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { TutorialImageClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial-image';
 
-import * as ort from 'onnxruntime-web';
+declare global {
+  interface Window {
+    ort: any; // ou mieux : typeof import('onnxruntime-web') si tu veux le typage
+  }
+}
+
+const ort = window.ort;
+
 import { DrawCanvasComponent } from 'src/app/Components/Toolbox/draw-canvas/draw-canvas.component';
 
 @Component({
@@ -13,7 +20,7 @@ export class CNNComponent extends TutorialImageClass implements OnInit {
   @ViewChild('drawCanvas') canvas: DrawCanvasComponent;
   @ViewChild('drawCanvas2') canvas2: DrawCanvasComponent;
 
-  session: ort.InferenceSession;
+  session: any;
   isready: boolean = false;
   probas: Array<number> = new Array(10).fill(0);
   maxProba: number = 0;
@@ -24,7 +31,7 @@ export class CNNComponent extends TutorialImageClass implements OnInit {
   }
 
   async load_sessions() {
-    this.session = await ort.InferenceSession.create(
+    this.session = await window.ort.InferenceSession.create(
       'assets/models/onnx_model.onnx'
     );
     this.isready = true;
@@ -48,7 +55,6 @@ export class CNNComponent extends TutorialImageClass implements OnInit {
     const tensor = new ort.Tensor('float32', float32Array, [1, 1, 28, 28]);
 
     const output = await this.session.run({ 'input.1': tensor });
-
     this.probas = [];
     this.maxProba = 0;
     for (let i = 0; i < output[27].data.length; i++) {

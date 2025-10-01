@@ -36,6 +36,7 @@ export class Trainer {
       if (i < this.dataset.length() / batch_size) {
         let batch = this.dataset.getBatch(i, batch_size);
         loss += this.train_step(batch).data[0];
+
         i++;
       } else {
         this.currentEpoch++;
@@ -43,7 +44,7 @@ export class Trainer {
         loss = 0;
         i = 0;
       }
-    }, 0);
+    }, 1);
   }
 
   train_step(batch: Tensor[]) {
@@ -63,6 +64,7 @@ export class Trainer {
   stopTraining() {
     if (this.trainTimeout) {
       clearInterval(this.trainTimeout);
+      this.trainTimeout = undefined;
     }
   }
 

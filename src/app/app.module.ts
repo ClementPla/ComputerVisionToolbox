@@ -57,6 +57,7 @@ import { PrincipalComponentAnalysisComponent } from './Components/Tutorials/Mach
 import { RegressionComponent } from './Components/Tutorials/MachineLearning/regression/regression.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { CNNComponent } from './Components/Tutorials/MachineLearning/cnn/cnn.component';
+import { BayesianRegressionComponent } from './Components/Tutorials/MachineLearning/bayesian-regression/bayesian-regression.component';
 const openCVConfig: OpenCVConfig = {
   openCVDirPath: 'assets/opencv',
 };
@@ -90,6 +91,7 @@ const openCVConfig: OpenCVConfig = {
     PrincipalComponentAnalysisComponent,
     RegressionComponent,
     CNNComponent,
+    BayesianRegressionComponent,
   ],
   imports: [
     NgxEchartsModule.forRoot({

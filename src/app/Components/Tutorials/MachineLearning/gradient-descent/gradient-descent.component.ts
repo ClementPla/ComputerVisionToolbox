@@ -1,13 +1,10 @@
 import {
   AfterViewInit,
-  ChangeDetectorRef,
   Component,
   ElementRef,
-  HostListener,
   OnInit,
-  QueryList,
   ViewChild,
-  ViewChildren,
+  OnDestroy,
 } from '@angular/core';
 import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial';
 
@@ -19,7 +16,7 @@ import { Identity, RELU, Sigmoid, TanH } from '../NN/activation';
 import { ECharts, EChartsOption } from 'echarts';
 import { Datapoint, Dataset } from '../NN/dataset';
 import { Trainer } from '../NN/trainer';
-import { CrossEntropyLoss, MSELoss } from '../NN/loss';
+import { CrossEntropyLoss } from '../NN/loss';
 import { SGD } from '../NN/optim';
 import { spectral } from 'src/app/utils/colormap';
 
@@ -30,7 +27,7 @@ import { spectral } from 'src/app/utils/colormap';
 })
 export class GradientDescentComponent
   extends TutorialClass
-  implements OnInit, AfterViewInit
+  implements OnInit, AfterViewInit, OnDestroy
 {
   @ViewChild('heatmapCanvas') heatmapCanvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('legendHeatmap') legendHeatmap: ElementRef<HTMLCanvasElement>;
@@ -39,10 +36,13 @@ export class GradientDescentComponent
 
   model: Network;
   dataset: Dataset = new Dataset();
-  gridResolution: number = 100;
+  gridResolution: number = 15;
   trainer: Trainer;
   correctlyClassified: number = 0;
   inputData: Tensor;
+
+  inferenceInterval: NodeJS.Timeout;
+  normEvalInterval: NodeJS.Timeout;
 
   n_points = 150;
   n_layers = 1;
@@ -135,13 +135,13 @@ export class GradientDescentComponent
     this.buildHeatmapLegend();
     this.resetDataset();
     this.updateParamsNormsView();
-    setInterval(() => {
+    this.inferenceInterval = setInterval(() => {
       if (this.isTraining) {
         this.updateChart();
       }
     }, 100);
 
-    setInterval(() => {
+    this.normEvalInterval = setInterval(() => {
       if (this.isTraining) {
         this.updateParamsNormsView();
       }
@@ -553,5 +553,12 @@ export class GradientDescentComponent
         },
       ],
     };
+  }
+
+  ngOnDestroy(): void {
+    console.log('Destroy');
+    this.trainer.stopTraining();
+    clearInterval(this.inferenceInterval);
+    clearInterval(this.normEvalInterval);
   }
 }
