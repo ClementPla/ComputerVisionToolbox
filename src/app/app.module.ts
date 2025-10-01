@@ -27,9 +27,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
-import { ColorPickerModule } from 'ngx-color-picker';
 
-import { MatSliderModule, MatSliderThumb } from '@angular/material/slider';
+import { MatSliderModule } from '@angular/material/slider';
 import { HomeComponent } from './Components/home/home.component';
 import { HomeCardComponent } from './Components/home-card/home-card.component';
 import { SpatialFilteringComponent } from './Components/Tutorials/Images/spatial-filtering/spatial-filtering.component';
@@ -55,7 +54,6 @@ import { FastFourierTransformComponent } from './Components/Tutorials/Images/fas
 import { OptimizerComponent } from './Components/Tutorials/MachineLearning/optimizer/optimizer.component';
 import { PrincipalComponentAnalysisComponent } from './Components/Tutorials/MachineLearning/principal-component-analysis/principal-component-analysis.component';
 import { RegressionComponent } from './Components/Tutorials/MachineLearning/regression/regression.component';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { CNNComponent } from './Components/Tutorials/MachineLearning/cnn/cnn.component';
 import { BayesianRegressionComponent } from './Components/Tutorials/MachineLearning/bayesian-regression/bayesian-regression.component';
 const openCVConfig: OpenCVConfig = {
@@ -102,13 +100,11 @@ const openCVConfig: OpenCVConfig = {
     MatCardModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    MatSliderThumb,
     MatButtonToggleModule,
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     FormsModule,
-    ColorPickerModule,
     MatExpansionModule,
     MatSlideToggleModule,
     MatListModule,
@@ -122,12 +118,8 @@ const openCVConfig: OpenCVConfig = {
     MatIconModule,
     MatSliderModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
   ],
-  providers: [
-    provideAnimationsAsync(),
-    importProvidersFrom(NgxOpenCVModule.forRoot(openCVConfig)),
-  ],
+  providers: [importProvidersFrom(NgxOpenCVModule.forRoot(openCVConfig))],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
