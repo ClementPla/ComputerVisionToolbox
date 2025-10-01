@@ -1,9 +1,10 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-labelled-sliders',
-  templateUrl: './labelled-sliders.component.html',
-  styleUrls: ['./labelled-sliders.component.scss'],
+    selector: 'app-labelled-sliders',
+    templateUrl: './labelled-sliders.component.html',
+    styleUrls: ['./labelled-sliders.component.scss'],
+    standalone: false
 })
 export class LabelledSlidersComponent implements OnInit {
   @Input() min: number = 1;

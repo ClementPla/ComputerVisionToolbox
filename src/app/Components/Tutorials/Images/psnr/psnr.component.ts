@@ -5,9 +5,10 @@ import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-i
 
 import { gaussianRandom, getMean, getStandardDeviation } from '../../../../utils/math';
 @Component({
-  selector: 'app-psnr',
-  templateUrl: './psnr.component.html',
-  styleUrls: ['./psnr.component.scss']
+    selector: 'app-psnr',
+    templateUrl: './psnr.component.html',
+    styleUrls: ['./psnr.component.scss'],
+    standalone: false
 })
 export class PSNRComponent extends TutorialImageClass implements AfterViewInit, OnInit
 { 

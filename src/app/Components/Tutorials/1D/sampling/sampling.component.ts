@@ -6,9 +6,10 @@ import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 
 @Component({
-  selector: 'app-sampling',
-  templateUrl: './sampling.component.html',
-  styleUrls: ['./sampling.component.scss']
+    selector: 'app-sampling',
+    templateUrl: './sampling.component.html',
+    styleUrls: ['./sampling.component.scss'],
+    standalone: false
 })
 export class SamplingComponent implements AfterViewInit {
 

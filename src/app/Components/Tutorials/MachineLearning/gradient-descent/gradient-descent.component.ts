@@ -21,9 +21,10 @@ import { SGD } from '../NN/optim';
 import { spectral } from 'src/app/utils/colormap';
 
 @Component({
-  selector: 'app-gradient-descent',
-  templateUrl: './gradient-descent.component.html',
-  styleUrls: ['./gradient-descent.component.scss'],
+    selector: 'app-gradient-descent',
+    templateUrl: './gradient-descent.component.html',
+    styleUrls: ['./gradient-descent.component.scss'],
+    standalone: false
 })
 export class GradientDescentComponent
   extends TutorialClass

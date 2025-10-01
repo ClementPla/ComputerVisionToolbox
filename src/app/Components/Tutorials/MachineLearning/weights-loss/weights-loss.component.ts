@@ -7,9 +7,10 @@ import { EChartsOption, SeriesOption } from 'echarts';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 @Component({
-  selector: 'app-weights-loss',
-  templateUrl: './weights-loss.component.html',
-  styleUrls: ['./weights-loss.component.scss'],
+    selector: 'app-weights-loss',
+    templateUrl: './weights-loss.component.html',
+    styleUrls: ['./weights-loss.component.scss'],
+    standalone: false
 })
 export class WeightsLossComponent implements OnInit {
   x_range = [-10, 10];

@@ -6,10 +6,11 @@ import { TutorialTemplateComponent } from '../tutorial-template/tutorial-templat
 import { UIControlService } from '../../../Services/uicontrol.service';
 
 @Component({
-  selector: 'app-tutorial-template-images',
-  templateUrl: './tutorial-template-images.component.html',
-  styleUrls: ['./tutorial-template-images.component.scss',
-  '../tutorial-template/tutorial-template.component.scss']
+    selector: 'app-tutorial-template-images',
+    templateUrl: './tutorial-template-images.component.html',
+    styleUrls: ['./tutorial-template-images.component.scss',
+        '../tutorial-template/tutorial-template.component.scss'],
+    standalone: false
 })
 export class TutorialTemplateImagesComponent extends TutorialTemplateComponent implements AfterViewInit {
 

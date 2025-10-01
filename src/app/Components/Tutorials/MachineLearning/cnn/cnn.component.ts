@@ -12,9 +12,10 @@ const ort = window.ort;
 import { DrawCanvasComponent } from 'src/app/Components/Toolbox/draw-canvas/draw-canvas.component';
 
 @Component({
-  selector: 'app-cnn',
-  templateUrl: './cnn.component.html',
-  styleUrl: './cnn.component.scss',
+    selector: 'app-cnn',
+    templateUrl: './cnn.component.html',
+    styleUrl: './cnn.component.scss',
+    standalone: false
 })
 export class CNNComponent extends TutorialImageClass implements OnInit {
   @ViewChild('drawCanvas') canvas: DrawCanvasComponent;

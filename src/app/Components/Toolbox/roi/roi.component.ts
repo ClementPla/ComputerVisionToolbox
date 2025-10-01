@@ -4,9 +4,10 @@ import { ROIProperty } from '../../../utils/interface';
 import { Point2D } from '../../../utils/geometry';
 
 @Component({
-  selector: 'app-roi',
-  templateUrl: './roi.component.html',
-  styleUrls: ['./roi.component.scss']
+    selector: 'app-roi',
+    templateUrl: './roi.component.html',
+    styleUrls: ['./roi.component.scss'],
+    standalone: false
 })
 export class ROIComponent implements OnInit, AfterViewInit{
 

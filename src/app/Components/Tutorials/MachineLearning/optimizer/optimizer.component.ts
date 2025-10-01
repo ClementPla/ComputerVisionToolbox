@@ -11,9 +11,10 @@ import { ToyModel } from './toy_model';
 import { Adam, Optimizer, RMSProp, SGD } from '../NN/optim';
 
 @Component({
-  selector: 'app-optimizer',
-  templateUrl: './optimizer.component.html',
-  styleUrls: ['./optimizer.component.scss'],
+    selector: 'app-optimizer',
+    templateUrl: './optimizer.component.html',
+    styleUrls: ['./optimizer.component.scss'],
+    standalone: false
 })
 export class OptimizerComponent
   extends TutorialClass

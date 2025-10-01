@@ -3,9 +3,10 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UIControlService } from '../../../Services/uicontrol.service';
 
 @Component({
-  selector: 'app-loading-buttons',
-  templateUrl: './loading-buttons.component.html',
-  styleUrls: ['./loading-buttons.component.scss']
+    selector: 'app-loading-buttons',
+    templateUrl: './loading-buttons.component.html',
+    styleUrls: ['./loading-buttons.component.scss'],
+    standalone: false
 })
 export class LoadingButtonsComponent implements OnInit {
   @Output() loadingEvent = new EventEmitter<File>();

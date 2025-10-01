@@ -6,9 +6,10 @@ declare var cv: any;
 
 
 @Component({
-  selector: 'app-spectral-filtering',
-  templateUrl: './spectral-filtering.component.html',
-  styleUrls: ['./spectral-filtering.component.scss']
+    selector: 'app-spectral-filtering',
+    templateUrl: './spectral-filtering.component.html',
+    styleUrls: ['./spectral-filtering.component.scss'],
+    standalone: false
 })
 export class SpectralFilteringComponent extends TutorialImageClass {
 

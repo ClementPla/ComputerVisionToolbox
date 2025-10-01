@@ -7,9 +7,10 @@ import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-i
 declare var cv: any;
 
 @Component({
-  selector: 'app-color-spaces',
-  templateUrl: './color-spaces.component.html',
-  styleUrls: ['./color-spaces.component.scss']
+    selector: 'app-color-spaces',
+    templateUrl: './color-spaces.component.html',
+    styleUrls: ['./color-spaces.component.scss'],
+    standalone: false
 })
 export class ColorSpacesComponent extends TutorialImageClass implements AfterViewInit {
 

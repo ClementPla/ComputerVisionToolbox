@@ -5,9 +5,10 @@ import { polyfit } from '../../../../utils/linalg';
 import { arange, choice, linspace } from '../../../../utils/math';
 
 @Component({
-  selector: 'app-regression',
-  templateUrl: './regression.component.html',
-  styleUrls: ['./regression.component.scss']
+    selector: 'app-regression',
+    templateUrl: './regression.component.html',
+    styleUrls: ['./regression.component.scss'],
+    standalone: false
 })
 export class RegressionComponent implements OnInit {
 

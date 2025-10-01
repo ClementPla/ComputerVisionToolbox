@@ -2,9 +2,10 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { MathJaxService } from 'src/app/Services/math-jax.service';
 
 @Component({
-  selector: 'app-math-jax-paragraph',
-  templateUrl: './math-jax-paragraph.component.html',
-  styleUrls: ['./math-jax-paragraph.component.scss']
+    selector: 'app-math-jax-paragraph',
+    templateUrl: './math-jax-paragraph.component.html',
+    styleUrls: ['./math-jax-paragraph.component.scss'],
+    standalone: false
 })
 export class MathJaxParagraphComponent implements OnInit {
   @ViewChild('mathParagraph') paragraphElement: ElementRef<HTMLDivElement>;

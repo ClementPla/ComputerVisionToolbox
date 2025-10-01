@@ -10,9 +10,10 @@ import {
 import { Kernel } from '../kernel';
 
 @Component({
-  selector: 'app-kernel-element',
-  templateUrl: './kernel-element.component.html',
-  styleUrls: ['./kernel-element.component.scss'],
+    selector: 'app-kernel-element',
+    templateUrl: './kernel-element.component.html',
+    styleUrls: ['./kernel-element.component.scss'],
+    standalone: false
 })
 export class KernelElementComponent implements OnInit {
   @Input() kernel: Kernel;

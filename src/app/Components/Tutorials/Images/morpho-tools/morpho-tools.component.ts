@@ -12,9 +12,10 @@ import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-i
 declare var cv: any;
 
 @Component({
-  selector: 'app-morpho-tools',
-  templateUrl: './morpho-tools.component.html',
-  styleUrls: ['./morpho-tools.component.scss'],
+    selector: 'app-morpho-tools',
+    templateUrl: './morpho-tools.component.html',
+    styleUrls: ['./morpho-tools.component.scss'],
+    standalone: false
 })
 export class MorphoToolsComponent
   extends TutorialImageClass

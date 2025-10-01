@@ -4,9 +4,10 @@ import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-i
 declare var cv: any;
 
 @Component({
-  selector: 'app-fast-fourier-transform',
-  templateUrl: './fast-fourier-transform.component.html',
-  styleUrls: ['./fast-fourier-transform.component.scss'],
+    selector: 'app-fast-fourier-transform',
+    templateUrl: './fast-fourier-transform.component.html',
+    styleUrls: ['./fast-fourier-transform.component.scss'],
+    standalone: false
 })
 export class FastFourierTransformComponent extends TutorialImageClass {
   angle: number | null = 0;

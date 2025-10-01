@@ -24,9 +24,10 @@ import { ROIComponent } from '../roi/roi.component';
 declare var cv: any;
 
 @Component({
-  selector: 'app-draw-canvas',
-  templateUrl: './draw-canvas.component.html',
-  styleUrls: ['./draw-canvas.component.scss'],
+    selector: 'app-draw-canvas',
+    templateUrl: './draw-canvas.component.html',
+    styleUrls: ['./draw-canvas.component.scss'],
+    standalone: false
 })
 export class DrawCanvasComponent implements OnInit {
   @Output() drawingEnded = new EventEmitter<boolean>();

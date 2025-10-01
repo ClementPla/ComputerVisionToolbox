@@ -5,9 +5,10 @@ import { OpenCVState } from 'ngx-opencv';
 declare var cv: any;
 
 @Component({
-  selector: 'app-image-histogram',
-  templateUrl: './image-histogram.component.html',
-  styleUrls: ['./image-histogram.component.scss'],
+    selector: 'app-image-histogram',
+    templateUrl: './image-histogram.component.html',
+    styleUrls: ['./image-histogram.component.scss'],
+    standalone: false
 })
 export class ImageHistogramComponent
   extends TutorialImageClass

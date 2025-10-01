@@ -2,9 +2,10 @@ import { Component, Input } from '@angular/core';
 import { Point2D } from '../../../utils/geometry';
 
 @Component({
-  selector: 'app-handle',
-  templateUrl: './handle.component.html',
-  styleUrls: ['./handle.component.scss']
+    selector: 'app-handle',
+    templateUrl: './handle.component.html',
+    styleUrls: ['./handle.component.scss'],
+    standalone: false
 })
 export class HandleComponent{
 

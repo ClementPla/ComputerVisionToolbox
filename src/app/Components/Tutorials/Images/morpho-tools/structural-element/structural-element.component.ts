@@ -2,9 +2,10 @@ import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef} 
 import { StructuralElement } from '../structuralElement';
 
 @Component({
-  selector: 'app-structural-element',
-  templateUrl: './structural-element.component.html',
-  styleUrls: ['./structural-element.component.scss']
+    selector: 'app-structural-element',
+    templateUrl: './structural-element.component.html',
+    styleUrls: ['./structural-element.component.scss'],
+    standalone: false
 })
 export class StructuralElementComponent implements OnInit {
 

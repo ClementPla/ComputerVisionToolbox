@@ -7,9 +7,10 @@ import { PCA } from '../../../../utils/linalg';
 
 
 @Component({
-  selector: 'app-principal-component-analysis',
-  templateUrl: './principal-component-analysis.component.html',
-  styleUrls: ['./principal-component-analysis.component.scss']
+    selector: 'app-principal-component-analysis',
+    templateUrl: './principal-component-analysis.component.html',
+    styleUrls: ['./principal-component-analysis.component.scss'],
+    standalone: false
 })
 export class PrincipalComponentAnalysisComponent extends TutorialClass implements OnInit {
   echartInstance: ECharts

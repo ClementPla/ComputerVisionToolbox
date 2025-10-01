@@ -6,9 +6,10 @@ declare var cv: any;
 
 
 @Component({
-  selector: 'app-spatial-filtering',
-  templateUrl: './spatial-filtering.component.html',
-  styleUrls: ['./spatial-filtering.component.scss'],
+    selector: 'app-spatial-filtering',
+    templateUrl: './spatial-filtering.component.html',
+    styleUrls: ['./spatial-filtering.component.scss'],
+    standalone: false
 })
 export class SpatialFilteringComponent extends TutorialImageClass implements AfterContentInit {
 
