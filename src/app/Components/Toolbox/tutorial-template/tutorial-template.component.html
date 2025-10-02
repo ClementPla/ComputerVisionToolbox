@@ -1,19 +1,25 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
-    <button mat-icon-button class="example-icon" *ngIf="leftDrawer" (click)="drawerLeft.toggle()">
-      <mat-icon>menu</mat-icon>
-    </button>
+    @if (leftDrawer) {<button
+      mat-icon-button
+      class="example-icon"
+      (click)="drawerLeft.toggle()"
+    >
+      <mat-icon>menu</mat-icon></button
+    >}
     <a routerLink="/home" class="show-smallscreen">
-    <button mat-icon-button class="example-icon" >
-      <mat-icon>home</mat-icon>
-    </button>
-  </a>
+      <button mat-icon-button class="example-icon">
+        <mat-icon>home</mat-icon>
+      </button>
+    </a>
     <span>
       <ng-content></ng-content>
     </span>
-    <button mat-icon-button class="example-icon" *ngIf="rightDrawer" (click)="drawerRight.toggle()">
+    @if (rightDrawer){
+    <button mat-icon-button class="example-icon" (click)="drawerRight.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
+    }
   </mat-toolbar-row>
 </mat-toolbar>
 
@@ -30,6 +36,19 @@
   </mat-drawer>
 
   <div class="horizontal-flex drawer-container">
+    @if (tutorial) {
+    <mat-expansion-panel class="w-5/6">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <ng-content select="[tutorialTitle]"> </ng-content>
+        </mat-panel-title>
+        <mat-panel-description>
+          <ng-content select="[tutorialDescription]"> </ng-content>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-content select="[tutorialContent]"> </ng-content>
+    </mat-expansion-panel>
+    }
     <ng-content select="[centerContent]"></ng-content>
   </div>
 </mat-drawer-container>

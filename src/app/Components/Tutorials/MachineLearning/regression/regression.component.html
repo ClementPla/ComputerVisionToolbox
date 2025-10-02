@@ -1,44 +1,74 @@
 <app-tutorial-template>
-    <ng-container ngProjectAs="[drawerLeft]">
-        <div class="flex flex-col m-2">
-            <app-labelled-sliders
-            [title]='"Polynomial degree"'
-            [(value)]="this.degree"
-            [max]="40"
-            [min]="0"
-            [step]="1"
-            (valueChange)="updatePolynomial()"
-            >
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col m-2">
+      <app-labelled-sliders
+        [title]="'Polynomial degree'"
+        [(value)]="this.degree"
+        [max]="40"
+        [min]="0"
+        [step]="1"
+        (valueChange)="updatePolynomial()"
+      >
+      </app-labelled-sliders>
+      <app-labelled-sliders
+        [title]="'Number of points'"
+        [(value)]="this.train_points"
+        [max]="100"
+        [min]="1"
+        [step]="1"
+        (valueChange)="resamplePoints()"
+      >
+      </app-labelled-sliders>
 
-            </app-labelled-sliders>
-            <app-labelled-sliders
-            [title]="'Number of points'"
-            [(value)]="this.train_points"
-            [max]="100"
-            [min]="1"
-            [step]="1"
-            (valueChange)="resamplePoints()"
-            >
-            </app-labelled-sliders>
+      <app-labelled-sliders
+        [title]="'Noise level'"
+        [(value)]="this.noise"
+        [max]="5"
+        [min]="0"
+        [step]="0.01"
+        (valueChange)="resamplePoints()"
+      >
+      </app-labelled-sliders>
 
+      <button mat-raised-button color="primary" (click)="resamplePoints()">
+        Resample
+      </button>
 
-            <app-labelled-sliders
-            [title]='"Noise level"'
-            [(value)]="this.noise"
-            [max]="5"
-            [min]="0"
-            [step]="0.01"
-            (valueChange)="resamplePoints()"
-            >    
-            </app-labelled-sliders>
+      <app-labelled-sliders
+        [title]="'Regularization'"
+        [(value)]="lambda"
+        [max]="2"
+        [min]="0"
+        [step]="0.001"
+        (valueChange)="updatePolynomial()"
+      >
+      </app-labelled-sliders>
 
-            <button mat-raised-button color="primary" (click)="resamplePoints()">Resample</button>
-        </div>
-    </ng-container>
-    <ng-container ngProjectAs="[centerContent]">
-        <div class="w-full" echarts [options]="graphData" (chartInit)="chartInit($event)"></div>
-        <div> Training RMSE: {{this.training_rmse().toFixed(3)}} </div>
-        <div> RMSE: {{this.rmse().toFixed(3)}}</div>
-    </ng-container>
+      <app-labelled-sliders
+        [title]="'Regularization Norm'"
+        [(value)]="q"
+        [max]="8"
+        [min]="0"
+        [step]="0.25"
+        (valueChange)="updatePolynomial()"
+      >
+      </app-labelled-sliders>
+    </div>
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+    <div
+      class="w-full"
+      echarts
+      [options]="graphData"
+      (chartInit)="chartInit($event)"
+    ></div>
+    <div>Training RMSE: {{ this.training_rmse().toFixed(3) }}</div>
+    <div>RMSE: {{ this.rmse().toFixed(3) }}</div>
+    <div
+      class="w-full"
+      echarts
+      [options]="histData"
+      (chartInit)="histInit($event)"
+    ></div>
+  </ng-container>
 </app-tutorial-template>
-

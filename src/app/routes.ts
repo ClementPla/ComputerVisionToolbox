@@ -13,6 +13,7 @@ import { GradientDescentComponent } from './Components/Tutorials/MachineLearning
 import { OptimizerComponent } from './Components/Tutorials/MachineLearning/optimizer/optimizer.component';
 import { CNNComponent } from './Components/Tutorials/MachineLearning/cnn/cnn.component';
 import { BayesianRegressionComponent } from './Components/Tutorials/MachineLearning/bayesian-regression/bayesian-regression.component';
+import { RegressionComponent } from './Components/Tutorials/MachineLearning/regression/regression.component';
 export const routeConfig: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
@@ -29,4 +30,5 @@ export const routeConfig: Routes = [
   { path: 'CNN', component: CNNComponent },
   { path: 'bayesianRegression', component: BayesianRegressionComponent },
   { path: 'optimizer', component: OptimizerComponent },
+  { path: 'regression', component: RegressionComponent },
 ];

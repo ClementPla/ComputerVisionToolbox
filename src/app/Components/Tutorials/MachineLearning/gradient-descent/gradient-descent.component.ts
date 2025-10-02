@@ -21,10 +21,10 @@ import { SGD } from '../NN/optim';
 import { spectral } from 'src/app/utils/colormap';
 
 @Component({
-    selector: 'app-gradient-descent',
-    templateUrl: './gradient-descent.component.html',
-    styleUrls: ['./gradient-descent.component.scss'],
-    standalone: false
+  selector: 'app-gradient-descent',
+  templateUrl: './gradient-descent.component.html',
+  styleUrls: ['./gradient-descent.component.scss'],
+  standalone: false,
 })
 export class GradientDescentComponent
   extends TutorialClass
@@ -32,7 +32,7 @@ export class GradientDescentComponent
 {
   @ViewChild('heatmapCanvas') heatmapCanvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('legendHeatmap') legendHeatmap: ElementRef<HTMLCanvasElement>;
-  paramsNormsEcharts: ECharts[] = [];
+  paramsNormsEcharts: any[] = [];
   ctx: CanvasRenderingContext2D;
 
   model: Network;

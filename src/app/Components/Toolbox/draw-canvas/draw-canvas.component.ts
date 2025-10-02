@@ -24,10 +24,10 @@ import { ROIComponent } from '../roi/roi.component';
 declare var cv: any;
 
 @Component({
-    selector: 'app-draw-canvas',
-    templateUrl: './draw-canvas.component.html',
-    styleUrls: ['./draw-canvas.component.scss'],
-    standalone: false
+  selector: 'app-draw-canvas',
+  templateUrl: './draw-canvas.component.html',
+  styleUrls: ['./draw-canvas.component.scss'],
+  standalone: false,
 })
 export class DrawCanvasComponent implements OnInit {
   @Output() drawingEnded = new EventEmitter<boolean>();
@@ -40,7 +40,6 @@ export class DrawCanvasComponent implements OnInit {
   private canvasUI: ElementRef<HTMLCanvasElement>;
   private ctxUI: CanvasRenderingContext2D;
 
-
   @ViewChildren('handleProfile') handles: QueryList<HandleComponent>;
 
   @ViewChildren('ROI') ROIs: QueryList<ROIComponent>;
@@ -48,7 +47,7 @@ export class DrawCanvasComponent implements OnInit {
   @Input() width = 256;
   height = this.width;
 
-  UIwidth = 1024
+  UIwidth = 1024;
 
   @Input() roi: Array<ROIProperty> = [];
   @Input() brushRadius: number | null = 10;
@@ -57,7 +56,7 @@ export class DrawCanvasComponent implements OnInit {
   @Input() title = '';
   @Input() BWOption: boolean = false;
   @Input() OnlyBW: boolean = false;
-  @Input() profileOption: boolean = false
+  @Input() profileOption: boolean = false;
   @Input() antialiasing: boolean = true;
 
   @Output() BWSet = new EventEmitter<boolean>();
@@ -65,17 +64,16 @@ export class DrawCanvasComponent implements OnInit {
 
   @Output() roiChanged = new EventEmitter<ROIProperty>();
 
-  profile: boolean = false
+  profile: boolean = false;
 
   isBWChecked = false;
   cursorPosition: Point2D = { x: 0, y: 0 };
   startDrawing: boolean = false;
   initialPos: Point2D;
 
-
   profileArray: Array<number>;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
@@ -100,7 +98,7 @@ export class DrawCanvasComponent implements OnInit {
   }
 
   BWToggle() {
-    this.BWSet.emit()
+    this.BWSet.emit();
   }
 
   ngAfterViewInit(): void {
@@ -152,7 +150,8 @@ export class DrawCanvasComponent implements OnInit {
     x: number = 0,
     y: number = 0
   ) {
-    var image = new ImageData(data, width, height);
+    const clampedData = new Uint8ClampedArray(data);
+    var image = new ImageData(clampedData, width, height);
     this.ctx.putImageData(image, x, y);
 
     this.updateCanvasUI();
@@ -171,7 +170,8 @@ export class DrawCanvasComponent implements OnInit {
     dirtyWidth: number = width,
     dirtyHeight: number = height
   ) {
-    var image = new ImageData(data, width, height);
+    const clampedData = new Uint8ClampedArray(data);
+    var image = new ImageData(clampedData, width, height);
     this.ctx.putImageData(image, x, y, dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 
     this.updateCanvasUI();
@@ -196,35 +196,52 @@ export class DrawCanvasComponent implements OnInit {
         this.ctx.lineTo(previousPos.x, previousPos.y);
       }
       this.ctx.stroke();
-
-    }
-    else {
+    } else {
       if (nextPosition) {
-        this.drawLineNoAliasing(this.ctx, previousPos.x, previousPos.y, nextPosition.x, nextPosition.y);
-      }
-      else {
-        this.drawLineNoAliasing(this.ctx, previousPos.x, previousPos.y, previousPos.x, previousPos.y);
+        this.drawLineNoAliasing(
+          this.ctx,
+          previousPos.x,
+          previousPos.y,
+          nextPosition.x,
+          nextPosition.y
+        );
+      } else {
+        this.drawLineNoAliasing(
+          this.ctx,
+          previousPos.x,
+          previousPos.y,
+          previousPos.x,
+          previousPos.y
+        );
       }
       this.ctx.fill();
     }
-
   }
 
   private DBP(x1: number, y1: number, x2: number, y2: number) {
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
   // finds the angle of (x,y) on a plane from the origin
-  private getAngle(x: number, y: number) { return Math.atan(y / (x == 0 ? 0.01 : x)) + (x < 0 ? Math.PI : 0); }
+  private getAngle(x: number, y: number) {
+    return Math.atan(y / (x == 0 ? 0.01 : x)) + (x < 0 ? Math.PI : 0);
+  }
   // the function
-  private drawLineNoAliasing(ctx: CanvasRenderingContext2D, sx: number, sy: number, tx: number, ty: number) {
+  private drawLineNoAliasing(
+    ctx: CanvasRenderingContext2D,
+    sx: number,
+    sy: number,
+    tx: number,
+    ty: number
+  ) {
     var dist = this.DBP(sx, sy, tx, ty); // length of line
     var ang = this.getAngle(tx - sx, ty - sy); // angle of line
     for (var i = 0; i < dist; i++) {
       // for each point along the line
       ctx.fillRect(
-        Math.round(sx + Math.cos(ang) * i)-0.5, // round for perfect pixels
-        Math.round(sy + Math.sin(ang) * i)-0.5, // thus no aliasing
-        this.brushRadius!, this.brushRadius! // fill in with brush size
+        Math.round(sx + Math.cos(ang) * i) - 0.5, // round for perfect pixels
+        Math.round(sy + Math.sin(ang) * i) - 0.5, // thus no aliasing
+        this.brushRadius!,
+        this.brushRadius! // fill in with brush size
       );
     }
   }
@@ -325,14 +342,13 @@ export class DrawCanvasComponent implements OnInit {
     const x = pos.clientX - rect.left;
     const y = pos.clientY - rect.top;
     let redrawNeeded = false;
-    const outOfBounds = x >= rect.width || x <= 0 || y >= rect.height || y <= 0
+    const outOfBounds = x >= rect.width || x <= 0 || y >= rect.height || y <= 0;
     handles.forEach((handle) => {
       handle.handleDrag = outOfBounds ? false : handle.handleDrag;
       if (handle.handleDrag) {
         handle.moveTo(x, y, rect.width, rect.height);
         redrawNeeded = true;
       }
-
     });
     rois.forEach((roi) => {
       let roiHandles = roi.getHandles();
@@ -347,22 +363,22 @@ export class DrawCanvasComponent implements OnInit {
       let midHandle = roi.getMidHandle();
       midHandle.handleDrag = outOfBounds ? false : midHandle.handleDrag;
       if (midHandle.handleDrag) {
-        let offsetX = x - midHandle.handlePos.x
-        let offsetY = y - midHandle.handlePos.y
+        let offsetX = x - midHandle.handlePos.x;
+        let offsetY = y - midHandle.handlePos.y;
         roiHandles.forEach((handle) => {
-          handle.moveTo(handle.handlePos.x + offsetX, handle.handlePos.y + offsetY, rect.width, rect.height);
+          handle.moveTo(
+            handle.handlePos.x + offsetX,
+            handle.handlePos.y + offsetY,
+            rect.width,
+            rect.height
+          );
           roi.update();
           redrawNeeded = true;
-        })
-
+        });
       }
-
-    })
-
+    });
 
     this.updateCanvasUI();
-
-
   }
 
   @HostListener('window:resize', ['$event'])
@@ -370,21 +386,16 @@ export class DrawCanvasComponent implements OnInit {
     this.ctxUI.clearRect(0, 0, this.UIwidth, this.UIwidth);
     // this.ctxUI.globalCompositeOperation = 'copy';
 
-    requestAnimationFrame(() => { // We use setTimeout to be sure handles exist (wait for next frame)
+    requestAnimationFrame(() => {
+      // We use setTimeout to be sure handles exist (wait for next frame)
 
       if (this.ROIs.length > 0) {
         this.updateROI();
-
       }
       if (this.profile) {
         this.updateProfile();
-
       }
-
     });
-
-
-
   }
 
   transformCoordinatesFromScreenToUISpace(point: Point2D): Point2D {
@@ -407,12 +418,10 @@ export class DrawCanvasComponent implements OnInit {
   }
 
   getScreenToCanvasScale(): number {
-
     const canvas = this.ctx.canvas;
     const rect = canvas.getBoundingClientRect();
     const width = rect.width;
     return this.width / width;
-
   }
   getProfile(): Array<number> {
     return this.profileArray;
@@ -422,11 +431,19 @@ export class DrawCanvasComponent implements OnInit {
     this.ctxUI.beginPath();
     let handles = this.handles.toArray();
 
-    const pointCanvas1 = this.transformCoordinatesFromScreenToCanvas(handles[0].handlePos);
-    const pointCanvas2 = this.transformCoordinatesFromScreenToCanvas(handles[1].handlePos);
+    const pointCanvas1 = this.transformCoordinatesFromScreenToCanvas(
+      handles[0].handlePos
+    );
+    const pointCanvas2 = this.transformCoordinatesFromScreenToCanvas(
+      handles[1].handlePos
+    );
 
-    const pointUI1 = this.transformCoordinatesFromScreenToUISpace(handles[0].handlePos);
-    const pointUI2 = this.transformCoordinatesFromScreenToUISpace(handles[1].handlePos);
+    const pointUI1 = this.transformCoordinatesFromScreenToUISpace(
+      handles[0].handlePos
+    );
+    const pointUI2 = this.transformCoordinatesFromScreenToUISpace(
+      handles[1].handlePos
+    );
 
     this.ctxUI.moveTo(pointUI1.x, pointUI1.y);
     this.ctxUI.lineTo(pointUI2.x, pointUI2.y);
@@ -437,7 +454,6 @@ export class DrawCanvasComponent implements OnInit {
     this.ctxUI.stroke();
 
     this.recomputeProfile(pointCanvas1, pointCanvas2);
-
   }
   updateROI() {
     let rois = this.ROIs.toArray();
@@ -445,25 +461,36 @@ export class DrawCanvasComponent implements OnInit {
     this.ctxUI.lineWidth = 2;
 
     rois.forEach((roi) => {
-
       const handles = roi.getHandles();
-      const pointUI1 = this.transformCoordinatesFromScreenToUISpace(handles[0].handlePos);
-      const pointUI2 = this.transformCoordinatesFromScreenToUISpace(handles[1].handlePos);
+      const pointUI1 = this.transformCoordinatesFromScreenToUISpace(
+        handles[0].handlePos
+      );
+      const pointUI2 = this.transformCoordinatesFromScreenToUISpace(
+        handles[1].handlePos
+      );
       this.ctxUI.beginPath();
       this.ctxUI.strokeStyle = roi.property.color;
       this.ctxUI.fillStyle = roi.property.color;
-      this.ctxUI.strokeRect(pointUI1.x, pointUI1.y, pointUI2.x - pointUI1.x, pointUI2.y - pointUI1.y);
+      this.ctxUI.strokeRect(
+        pointUI1.x,
+        pointUI1.y,
+        pointUI2.x - pointUI1.x,
+        pointUI2.y - pointUI1.y
+      );
       this.ctxUI.globalAlpha = 0.3;
-      this.ctxUI.fillRect(pointUI1.x, pointUI1.y, pointUI2.x - pointUI1.x, pointUI2.y - pointUI1.y);
-      this.ctxUI.fill()
+      this.ctxUI.fillRect(
+        pointUI1.x,
+        pointUI1.y,
+        pointUI2.x - pointUI1.x,
+        pointUI2.y - pointUI1.y
+      );
+      this.ctxUI.fill();
       this.ctxUI.globalAlpha = 1;
       this.ctxUI.stroke();
       this.recomputeROI(roi);
     });
-
   }
-  recomputeProfile
-    (point1: Point2D, point2: Point2D) {
+  recomputeProfile(point1: Point2D, point2: Point2D) {
     let array: Array<Point2D> = getLine(point1, point2);
     this.profileArray = new Array<number>();
 
@@ -480,14 +507,18 @@ export class DrawCanvasComponent implements OnInit {
 
   recomputeROI(roi: ROIComponent) {
     let handles = roi.getHandles();
-    let point1 = this.transformCoordinatesFromScreenToCanvas(handles[0].handlePos);
-    let point2 = this.transformCoordinatesFromScreenToCanvas(handles[1].handlePos);
+    let point1 = this.transformCoordinatesFromScreenToCanvas(
+      handles[0].handlePos
+    );
+    let point2 = this.transformCoordinatesFromScreenToCanvas(
+      handles[1].handlePos
+    );
     let x = Math.min(point1.x, point2.x);
     let y = Math.min(point1.y, point2.y);
 
     let w = Math.abs(point1.x - point2.x);
     let h = Math.abs(point1.y - point2.y);
-    let square = this.ctx.getImageData(x, y, w, h)
+    let square = this.ctx.getImageData(x, y, w, h);
     roi.property.data = square;
     this.roiChanged.emit(roi.property);
   }
@@ -496,9 +527,13 @@ export class DrawCanvasComponent implements OnInit {
     return this.isBWChecked;
   }
 
-  getValueAtSquare(x: number, y: number, w: number, h: number): Uint8ClampedArray {
+  getValueAtSquare(
+    x: number,
+    y: number,
+    w: number,
+    h: number
+  ): Uint8ClampedArray {
     let square = this.ctx.getImageData(x, y, w, h).data;
     return square;
-
   }
 }

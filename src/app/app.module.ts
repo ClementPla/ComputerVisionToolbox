@@ -10,7 +10,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DrawCanvasComponent } from './Components/Toolbox/draw-canvas/draw-canvas.component';
 import { MatIconModule } from '@angular/material/icon';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -27,6 +26,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { ColorSketchModule } from 'ngx-color/sketch';
 
 import { MatSliderModule } from '@angular/material/slider';
 import { HomeComponent } from './Components/home/home.component';
@@ -59,6 +59,12 @@ import { BayesianRegressionComponent } from './Components/Tutorials/MachineLearn
 const openCVConfig: OpenCVConfig = {
   openCVDirPath: 'assets/opencv',
 };
+
+import * as echarts from 'echarts/core';
+import { BarChart } from 'echarts/charts';
+import { GridComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+echarts.use([BarChart, GridComponent, CanvasRenderer]);
 
 @NgModule({
   declarations: [
@@ -93,9 +99,10 @@ const openCVConfig: OpenCVConfig = {
   ],
   imports: [
     NgxEchartsModule.forRoot({
-      echarts: () => import('echarts'),
+      echarts,
     }),
     // NgxOpenCVModule.forRoot(openCVConfig),
+    ColorSketchModule,
     MatCheckboxModule,
     MatCardModule,
     MatProgressSpinnerModule,

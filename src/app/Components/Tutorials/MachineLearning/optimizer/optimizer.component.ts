@@ -6,15 +6,15 @@ import {
 } from '@angular/core';
 import { TutorialClass } from '../../../Toolbox/tutorial-parents/tutorial';
 
-import { ECharts, EChartsOption } from 'echarts';
+import { ECharts, EChartsOption, EChartsType, ECElementEvent } from 'echarts';
 import { ToyModel } from './toy_model';
 import { Adam, Optimizer, RMSProp, SGD } from '../NN/optim';
 
 @Component({
-    selector: 'app-optimizer',
-    templateUrl: './optimizer.component.html',
-    styleUrls: ['./optimizer.component.scss'],
-    standalone: false
+  selector: 'app-optimizer',
+  templateUrl: './optimizer.component.html',
+  styleUrls: ['./optimizer.component.scss'],
+  standalone: false,
 })
 export class OptimizerComponent
   extends TutorialClass
@@ -154,7 +154,7 @@ export class OptimizerComponent
   ngOnInit(): void {}
   ngAfterViewInit(): void {}
 
-  onChartInit(ec: ECharts) {
+  onChartInit(ec: any) {
     this.echartInstance = ec;
     let start = this.min;
     let stop = this.max;
@@ -171,11 +171,13 @@ export class OptimizerComponent
       this.updateOption();
     });
   }
-  onLossChartInit(ec: ECharts) {
+  onLossChartInit(ec: any) {
+    console.log(ec as ECharts);
     this.echartLossPlotInstance = ec;
   }
 
   onChartClick(event: any) {
+    console.log(event);
     if (this.isTraining) {
       this.pauseTraining();
     }

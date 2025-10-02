@@ -1,1 +1,88 @@
-<p>bayesian-regression works!</p>
+<app-tutorial-template [rightDrawer]="false" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">
+    Bayesian Linear Regression
+  </ng-container>
+
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small
+      ><i>
+        Taken from Pattern Recognition and Machine Learning from C. M. Bishop.
+      </i>
+    </small>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <app-labelled-sliders
+      [min]="0.01"
+      [max]="2"
+      [step]="0.01"
+      [(value)]="std_noise"
+      (valueChange)="resampleData($event)"
+    >
+    </app-labelled-sliders>
+    <app-labelled-sliders
+      [min]="0.01"
+      [max]="5"
+      [step]="0.01"
+      (valueChange)="changeStdPrior($event)"
+      [(value)]="std_prior"
+      title="Prior std"
+    >
+    </app-labelled-sliders>
+    <app-labelled-sliders
+      [min]="1"
+      [max]="maxObservations"
+      [value]="nObservations"
+      (valueChange)="updateCharts($event)"
+      title="Number of observations"
+    ></app-labelled-sliders>
+    <button
+      mat-raised-button
+      class="w-full"
+      color="primary"
+      (click)="resampleObservations()"
+    >
+      Resample observations
+    </button>
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col w-full items-center">
+      <div class="grid grid-cols-2 w-full">
+        <div class="w-full">
+          <div
+            echarts
+            [options]="priorChart"
+            class="graph"
+            (chartInit)="onPriorChartInit($event)"
+          ></div>
+        </div>
+
+        <div class="w-full">
+          <div
+            echarts
+            [options]="likelihoodChart"
+            class="graph"
+            (chartInit)="onLikelihoodChartInit($event)"
+          ></div>
+        </div>
+
+        <div class="w-full">
+          <div
+            echarts
+            [options]="posteriorChart"
+            class="graph"
+            (chartInit)="onPosteriorChartInit($event)"
+          ></div>
+        </div>
+        <div class="w-full">
+          <div
+            echarts
+            [options]="dataSpaceChart"
+            class="graph"
+            (chartInit)="onDataSpaceChartInit($event)"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>
