@@ -1,4 +1,4 @@
-<div class="w-full home">
+<div class="home w-full">
   <h2>1D</h2>
   <div class="flex flex-row flex-wrap gap-4 mx-16 pb-4 section">
     <a routerLink="/sampling">
@@ -20,7 +20,7 @@
     </a>
   </div>
   <h2>2D</h2>
-  <div class="flex-row flex gap-4 flex-wrap mx-16 pb-4 section">
+  <div class="flex flex-row flex-wrap gap-4 mx-16 pb-4 section">
     <a routerLink="/PSNR">
       <app-home-card
         title="Image Quality and Noise"
@@ -86,7 +86,7 @@
     </a>
   </div>
   <h2>Machine Learning</h2>
-  <div class="flex-row flex gap-4 flex-wrap mx-16 pb-4 section">
+  <div class="flex flex-row flex-wrap gap-4 mx-16 pb-4 section">
     <a routerLink="/PCA"
       ><app-home-card
         title="Principal Component Analysis"
@@ -132,6 +132,14 @@
     <a routerLink="/CNN"
       ><app-home-card
         title="A simple CNN Demo"
+        imgURL="assets/images/home-cards/mnist.png"
+      >
+      </app-home-card>
+    </a>
+
+     <a routerLink="/autoencoder"
+      ><app-home-card
+        title="A simple autoencoder trained on MNIST"
         imgURL="assets/images/home-cards/mnist.png"
       >
       </app-home-card>

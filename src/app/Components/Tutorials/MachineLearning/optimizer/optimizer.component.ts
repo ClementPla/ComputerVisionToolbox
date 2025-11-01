@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { TutorialClass } from '../../../Toolbox/tutorial-parents/tutorial';
 
-import { ECharts, EChartsOption, EChartsType, ECElementEvent } from 'echarts';
+import { ECharts, EChartsOption, EChartsType } from 'echarts';
 import { ToyModel } from './toy_model';
 import { Adam, Optimizer, RMSProp, SGD } from '../NN/optim';
 
@@ -172,12 +172,10 @@ export class OptimizerComponent
     });
   }
   onLossChartInit(ec: any) {
-    console.log(ec as ECharts);
     this.echartLossPlotInstance = ec;
   }
 
   onChartClick(event: any) {
-    console.log(event);
     if (this.isTraining) {
       this.pauseTraining();
     }

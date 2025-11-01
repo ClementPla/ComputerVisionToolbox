@@ -14,6 +14,7 @@ import { OptimizerComponent } from './Components/Tutorials/MachineLearning/optim
 import { CNNComponent } from './Components/Tutorials/MachineLearning/cnn/cnn.component';
 import { BayesianRegressionComponent } from './Components/Tutorials/MachineLearning/bayesian-regression/bayesian-regression.component';
 import { RegressionComponent } from './Components/Tutorials/MachineLearning/regression/regression.component';
+import { AutoencoderComponent } from './Components/Tutorials/MachineLearning/autoencoder/autoencoder.component';
 export const routeConfig: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
@@ -31,4 +32,5 @@ export const routeConfig: Routes = [
   { path: 'bayesianRegression', component: BayesianRegressionComponent },
   { path: 'optimizer', component: OptimizerComponent },
   { path: 'regression', component: RegressionComponent },
+  { path: 'autoencoder', component: AutoencoderComponent },
 ];
