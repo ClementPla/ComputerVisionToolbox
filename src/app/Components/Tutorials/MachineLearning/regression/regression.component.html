@@ -37,7 +37,7 @@
       <app-labelled-sliders
         [title]="'Regularization'"
         [(value)]="lambda"
-        [max]="2"
+        [max]="0.5"
         [min]="0"
         [step]="0.001"
         (valueChange)="updatePolynomial()"
@@ -47,7 +47,7 @@
       <app-labelled-sliders
         [title]="'Regularization Norm'"
         [(value)]="q"
-        [max]="8"
+        [max]="3"
         [min]="0"
         [step]="0.25"
         (valueChange)="updatePolynomial()"
