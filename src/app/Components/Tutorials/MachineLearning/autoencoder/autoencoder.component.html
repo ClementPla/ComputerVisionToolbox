@@ -1,24 +1,86 @@
-<app-tutorial-template [rightDrawer]="false" [leftDrawer]="false" [tutorial]="true">
-<ng-container ngProjectAs="[tutorialTitle]">
+<app-tutorial-template
+  [rightDrawer]="false"
+  [leftDrawer]="false"
+  [tutorial]="true"
+  [leftDrawer]="true"
+>
+  <ng-container ngProjectAs="[tutorialTitle]">
     Autoencoder Tutorial
-</ng-container>
-<ng-container ngProjectAs="[tutorialDescription]">
-    <small><i>
+  </ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small
+      ><i>
         An interactive tutorial to understand how autoencoders work.
-    </i></small>
-</ng-container>
-<ng-container ngProjectAs="[centerContent]">
-    <div class="grid grid-cols-2 w-full">
-    <div
+      </i></small
+    >
+  </ng-container>
+  <ng-container ngProjectAs="[tutorialContent]">
+    <p>
+      An autoencoder is a type of neural network that is trained to attempt to
+      copy its input to its output. Internally, it has a hidden layer that
+      describes a code used to represent the input. The network consists of two
+      parts: an encoder function that compresses the input into the code, and a
+      decoder function that reconstructs the input from the code. Autoencoders
+      are used for various applications, including dimensionality reduction,
+      image compression, and denoising.
+    </p>
+    <p>
+      In this tutorial, we will visualize how an autoencoder compresses and
+      reconstructs images from the MNIST dataset. The scatter plot shows the 2D
+      encoded representation of the images, and hovering over a point will
+      display the corresponding reconstructed image.
+    </p>
+  </ng-container>
+  <ng-container ngProjectAs="[drawerLeft]">
+    <mat-button-toggle-group
+      [(ngModel)]="modelType"
+      (ngModelChange)="onModelChange($event)"
+      class="w-full"
+      color="primary"
+    >
+      <mat-button-toggle value="regular">AE</mat-button-toggle>
+      <mat-button-toggle value="sparse">Sparse AE</mat-button-toggle>
+      <mat-button-toggle value="variational">VAE</mat-button-toggle>
+      <mat-button-toggle value="cvae">CVAE</mat-button-toggle>
+    </mat-button-toggle-group>
 
+    @if (modelType =='cvae') {
+
+    <app-labelled-sliders
+    class="pt-4 w-full"
+      [min]="0"
+      [max]="9"
+      [step]="1"
+      [(value)]="conditional"
+      title="Conditional digit"
+    ></app-labelled-sliders>
+    }
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="grid grid-cols-2 w-full">
+      @if (modelType == 'regular' || modelType == 'sparse') {
+      <div
         echarts
         [options]="scatterChartOptions"
         (chartInit)="onScatterChartInit($event)"
         (mousemove)="onChartMouseOver($event)"
         class="aspect-square w-5/6"
-    ></div>
-    <canvas #reconstructionCanvas class="antialiased border border-black mt-14 w-3/4" [width]="28" [height]="28"></canvas>
+      ></div>
+      } @else{
+      <div
+        echarts
+        [options]="densityChartOptions"
+        (chartInit)="onDensityChartInit($event)"
+        (chartMouseOver)="onDensityMouseOver($event)"
+        class="aspect-square w-5/6"
+      ></div>
+      }
+      <canvas
+        #reconstructionCanvas
+        class="antialiased border border-black mt-14 w-3/4"
+        [width]="28"
+        [height]="28"
+      ></canvas>
     </div>
-</ng-container>
-
+  </ng-container>
 </app-tutorial-template>
