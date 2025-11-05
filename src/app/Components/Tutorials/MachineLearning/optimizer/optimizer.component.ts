@@ -213,6 +213,7 @@ export class OptimizerComponent
     } else {
       this.optim = new RMSProp(this.model, this.lr, this.wc);
     }
+    console.log(this.optim);
     this.optim.reset_momentums();
     if (this.isTraining) {
       this.startTraining();

@@ -1,5 +1,12 @@
-<app-tutorial-template [rightDrawer]="true">
-
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="false" [tutorial]="true">
+<ng-container ngProjectAs="[tutorialTitle]">
+    Autoencoder Tutorial
+</ng-container>
+<ng-container ngProjectAs="[tutorialDescription]">
+    <small><i>
+        An interactive tutorial to understand how autoencoders work.
+    </i></small>
+</ng-container>
 <ng-container ngProjectAs="[centerContent]">
     <div class="grid grid-cols-2 w-full">
     <div

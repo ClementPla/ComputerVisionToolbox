@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, ElementRef, OnInit, viewChild, ViewChild } from '@angular/core';
 import { TutorialClass } from '../../../Toolbox/tutorial-parents/tutorial';
+import mnist_data from '../../../../../assets/autoencoder/mnist_encoded_2D.json'
 import { ECharts, EChartsOption } from 'echarts';
+
 
 declare global {
   interface Window {
@@ -22,86 +24,14 @@ export class AutoencoderComponent extends TutorialClass implements OnInit, After
   session: any;
   isready: boolean = false;
   // each row: [x, y, label]
-  dataFromCsv: Array<[number, number, number]> = [];
+  mnistData: Array<[number, number, number]> = mnist_data as Array<[number, number, number]>;
 
-  scatterChartOptions: EChartsOption;
-  scatterChartInstance: ECharts;
-  
-
-  // colors for labels 0..9 (choose any palette you prefer)
-  labelColors = [
-    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
-  ];
-
-  async ngOnInit(): Promise<void> {
-    this.scatterChartOptions = {
-      tooltip: {
-        formatter: (params: any) => {
-          // params.value is [x,y,label]
-          const label = params.value && params.value[2] !== undefined ? params.value[2] : '';
-          return `x: ${params.value[0]}<br/>y: ${params.value[1]}<br/>label: ${label}`;
-        }
-      },
-      xAxis: { type: 'value', min: -50, max: 50 },
-      yAxis: { type: 'value', min: -50, max: 50 },
+  scatterChartOptions: EChartsOption = {
+      xAxis: { type: 'value', min: -150, max: 150 },
+      yAxis: { type: 'value', min: -150, max: 150 },
       series: [{
         type: 'scatter',
         data: [],
-      }]
-    };
-    await this.load_sessions();
-  }
-  ngAfterViewInit(): void {
-    this.ctxCanvas = this.reconstructionCanvas.nativeElement.getContext('2d', {alpha: false})!;
-    this.ctxCanvas.imageSmoothingEnabled = false;
-  }
-  async load_sessions() {
-    this.session = await window.ort.InferenceSession.create(
-      'assets/autoencoder/autoencoder_decoder.onnx'
-    );
-    this.isready = true;
-    await this.loadCsvData();
-    this.updateScatterPlot();
-  }
-
-  async loadCsvData() {
-    const response = await fetch('/assets/autoencoder/mnist_encoded_2D.csv'); // Adjust path as needed
-    const csvText = await response.text();
-    // Skip the first row as it contains headers, filter out empty lines
-    const rows = csvText.split('\n').slice(1).map(r => r.trim()).filter(r => r.length > 0);
-    this.dataFromCsv = rows.map(row => {
-      const parts = row.split(',').map(value => parseFloat(value));
-      // expect at least 3 values: x, y, label
-      return [parts[0], parts[1], parts[2]] as [number, number, number];
-    });
-  }
-
-  onScatterChartInit(instance: any) {
-    this.scatterChartInstance = instance as ECharts;
-    this.updateScatterPlot();
-  }
-
-  updateScatterPlot() {
-    if (!this.scatterChartInstance) return;
-
-    const seriesData = this.dataFromCsv.map(([x, y, label]) => {
-      const lbl = Math.max(0, Math.min(9, Math.floor(label))); // ensure valid index
-      return {
-        value: [x, y, lbl],
-        itemStyle: {
-          color: this.labelColors[lbl]
-        }
-      };
-    });
-
-    this.scatterChartOptions = {
-      xAxis: { type: 'value', min: -45, max: 45 },
-      yAxis: { type: 'value', min: -45, max: 45 },
-      series: [{
-        type: 'scatter',
-        data: seriesData,
-        symbolSize: 4
       }],
       dataZoom: [
             {
@@ -118,6 +48,54 @@ export class AutoencoderComponent extends TutorialClass implements OnInit, After
             }
         ]
     };
+  scatterChartInstance: ECharts;
+  
+
+  // colors for labels 0..9 (choose any palette you prefer)
+  labelColors = [
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+  ];
+
+  async ngOnInit(): Promise<void> {
+    await this.load_sessions();
+  }
+  ngAfterViewInit(): void {
+    this.ctxCanvas = this.reconstructionCanvas.nativeElement.getContext('2d', {alpha: false})!;
+    this.ctxCanvas.imageSmoothingEnabled = false;
+  }
+  async load_sessions() {
+    this.session = await window.ort.InferenceSession.create(
+      'assets/autoencoder/autoencoder_decoder.onnx'
+    );
+    this.isready = true;
+    this.updateScatterPlot();
+  }
+
+
+  onScatterChartInit(instance: any) {
+    this.scatterChartInstance = instance as ECharts;
+    this.updateScatterPlot();
+  }
+
+  updateScatterPlot() {
+    if (!this.scatterChartInstance) return;
+
+    const seriesData = this.mnistData.map(([x, y, label]) => {
+      const lbl = Math.max(0, Math.min(9, Math.floor(label))); // ensure valid index
+      return {
+        value: [x, y, lbl],
+        itemStyle: {
+          color: this.labelColors[lbl]
+        }
+      };
+    });
+
+    this.scatterChartOptions.series = [{
+        type: 'scatter',
+        data: seriesData,
+        symbolSize: 4
+      }],
     this.scatterChartInstance.setOption(this.scatterChartOptions);
   }
 
