@@ -7,13 +7,7 @@
   <ng-container ngProjectAs="[tutorialTitle]">
     Autoencoder Tutorial
   </ng-container>
-  <ng-container ngProjectAs="[tutorialDescription]">
-    <small
-      ><i>
-        An interactive tutorial to understand how autoencoders work.
-      </i></small
-    >
-  </ng-container>
+
   <ng-container ngProjectAs="[tutorialContent]">
     <p>
       An autoencoder is a type of neural network that is trained to attempt to
@@ -24,24 +18,21 @@
       are used for various applications, including dimensionality reduction,
       image compression, and denoising.
     </p>
-    <p>
-      In this tutorial, we will visualize how an autoencoder compresses and
-      reconstructs images from the MNIST dataset. The scatter plot shows the 2D
-      encoded representation of the images, and hovering over a point will
-      display the corresponding reconstructed image.
-    </p>
+   
   </ng-container>
   <ng-container ngProjectAs="[drawerLeft]">
+    
     <mat-button-toggle-group
       [(ngModel)]="modelType"
       (ngModelChange)="onModelChange($event)"
       class="w-full"
       color="primary"
+      vertical
     >
       <mat-button-toggle value="regular">AE</mat-button-toggle>
       <mat-button-toggle value="sparse">Sparse AE</mat-button-toggle>
-      <mat-button-toggle value="variational">VAE</mat-button-toggle>
-      <mat-button-toggle value="cvae">CVAE</mat-button-toggle>
+      <mat-button-toggle value="variational">Variational AE</mat-button-toggle>
+      <mat-button-toggle value="cvae">Conditional VAE</mat-button-toggle>
     </mat-button-toggle-group>
 
     @if (modelType =='cvae') {
@@ -57,14 +48,15 @@
     }
   </ng-container>
   <ng-container ngProjectAs="[centerContent]">
-    <div class="grid grid-cols-2 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 w-full">
       @if (modelType == 'regular' || modelType == 'sparse') {
       <div
         echarts
         [options]="scatterChartOptions"
         (chartInit)="onScatterChartInit($event)"
         (mousemove)="onChartMouseOver($event)"
-        class="aspect-square w-5/6"
+        (touchmove)="onChartTouchMove($event)"
+        class="aspect-square w-full"
       ></div>
       } @else{
       <div
@@ -72,12 +64,12 @@
         [options]="densityChartOptions"
         (chartInit)="onDensityChartInit($event)"
         (chartMouseOver)="onDensityMouseOver($event)"
-        class="aspect-square w-5/6"
+        class="aspect-square w-full"
       ></div>
       }
       <canvas
         #reconstructionCanvas
-        class="antialiased border border-black mt-14 w-3/4"
+        class="antialiased border border-black w-full"
         [width]="28"
         [height]="28"
       ></canvas>

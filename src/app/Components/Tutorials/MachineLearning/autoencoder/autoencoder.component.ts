@@ -70,7 +70,6 @@ export class AutoencoderComponent
 
   densityChartOptions: any = 
 {
-  tooltip: {},
   xAxis3D: {
     type: 'value'
   },
@@ -271,6 +270,15 @@ export class AutoencoderComponent
     if (!this.densityChartInstance) return;
 
     this.densityChartInstance.setOption(this.densityChartOptions);
+  }
+
+  onChartTouchMove(event: any) {
+    if (!this.scatterChartInstance || !this.isready) return;
+    const pointInGrid = this.scatterChartInstance.convertFromPixel(
+      { seriesIndex: 0 },
+      [event.offsetX, event.offsetY]
+    ) as [number, number];
+    this.inference(pointInGrid);
   }
   
 }
