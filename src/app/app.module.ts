@@ -65,6 +65,7 @@ import { BarChart } from 'echarts/charts';
 import { GridComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { AutoencoderComponent } from './Components/Tutorials/MachineLearning/autoencoder/autoencoder.component';
+import { GaussianComponent } from './Components/Tutorials/Probability/gaussian/gaussian.component';
 echarts.use([BarChart, GridComponent, CanvasRenderer]);
 
 @NgModule({
@@ -98,6 +99,7 @@ echarts.use([BarChart, GridComponent, CanvasRenderer]);
     CNNComponent,
     BayesianRegressionComponent,
     AutoencoderComponent,
+    GaussianComponent,
   ],
   imports: [
     NgxEchartsModule.forRoot({

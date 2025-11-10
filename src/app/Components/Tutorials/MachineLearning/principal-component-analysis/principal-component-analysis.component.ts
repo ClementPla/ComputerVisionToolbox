@@ -47,7 +47,6 @@ export class PrincipalComponentAnalysisComponent extends TutorialClass implement
   }
 
   generateData() {
-    console.log(this.covariance)
 
     let data = sample_randn_2D(1000, { x: 0, y: 0 }, 
       [[1, this.covariance],

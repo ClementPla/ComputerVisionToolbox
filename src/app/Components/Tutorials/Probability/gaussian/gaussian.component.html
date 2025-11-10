@@ -1,0 +1,133 @@
+<app-tutorial-template [rightDrawer]="true" [leftDrawer]="true">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <mat-button-toggle-group [(ngModel)]="dimension">
+      <mat-button-toggle value="1d">1D</mat-button-toggle>
+      <mat-button-toggle value="2d">2D</mat-button-toggle>
+    </mat-button-toggle-group>
+    <mat-checkbox class="example-margin" [(ngModel)]="addSecondDistribution"
+      >Random Variable Y</mat-checkbox
+    >
+    @if (addSecondDistribution){
+    <mat-button-toggle-group [(ngModel)]="operation">
+      <mat-button-toggle value="add">X+Y</mat-button-toggle>
+      <mat-button-toggle value="multiply">p(X)*p(Y)</mat-button-toggle>
+      <mat-button-toggle value="condition">X | Y</mat-button-toggle>
+    </mat-button-toggle-group>
+    }
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+    @if (dimension == '1d'){
+    <div
+      echarts
+      [options]="option1D"
+      class="aspect-square max-w-[512px] w-full"
+      (chartInit)="onChartInit1D($event)"
+    ></div>
+    @if (addSecondDistribution){
+    <div
+      echarts
+      [options]="option1D_combined"
+      class="aspect-square max-w-[512px] w-full"
+      (chartInit)="onChartInit1D($event, 'combined')"
+    ></div>
+    } } @else{
+    <div
+      echarts
+      [options]="option2D"
+      class="aspect-square max-w-[512px] w-full"
+      (chartInit)="onChartInit2D($event)"
+    ></div>
+    }
+  </ng-container>
+  <ng-container ngProjectAs="[drawerRight]">
+    @if (dimension == '1d'){
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Distribution X Settings</mat-panel-title>
+      </mat-expansion-panel-header>
+      <h3>Mean</h3>
+      <app-labelled-sliders
+        [(value)]="mean1D"
+        [min]="-5"
+        [max]="5"
+        [step]="0.1"
+        title="Mean"
+        (valueChange)="generateGaussian1D()"
+      >
+      </app-labelled-sliders>
+      <h3>Standard Deviation</h3>
+      <app-labelled-sliders
+        [(value)]="stdDev1D"
+        [min]="0.1"
+        [max]="5"
+        [step]="0.1"
+        title="Standard Deviation"
+        (valueChange)="generateGaussian1D()"
+      >
+      </app-labelled-sliders>
+    </mat-expansion-panel>
+    } @else {
+    <h3>Mean</h3>
+    <div class="grid grid-cols-2 max-w-92">
+      <app-labelled-sliders
+        [(value)]="mean2D[0]"
+        [min]="-5"
+        [max]="5"
+        [step]="0.1"
+        title="Mean X"
+        (valueChange)="generateGaussian2D()"
+      >
+      </app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="mean2D[1]"
+        [min]="-5"
+        [max]="5"
+        [step]="0.1"
+        title="Mean Y"
+        (valueChange)="generateGaussian2D()"
+      >
+      </app-labelled-sliders>
+    </div>
+    <h3>Standard Deviation</h3>
+    <div class="grid grid-cols-2 max-w-92">
+      <app-labelled-sliders
+        [(value)]="stdDev2D[0]"
+        [min]="0"
+        [max]="3"
+        [step]="0.1"
+        title="Std Dev xx"
+        (valueChange)="generateGaussian2D()"
+      >
+      </app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="stdDev2D[1]"
+        [min]="0"
+        [max]="3"
+        [step]="0.1"
+        title="Std Dev xy"
+        (valueChange)="generateGaussian2D()"
+      >
+      </app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="stdDev2D[2]"
+        [min]="0"
+        [max]="3"
+        [step]="0.1"
+        title="Std Dev yy"
+        (valueChange)="generateGaussian2D()"
+      >
+      </app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="stdDev2D[3]"
+        [min]="0"
+        [max]="3"
+        [step]="0.1"
+        title="Std Dev yx"
+        (valueChange)="generateGaussian2D()"
+      >
+      </app-labelled-sliders>
+    </div>
+
+    }
+  </ng-container>
+</app-tutorial-template>
