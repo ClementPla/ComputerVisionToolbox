@@ -58,7 +58,7 @@ export class DrawCanvasComponent implements OnInit {
   @Input() OnlyBW: boolean = false;
   @Input() profileOption: boolean = false;
   @Input() antialiasing: boolean = true;
-
+  @Input() backgroundColor: string = 'black';
   @Output() BWSet = new EventEmitter<boolean>();
   @Output() profileChanged = new EventEmitter<boolean>();
 
@@ -122,7 +122,7 @@ export class DrawCanvasComponent implements OnInit {
   }
 
   clearCanvas(): void {
-    this.ctx.fillStyle = 'black';
+    this.ctx.fillStyle = this.backgroundColor;
     this.ctx.fillRect(0, 0, this.width, this.height);
     this.drawingEnded.emit();
   }
@@ -381,7 +381,7 @@ export class DrawCanvasComponent implements OnInit {
     this.updateCanvasUI();
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   updateCanvasUI() {
     this.ctxUI.clearRect(0, 0, this.UIwidth, this.UIwidth);
     // this.ctxUI.globalCompositeOperation = 'copy';

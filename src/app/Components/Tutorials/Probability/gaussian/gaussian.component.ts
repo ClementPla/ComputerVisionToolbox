@@ -10,6 +10,7 @@ import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutor
   styleUrl: './gaussian.component.scss',
 })
 export class GaussianComponent extends TutorialClass {
+  step = 0.25;
   dimension: string = '1d';
   option1D: EChartsOption = {
     title: {
@@ -42,8 +43,33 @@ export class GaussianComponent extends TutorialClass {
     yAxis3D: {},
     zAxis3D: {},
     grid3D: {},
-  };
+    series: [
+      {
+        type: 'surface',
+        parametric: true,
+        parametricEquation: {
+          u: {
+            min: -7.5,
+            max: 7.5,
+            step: this.step,
+          },
+          v: {
+            min: -7.5,
+            max: 7.5,
+            step: this.step,
+          },
 
+          x: function (u: number, v: number) {
+            return u;
+          },
+          y: function (u: number, v: number) {
+            return v;
+          },
+          z: this.parametricEquationZ.bind(this)
+        },
+      },
+    ],
+  };
   option1D_combined: EChartsOption = {
     title: {
       text: 'p(X, Y)',
@@ -77,7 +103,7 @@ export class GaussianComponent extends TutorialClass {
   constructor() {
     super();
   }
-  onChartInit1D(e: any, which: string='main') {
+  onChartInit1D(e: any, which: string = 'main') {
     if (which === 'combined') {
       this.chart1D_combined = e;
     } else {
@@ -108,8 +134,8 @@ export class GaussianComponent extends TutorialClass {
         data_Y.push([x, y_Y]);
       }
     }
-    if (this.addSecondDistribution){
-      this.option1D.title! = { text: 'p(X); p(Y)'  };
+    if (this.addSecondDistribution) {
+      this.option1D.title! = { text: 'p(X); p(Y)' };
     }
 
     const series = this.option1D.series;
@@ -127,23 +153,26 @@ export class GaussianComponent extends TutorialClass {
     if (this.chart1D) {
       this.chart1D.setOption(this.option1D);
     }
-    if (this.addSecondDistribution){
+    if (this.addSecondDistribution) {
       this.computeCombined1D();
     }
   }
 
-  computeCombined1D(){
+  computeCombined1D() {
     if (!this.chart1D_combined) return;
     const data_combined: [number, number][] = [];
     const step = 0.1;
     for (let x = -15; x <= 15; x += step) {
-      if (this.operation === 'add'){
+      if (this.operation === 'add') {
         const mean = this.mean1D + this.mean1D_Y;
-        const stdDev = Math.sqrt(this.stdDev1D * this.stdDev1D + this.stdDev1D_Y * this.stdDev1D_Y);
-        const y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
+        const stdDev = Math.sqrt(
+          this.stdDev1D * this.stdDev1D + this.stdDev1D_Y * this.stdDev1D_Y
+        );
+        const y =
+          (1 / (stdDev * Math.sqrt(2 * Math.PI))) *
+          Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
         data_combined.push([x, y]);
-      }
-      else if (this.operation === 'multiply'){
+      } else if (this.operation === 'multiply') {
         const y1 =
           (1 / (this.stdDev1D * Math.sqrt(2 * Math.PI))) *
           Math.exp(-0.5 * Math.pow((x - this.mean1D) / this.stdDev1D, 2));
@@ -151,15 +180,7 @@ export class GaussianComponent extends TutorialClass {
           (1 / (this.stdDev1D_Y * Math.sqrt(2 * Math.PI))) *
           Math.exp(-0.5 * Math.pow((x - this.mean1D_Y) / this.stdDev1D_Y, 2));
         data_combined.push([x, y1 * y2]);
-      }
-      else if (this.operation === 'condition'){
-        // P(X|Y) = P(X,Y) / P(Y)
-        const y1 =
-          (1 / (this.stdDev1D * Math.sqrt(2 * Math.PI))) *
-          Math.exp(-0.5 * Math.pow((x - this.mean1D) / this.stdDev1D, 2));
-        const y2 =
-          (1 / (this.stdDev1D_Y * Math.sqrt(2 * Math.PI))) *
-          Math.exp(-0.5 * Math.pow((x - this.mean1D_Y) / this.stdDev1D_Y, 2));
+      } else if (this.operation === 'condition') {
       }
     }
     this.option1D_combined.series = [
@@ -170,13 +191,15 @@ export class GaussianComponent extends TutorialClass {
       },
     ];
     this.chart1D_combined.setOption(this.option1D_combined);
-
-
-
   }
 
   generateGaussian2D() {
-    const step = 0.25;
+    if (this.chart2D) {
+      this.chart2D.setOption(this.option2D);
+    }
+  }
+
+  parametricEquationZ(u: number, v: number): number {
     const cov = [
       [this.stdDev2D[0] * this.stdDev2D[0], this.stdDev2D[1]],
       [this.stdDev2D[2], this.stdDev2D[3] * this.stdDev2D[3]],
@@ -187,47 +210,15 @@ export class GaussianComponent extends TutorialClass {
       [-cov[1][0] / det, cov[0][0] / det],
     ];
     const mean2D = this.mean2D;
-    this.option2D.series = [
-      {
-        type: 'surface',
-        parametric: true,
-        parametricEquation: {
-          u: {
-            min: -7.5,
-            max: 7.5,
-            step: step,
-          },
-          v: {
-            min: -7.5,
-            max: 7.5,
-            step: step,
-          },
-
-          x: function (u: number, v: number) {
-            return u;
-          },
-          y: function (u: number, v: number) {
-            return v;
-          },
-          z: function (u: number, v: number) {
-            return (
-              (1 / (2 * Math.PI * Math.sqrt(det))) *
-              Math.exp(
-                -0.5 *
-                  ((u - mean2D[0]) *
-                    (invCov[0][0] * (u - mean2D[0]) +
-                      invCov[0][1] * (v - mean2D[1])) +
-                    (v - mean2D[1]) *
-                      (invCov[1][0] * (u - mean2D[0]) +
-                        invCov[1][1] * (v - mean2D[1])))
-              )
-            );
-          },
-        },
-      },
-    ];
-    if (this.chart2D) {
-      this.chart2D.setOption(this.option2D);
-    }
+    return (
+      (1 / (2 * Math.PI * Math.sqrt(det))) *
+      Math.exp(
+        -0.5 *
+          ((u - mean2D[0]) *
+            (invCov[0][0] * (u - mean2D[0]) + invCov[0][1] * (v - mean2D[1])) +
+            (v - mean2D[1]) *
+              (invCov[1][0] * (u - mean2D[0]) + invCov[1][1] * (v - mean2D[1])))
+      )
+    );
   }
 }

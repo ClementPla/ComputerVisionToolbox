@@ -17,6 +17,7 @@ import { RegressionComponent } from './Components/Tutorials/MachineLearning/regr
 import { AutoencoderComponent } from './Components/Tutorials/MachineLearning/autoencoder/autoencoder.component';
 import { PrincipalComponentAnalysisComponent } from './Components/Tutorials/MachineLearning/principal-component-analysis/principal-component-analysis.component';
 import { GaussianComponent } from './Components/Tutorials/Probability/gaussian/gaussian.component';
+import { HoughTransformComponent } from './Components/Tutorials/Images/hough-transform/hough-transform.component';
 export const routeConfig: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
@@ -36,5 +37,6 @@ export const routeConfig: Routes = [
   { path: 'regression', component: RegressionComponent },
   { path: 'autoencoder', component: AutoencoderComponent },
   {path: "PCA", component: PrincipalComponentAnalysisComponent},
-  {path: "GaussianDistribution", component: GaussianComponent}
+  {path: "GaussianDistribution", component: GaussianComponent},
+  {path: "houghTransform", component: HoughTransformComponent}
 ];

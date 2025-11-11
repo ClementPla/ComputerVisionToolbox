@@ -1,0 +1,44 @@
+<app-tutorial-template-images>
+  Hough Transform
+  <ng-container ngProjectAs="[drawerLeft]">
+    <app-labelled-sliders #brushSizeSlider title="Brush Size">
+    </app-labelled-sliders>
+    <mat-checkbox #eraser>Eraser</mat-checkbox>
+    <hr />
+    <app-labelled-sliders
+      title="Detection Threshold"
+      #detectionThresholdSlider
+      [min]="0"
+      [max]="200"
+      [step]="1"
+      [(value)]="detectionThreshold"
+      (valueChange)="updateHough()"
+    >
+    </app-labelled-sliders>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <app-draw-canvas
+      #inputCanvas
+      class="canvas"
+      [width]="256"
+      (drawingEnded)="updateHough()"
+      [drawable]="true"
+      [OnlyBW]="true"
+      [brushRadius]="brushSizeSlider.value"
+      title="Canvas"
+      [drawColor]="!eraser.checked ? 'black' : 'white'"
+      [backgroundColor]="'white'"
+    ></app-draw-canvas>
+
+    <app-draw-canvas
+      #outputCanvas
+      [width]="inputCanvas.width"
+      [drawable]="false"
+      class="canvas"
+      title="Hough Transform"
+      [profileOption]="false"
+    >
+    </app-draw-canvas>
+  </ng-container>
+</app-tutorial-template-images>
