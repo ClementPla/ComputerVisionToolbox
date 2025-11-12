@@ -4,21 +4,20 @@
       <mat-button-toggle value="1d">1D</mat-button-toggle>
       <mat-button-toggle value="2d">2D</mat-button-toggle>
     </mat-button-toggle-group>
+    @if (dimension=='1d'){
     <mat-checkbox class="example-margin" [(ngModel)]="addSecondDistribution"
       >Random Variable Y</mat-checkbox
     >
     @if (addSecondDistribution){
-    <mat-button-toggle-group [(ngModel)]="operation">
+    <mat-button-toggle-group
+      [(ngModel)]="operation"
+      (change)="generateGaussian1D()"
+    >
       <mat-button-toggle value="add">X+Y</mat-button-toggle>
       <mat-button-toggle value="multiply">p(X)*p(Y)</mat-button-toggle>
-      @if (dimension == '2d'){
-        <mat-button-toggle value="condition">X | Y</mat-button-toggle>
-      }
-      @else{
-        <mat-button-toggle value="joint">p(X, Y)</mat-button-toggle>
-      }
+      <mat-button-toggle value="joint">p(X, Y)</mat-button-toggle>
     </mat-button-toggle-group>
-    }
+    } }
   </ng-container>
   <ng-container ngProjectAs="[centerContent]">
     @if (dimension == '1d'){
@@ -41,6 +40,7 @@
       [options]="option2D"
       class="aspect-square max-w-[512px] w-full"
       (chartInit)="onChartInit2D($event)"
+      (chartMouseOver)="plotConditional($event)"
     ></div>
     }
   </ng-container>
@@ -120,7 +120,16 @@
       </app-labelled-sliders>
     </div>
     <h3>Standard Deviation</h3>
-    <div class="grid grid-cols-2 max-w-92">
+    <app-labelled-sliders
+      [(value)]="rho"
+      [min]="-1"
+      [max]="1"
+      [step]="0.1"
+      title="Correlation coefficient"
+      (valueChange)="generateGaussian2D()"
+    >
+    </app-labelled-sliders>
+    <div class="grid grid-cols-2 max-w-92 gap-1">
       <app-labelled-sliders
         [(value)]="stdDev2D[0]"
         [min]="0"
@@ -130,30 +139,32 @@
         (valueChange)="generateGaussian2D()"
       >
       </app-labelled-sliders>
+
+      <mat-form-field appearance="fill" class="h-[77px]">
+        <mat-label>Std Dev xy </mat-label>
+        <input
+          matInput
+          type="text"
+          readonly="true"
+          [value]="(rho * stdDev2D[0] * stdDev2D[1]).toFixed(2)"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="h-[77px]">
+        <mat-label>Std Dev xy </mat-label>
+        <input
+          matInput
+          type="text"
+          readonly="true"
+          [value]="(rho * stdDev2D[0] * stdDev2D[1]).toFixed(2)"
+        />
+      </mat-form-field>
+
       <app-labelled-sliders
         [(value)]="stdDev2D[1]"
         [min]="0"
         [max]="3"
         [step]="0.1"
-        title="Std Dev xy"
-        (valueChange)="generateGaussian2D()"
-      >
-      </app-labelled-sliders>
-      <app-labelled-sliders
-        [(value)]="stdDev2D[2]"
-        [min]="0"
-        [max]="3"
-        [step]="0.1"
         title="Std Dev yy"
-        (valueChange)="generateGaussian2D()"
-      >
-      </app-labelled-sliders>
-      <app-labelled-sliders
-        [(value)]="stdDev2D[3]"
-        [min]="0"
-        [max]="3"
-        [step]="0.1"
-        title="Std Dev yx"
         (valueChange)="generateGaussian2D()"
       >
       </app-labelled-sliders>
