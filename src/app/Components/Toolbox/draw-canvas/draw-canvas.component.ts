@@ -15,7 +15,7 @@ import { fromEvent, merge } from 'rxjs';
 import { Point2D } from '../../../utils/geometry';
 
 import { getLine } from '../../../utils/bresenham';
-import { ROIProperty } from '../../../utils/interface';
+import { ROIProperty, SVGElementInterface } from '../../../utils/interface';
 import { switchMap, takeUntil, pairwise, mapTo } from 'rxjs/operators';
 
 import { HandleComponent } from '../handle/handle.component';
@@ -39,15 +39,15 @@ export class DrawCanvasComponent implements OnInit {
   @ViewChild('canvasUI', { static: true })
   private canvasUI: ElementRef<HTMLCanvasElement>;
   private ctxUI: CanvasRenderingContext2D;
-
+  @ViewChild('svgUI', { static: true })
+  private svgUI: ElementRef<SVGSVGElement>;
   @ViewChildren('handleProfile') handles: QueryList<HandleComponent>;
 
   @ViewChildren('ROI') ROIs: QueryList<ROIComponent>;
 
   @Input() width = 256;
   height = this.width;
-
-  UIwidth = 1024;
+  UIwidth = this.width;
 
   @Input() roi: Array<ROIProperty> = [];
   @Input() brushRadius: number | null = 10;
@@ -72,6 +72,8 @@ export class DrawCanvasComponent implements OnInit {
   initialPos: Point2D;
 
   profileArray: Array<number>;
+  svgViewbox: string = `0 0 ${this.width} ${this.width}`;
+  svgElements: Array<SVGElementInterface> = [];
 
   constructor() {}
 
@@ -94,7 +96,9 @@ export class DrawCanvasComponent implements OnInit {
     if (this.drawable) {
       this.captureEvents(canvasEl);
     }
+    this.ctx.fillStyle = this.backgroundColor;
     this.ctx.fillRect(0, 0, this.width, this.height);
+    this.svgViewbox = `0 0 ${this.width} ${this.width}`;
   }
 
   BWToggle() {
@@ -535,5 +539,17 @@ export class DrawCanvasComponent implements OnInit {
   ): Uint8ClampedArray {
     let square = this.ctx.getImageData(x, y, w, h).data;
     return square;
+  }
+  setSVGElements(elements: Array<SVGElementInterface>) {
+    this.svgElements = elements;
+  }
+  setSVGSize(width: number, height: number) {
+    this.svgViewbox = `0 0 ${width} ${height}`;
+    this.svgUI.nativeElement.setAttribute('viewBox', this.svgViewbox);
+    this.svgUI.nativeElement.setAttribute('width', width.toString());
+    this.svgUI.nativeElement.setAttribute('height', height.toString());
+    this.UIwidth = width;
+    this.canvasUI.nativeElement.width = width;
+    this.canvasUI.nativeElement.height = height;
   }
 }

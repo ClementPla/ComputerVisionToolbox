@@ -98,3 +98,23 @@ export const spectral = [[0.61960784, 0.00392157, 0.25882353, 1.        ],
 [0.33479431, 0.35363322, 0.65605536, 1.        ],
 [0.35509419, 0.32733564, 0.64359862, 1.        ],
 [0.36862745, 0.30980392, 0.63529412, 1.        ]]
+
+
+export function getColorValueToHex(index: number): string {
+    // We cycle through the colormap if index exceeds its length
+    index = index % spectral.length;
+    const color = spectral[index];
+    const r = Math.round(color[0] * 255);
+    const g = Math.round(color[1] * 255);
+    const b = Math.round(color[2] * 255);
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+export function getColorValueToRGBA(index: number, alpha: number = 1): string {
+    // We cycle through the colormap if index exceeds its length
+    index = index % spectral.length;
+    const color = spectral[index];
+    const r = Math.round(color[0] * 255);
+    const g = Math.round(color[1] * 255);
+    const b = Math.round(color[2] * 255);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}

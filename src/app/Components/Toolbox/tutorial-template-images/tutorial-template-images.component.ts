@@ -52,7 +52,7 @@ export class TutorialTemplateImagesComponent extends TutorialTemplateComponent i
       reader.onload = (event: any) => {
         const img = new Image()
         img.onerror = (error) => {
-          console.log('Loading failed')
+          console.error('Loading failed')
         }
         img.src = event.target.result;
         img.onload = () =>{

@@ -11,7 +11,12 @@
     <mat-button-toggle-group [(ngModel)]="operation">
       <mat-button-toggle value="add">X+Y</mat-button-toggle>
       <mat-button-toggle value="multiply">p(X)*p(Y)</mat-button-toggle>
-      <mat-button-toggle value="condition">X | Y</mat-button-toggle>
+      @if (dimension == '2d'){
+        <mat-button-toggle value="condition">X | Y</mat-button-toggle>
+      }
+      @else{
+        <mat-button-toggle value="joint">p(X, Y)</mat-button-toggle>
+      }
     </mat-button-toggle-group>
     }
   </ng-container>

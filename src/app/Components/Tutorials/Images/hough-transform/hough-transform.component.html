@@ -8,8 +8,8 @@
     <app-labelled-sliders
       title="Detection Threshold"
       #detectionThresholdSlider
-      [min]="0"
-      [max]="200"
+      [min]="25"
+      [max]="125"
       [step]="1"
       [(value)]="detectionThreshold"
       (valueChange)="updateHough()"
@@ -21,7 +21,7 @@
     <app-draw-canvas
       #inputCanvas
       class="canvas"
-      [width]="256"
+      [width]="180"
       (drawingEnded)="updateHough()"
       [drawable]="true"
       [OnlyBW]="true"

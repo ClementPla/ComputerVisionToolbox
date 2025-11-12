@@ -42,18 +42,6 @@
   border-radius: 3px;
 }
 
-.canvas-container{
-  canvas{
-    width: 100%;
-    aspect-ratio: 1;
-  }
-}
-.canvas-container > * {
-  position: absolute;
-
-  height: inherit;
-}
-
 // Cursor
 .cursor {
   z-index: 5;
