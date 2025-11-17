@@ -12,7 +12,7 @@ declare var cv: any;
 })
 export class HoughTransformComponent extends TutorialImageClass implements AfterViewInit {
 
-  detectionThreshold: number = 50;
+  detectionThreshold: number = 100;
   num_thetas = 180;
   max_dist = Math.ceil(Math.hypot(256, 256)) * 2;
   override ngAfterViewInit(): void {
@@ -96,5 +96,41 @@ export class HoughTransformComponent extends TutorialImageClass implements After
     }
     cv.imshow(this.outputCanvas.getCanvas(), accumImage);
     src.delete(); dst.delete(); accumImage.delete();
+  }
+
+  autoDrawLines(){
+    // Use a timer and draw a line every 100ms
+    let linesDrawn = 0;
+    this.drawCanvas.clearCanvas();
+    let interval = setInterval(() => {
+      if (linesDrawn >= 10) {
+        clearInterval(interval);
+        return;
+      }
+      linesDrawn++;
+
+      const ctx = this.drawCanvas.getCanvas().getContext('2d');
+      if (!ctx) {
+        console.error('Failed to get canvas context');
+        return;
+      }
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = this.drawCanvas.brushRadius!;
+      // We divide the circle into equal segments
+      const angle = (linesDrawn / 10) * Math.PI;
+      const centerX = this.drawCanvas.getCanvas().width / 2;
+      const centerY = this.drawCanvas.getCanvas().height / 2;
+      const length = Math.min(this.drawCanvas.getCanvas().width, this.drawCanvas.getCanvas().height) / 2;
+      const x1 = centerX + length * Math.cos(angle);
+      const y1 = centerY + length * Math.sin(angle);
+      const x2 = centerX - length * Math.cos(angle);
+      const y2 = centerY - length * Math.sin(angle);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      this.updateHough();
+    }, 1000);
   }
 }
