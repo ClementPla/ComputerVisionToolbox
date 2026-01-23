@@ -18,6 +18,6 @@ export class LabelledSlidersComponent implements OnInit {
   ngOnInit(): void {}
 
   onChange(event: any) {
-    this.valueChange.emit(event);
+    this.valueChange.emit(this.value!);
   }
 }

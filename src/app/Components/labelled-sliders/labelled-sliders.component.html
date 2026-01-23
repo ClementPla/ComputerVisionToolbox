@@ -14,7 +14,7 @@
     <input
       matSliderThumb
       [(ngModel)]="value"
-      (valueChange)="onChange($event)"
+      (input)="onChange($event)"
       #slider
     />
   </mat-slider>

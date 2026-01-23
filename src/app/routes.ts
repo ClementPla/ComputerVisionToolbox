@@ -18,6 +18,7 @@ import { AutoencoderComponent } from './Components/Tutorials/MachineLearning/aut
 import { PrincipalComponentAnalysisComponent } from './Components/Tutorials/MachineLearning/principal-component-analysis/principal-component-analysis.component';
 import { GaussianComponent } from './Components/Tutorials/Probability/gaussian/gaussian.component';
 import { HoughTransformComponent } from './Components/Tutorials/Images/hough-transform/hough-transform.component';
+import { FisherDiscriminantComponent } from './Components/Tutorials/MachineLearning/fisher-discriminant/fisher-discriminant.component';
 export const routeConfig: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
@@ -38,5 +39,6 @@ export const routeConfig: Routes = [
   { path: 'autoencoder', component: AutoencoderComponent },
   {path: "PCA", component: PrincipalComponentAnalysisComponent},
   {path: "GaussianDistribution", component: GaussianComponent},
-  {path: "houghTransform", component: HoughTransformComponent}
+  {path: "houghTransform", component: HoughTransformComponent},
+  {path: "fisherDiscriminantAnalysis", component: FisherDiscriminantComponent}
 ];

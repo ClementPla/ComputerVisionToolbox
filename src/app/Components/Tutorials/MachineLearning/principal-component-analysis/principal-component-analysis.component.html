@@ -1,21 +1,300 @@
-<app-tutorial-template [rightDrawer]="false">
-    <ng-container ngProjectAs="[drawerLeft]">
-
-        <app-labelled-sliders
-        [(value)]="covariance"
-        [min]="-5"
-        [max]="5"
-        [step]="0.1"
-        (valueChange)="generateData()">
-
-        </app-labelled-sliders>
+<app-tutorial-template [rightDrawer]="true" [leftDrawer]="true" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">
+    Principal Component Analysis (3D)
+  </ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small>
+      <i>
+        Explore how PCA finds directions of maximum variance. Move the projection 
+        vector and observe how the projected variance changes.
+      </i>
+    </small>
+  </ng-container>
+  <ng-container ngProjectAs="[tutorialContent]">
+    <p>
+      Principal Component Analysis (PCA) is a statistical technique used to identify the directions (principal components) 
+      in which data varies the most. In this interactive tutorial, you can manipulate a projection vector in 3D space 
+      and observe how it aligns with the principal components of a synthetic dataset.
+    </p>
+    <ul class="list-disc ml-6">
+      <li>
+        Adjust the polar (θ) and azimuthal (φ) angles to change the orientation of the projection vector.
+      </li>
+      <li>
+        Observe how the projected variance of the data changes as you move the vector.
+      </li>
+      <li>
+        Try aligning the vector with each principal component (PC1, PC2, PC3) using the buttons provided.
+      </li>
+    </ul>
     </ng-container>
-    <ng-container ngProjectAs="[centerContent]">
-        <div class="grid grid-cols-2 ">
-            <div echarts [options]="option" class="aspect-square max-w-[512px] w-full"
-                (chartInit)="onChartInit($event)"></div>
 
+  <ng-container ngProjectAs="[drawerLeft]">
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Projection Vector</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <!-- Using mat-slider directly for continuous updates -->
+      <div class="mb-4">
+        <label class="flex gap-2 items-center text-gray-600 text-sm">
+          <span class="bg-orange-500 h-3 rounded-full w-3"></span>
+          θ (Polar angle): {{ theta }}°
+        </label>
+        <mat-slider class="w-full" [min]="1" [max]="179" [step]="1">
+          <input matSliderThumb [(ngModel)]="theta" (input)="onAngleChange()">
+        </mat-slider>
+      </div>
+      
+      <div class="mb-4">
+        <label class="flex gap-2 items-center text-gray-600 text-sm">
+          <span class="bg-green-600 h-3 rounded-full w-3"></span>
+          φ (Azimuthal angle): {{ phi }}°
+        </label>
+        <mat-slider class="w-full" [min]="0" [max]="360" [step]="1">
+          <input matSliderThumb [(ngModel)]="phi" (input)="onAngleChange()">
+        </mat-slider>
+      </div>
+
+      <div class="bg-gray-100 font-mono my-2 p-2 rounded text-center text-sm">
+        v = ({{ formatNumber(projectionVector[0]) }}, {{ formatNumber(projectionVector[1]) }}, {{ formatNumber(projectionVector[2]) }})
+      </div>
+
+      <div class="gap-2 grid grid-cols-3 mt-4">
+        <button mat-raised-button color="primary" (click)="alignWithPC(0)">
+          PC1
+        </button>
+        <button mat-raised-button color="accent" (click)="alignWithPC(1)">
+          PC2
+        </button>
+        <button mat-raised-button color="warn" (click)="alignWithPC(2)">
+          PC3
+        </button>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Eigenvalues</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="space-y-2">
+        @for (i of [0, 1, 2]; track i) {
+          <div class="flex gap-2 items-center">
+            <span class="font-bold w-8" [ngClass]="{
+              'text-yellow-600': i === 0,
+              'text-cyan-600': i === 1,
+              'text-purple-600': i === 2
+            }">λ{{ i + 1 }}</span>
+            <span class="font-mono w-16">{{ formatNumber(eigenvalues[i]) }}</span>
+            <div class="bg-gray-200 flex-1 h-3 overflow-hidden rounded">
+              <div 
+                class="duration-300 h-full transition-all"
+                [ngClass]="{
+                  'bg-yellow-500': i === 0,
+                  'bg-cyan-500': i === 1,
+                  'bg-purple-500': i === 2
+                }"
+                [style.width.%]="eigenvalues[i] / eigenvalues[0] * 100">
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Variance Analysis</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span>Current Variance:</span>
+          <span class="font-mono" [ngClass]="projectedVariance / maxVariance > 0.95 ? 'text-green-600 font-bold' : 'text-red-600'">
+            {{ formatNumber(projectedVariance) }}
+          </span>
         </div>
-    </ng-container>
+        <div class="flex justify-between">
+          <span>Maximum Variance (λ₁):</span>
+          <span class="font-bold font-mono text-green-600">{{ formatNumber(maxVariance) }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Ratio:</span>
+          <span class="font-mono">{{ formatNumber(projectedVariance / maxVariance * 100) }}%</span>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </ng-container>
 
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col items-center w-full">
+      <div class="gap-4 grid grid-cols-1 lg:grid-cols-2 w-full">
+        <!-- 3D Scatter Plot -->
+        <div class="w-full">
+          <h3 class="font-semibold mb-2 text-center">3D Point Cloud & Projection Vector</h3>
+          <div
+            echarts
+            [options]="option3D"
+            class="aspect-square graph"
+            (chartInit)="onChart3DInit($event)"
+          ></div>
+          <div class="flex flex-wrap gap-3 justify-center mt-2 text-xs">
+            <span class="flex gap-1 items-center">
+              <span class="bg-blue-500 h-3 rounded-full w-3"></span> Data
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="bg-green-400 h-0.5 w-4"></span> Ellipsoid
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="bg-red-500 h-1 w-4"></span> Your vector
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="border-dashed border-t-2 border-yellow-500 h-0.5 w-4"></span> PC1
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="border-cyan-500 border-dashed border-t-2 h-0.5 w-4"></span> PC2
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="border-dashed border-purple-500 border-t-2 h-0.5 w-4"></span> PC3
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="bg-orange-500 h-1 w-4"></span> θ (polar)
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="bg-green-600 h-1 w-4"></span> φ (azimuth)
+            </span>
+          </div>
+        </div>
+
+        <!-- Projection Histogram -->
+        <div class="w-full">
+          <h3 class="font-semibold mb-2 text-center">Projected Data Distribution</h3>
+          <div
+            echarts
+            [options]="optionProjection"
+            class="aspect-square graph"
+            (chartInit)="onChartProjectionInit($event)"
+          ></div>
+          <div 
+            class="mt-2 p-2 rounded text-center"
+            [ngClass]="projectedVariance / maxVariance > 0.95 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+            @if (projectedVariance / maxVariance > 0.95) {
+              ✅ Optimal! Vector aligned with maximum variance direction
+            } @else {
+              🎯 Adjust θ and φ to maximize variance
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="max-w-96">
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Covariance Matrix</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <!-- Matrix Display -->
+      <div class="flex items-center justify-center my-4">
+        <span class="font-light text-4xl">[</span>
+        <div class="font-mono gap-2 grid grid-cols-3 mx-2 text-sm">
+          <span class="font-bold text-blue-600 text-center">{{ formatNumber(varX) }}</span>
+          <span class="text-center">{{ formatNumber(covXY) }}</span>
+          <span class="text-center">{{ formatNumber(covXZ) }}</span>
+          <span class="text-center">{{ formatNumber(covXY) }}</span>
+          <span class="font-bold text-blue-600 text-center">{{ formatNumber(varY) }}</span>
+          <span class="text-center">{{ formatNumber(covYZ) }}</span>
+          <span class="text-center">{{ formatNumber(covXZ) }}</span>
+          <span class="text-center">{{ formatNumber(covYZ) }}</span>
+          <span class="font-bold text-blue-600 text-center">{{ formatNumber(varZ) }}</span>
+        </div>
+        <span class="font-light text-4xl">]</span>
+      </div>
+
+      <h4 class="font-semibold mb-2 mt-4">Variances</h4>
+      <app-labelled-sliders
+        [(value)]="varX"
+        [min]="0.3"
+        [max]="3"
+        [step]="0.1"
+        title="σ²ₓ"
+        (valueChange)="onCovarianceChange()"
+      ></app-labelled-sliders>
+      
+      <app-labelled-sliders
+        [(value)]="varY"
+        [min]="0.3"
+        [max]="3"
+        [step]="0.1"
+        title="σ²ᵧ"
+        (valueChange)="onCovarianceChange()"
+      ></app-labelled-sliders>
+      
+      <app-labelled-sliders
+        [(value)]="varZ"
+        [min]="0.3"
+        [max]="3"
+        [step]="0.1"
+        title="σ²ᵤ"
+        (valueChange)="onCovarianceChange()"
+      ></app-labelled-sliders>
+
+      <h4 class="font-semibold mb-2 mt-4">Covariances</h4>
+      <app-labelled-sliders
+        [(value)]="covXY"
+        [min]="-0.9"
+        [max]="0.9"
+        [step]="0.1"
+        title="cov(X,Y)"
+        (valueChange)="onCovarianceChange()"
+      ></app-labelled-sliders>
+      
+      <app-labelled-sliders
+        [(value)]="covXZ"
+        [min]="-0.9"
+        [max]="0.9"
+        [step]="0.1"
+        title="cov(X,Z)"
+        (valueChange)="onCovarianceChange()"
+      ></app-labelled-sliders>
+      
+      <app-labelled-sliders
+        [(value)]="covYZ"
+        [min]="-0.9"
+        [max]="0.9"
+        [step]="0.1"
+        title="cov(Y,Z)"
+        (valueChange)="onCovarianceChange()"
+      ></app-labelled-sliders>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Settings</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <app-labelled-sliders
+        [(value)]="nSamples"
+        [min]="100"
+        [max]="1000"
+        [step]="100"
+        title="Number of samples"
+        (valueChange)="generateData()"
+      ></app-labelled-sliders>
+
+      <button 
+        mat-raised-button 
+        class="mt-4 w-full" 
+        color="primary" 
+        (click)="generateData()">
+        Regenerate Data
+      </button>
+    </mat-expansion-panel>
+
+
+    </div>
+  </ng-container>
 </app-tutorial-template>

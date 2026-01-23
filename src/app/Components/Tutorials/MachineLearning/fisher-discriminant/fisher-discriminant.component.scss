@@ -1,0 +1,16 @@
+// Fisher Discriminant Tutorial Component Styles
+// Most styling is handled via Tailwind utility classes in the template
+
+.graph {
+  width: 100%;
+  min-height: 400px;
+}
+
+// Table styling improvements
+table {
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 0.5rem;
+  }
+}

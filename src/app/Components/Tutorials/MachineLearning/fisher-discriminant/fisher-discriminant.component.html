@@ -1,0 +1,347 @@
+<app-tutorial-template [rightDrawer]="true" [leftDrawer]="true" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">
+    Fisher's Linear Discriminant
+  </ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small>
+      <i>
+        Discover why maximizing variance (PCA) isn't always best for classification.
+        Fisher's criterion finds the direction that maximizes class separation.
+      </i>
+    </small>
+  </ng-container>
+
+  <ng-container ngProjectAs="[tutorialContent]">
+    <div class="space-y-3 text-sm">
+        <p>
+          <strong>Fisher's criterion</strong> maximizes the ratio of between-class 
+          variance to within-class variance:
+        </p>
+        <div class="p-3 rounded text-center">
+          <span class="font-serif italic text-lg">J(w) = (μ₁ - μ₂)² / (σ₁² + σ₂²)</span>
+        </div>
+        <p>
+          <strong>Key insight:</strong> PCA finds the direction of maximum <em>total</em> 
+          variance, which may align with class overlap. Fisher finds the direction 
+          that best <em>separates</em> the classes.
+        </p>
+        <p>
+          The optimal projection is:
+        </p>
+        <div class="p-3 rounded text-center">
+          <span class="font-serif italic">w* = S<sub>W</sub>⁻¹(μ₁ - μ₂)</span>
+        </div>
+        <p class="text-xs">
+          where S<sub>W</sub> is the within-class scatter matrix.
+        </p>
+      </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Projection Direction</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="mb-4">
+        <label class="flex gap-2 items-center text-sm">
+          <span class="bg-purple-600 h-3 rounded-full w-3"></span>
+          Angle: {{ formatNumber(projectionAngle, 0) }}°
+        </label>
+        <mat-slider class="w-full" [min]="0" [max]="180" [step]="1">
+          <input matSliderThumb [(ngModel)]="projectionAngle" (input)="onAngleChange()">
+        </mat-slider>
+      </div>
+
+      <div class="font-mono my-2 p-2 rounded text-center text-sm">
+        w = ({{ formatNumber(projectionVector[0]) }}, {{ formatNumber(projectionVector[1]) }})
+      </div>
+
+      <div class="gap-2 grid grid-cols-2 mt-4">
+        <button mat-raised-button color="primary" (click)="alignWithFisher()">
+          Align Fisher
+        </button>
+        <button mat-raised-button color="accent" (click)="alignWithPCA()">
+          Align PCA
+        </button>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>📊 Metrics Comparison</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <table class="text-sm w-full">
+        <thead>
+          <tr class="border-b">
+            <th class="py-1 text-left">Direction</th>
+            <th class="py-1 text-right">J(w)</th>
+            <th class="py-1 text-right">Overlap</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b">
+            <td class="flex gap-1 items-center py-2">
+              <span class="bg-purple-600 h-3 rounded-full w-3"></span>
+              Yours
+            </td>
+            <td class="font-mono text-right">{{ formatNumber(fisherCriterion) }}</td>
+            <td class="font-mono text-right">{{ formatNumber(overlapPercentage, 1) }}%</td>
+          </tr>
+          <tr class="bg-green-50 border-b">
+            <td class="flex gap-1 items-center py-2">
+              <span class="bg-green-500 h-3 rounded-full w-3"></span>
+              Fisher
+            </td>
+            <td class="font-bold font-mono text-green-700 text-right">{{ formatNumber(fisherCriterionOptimal) }}</td>
+            <td class="font-bold font-mono text-green-700 text-right">{{ formatNumber(overlapOptimal, 1) }}%</td>
+          </tr>
+          <tr>
+            <td class="flex gap-1 items-center py-2">
+              <span class="bg-yellow-500 h-3 rounded-full w-3"></span>
+              PCA
+            </td>
+            <td class="font-mono text-right">{{ formatNumber(fisherCriterionPCA) }}</td>
+            <td class="font-mono text-right">{{ formatNumber(overlapPCA, 1) }}%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mt-4 p-3 rounded text-sm"
+           [ngClass]="fisherCriterion >= fisherCriterionOptimal * 0.95 ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'">
+        @if (fisherCriterion >= fisherCriterionOptimal * 0.95) {
+          ✅ Optimal separation achieved!
+        } @else if (fisherCriterion > fisherCriterionPCA) {
+          👍 Better than PCA! Keep adjusting to find optimal.
+        } @else {
+          🎯 Try to maximize J(w) — rotate towards Fisher direction.
+        }
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Direction Angles</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="space-y-2 text-sm">
+        <div class="flex items-center justify-between">
+          <span class="flex gap-1 items-center">
+            <span class="bg-green-500 h-3 rounded-full w-3"></span>
+            Fisher optimal:
+          </span>
+          <span class="font-mono">{{ formatNumber(fisherAngle, 1) }}°</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex gap-1 items-center">
+            <span class="bg-yellow-500 h-3 rounded-full w-3"></span>
+            PCA (max variance):
+          </span>
+          <span class="font-mono">{{ formatNumber(pcaAngle, 1) }}°</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex gap-1 items-center">
+            <span class="bg-purple-600 h-3 rounded-full w-3"></span>
+            Your direction:
+          </span>
+          <span class="font-mono">{{ formatNumber(projectionAngle, 1) }}°</span>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col items-center w-full">
+      <div class="gap-4 grid grid-cols-1 lg:grid-cols-2 w-full">
+        <!-- 2D Scatter Plot -->
+        <div class="w-full">
+          <h3 class="font-semibold mb-2 text-center">2D Feature Space</h3>
+          <div
+            echarts
+            [options]="option2D"
+            class="aspect-square graph"
+            (chartInit)="onChart2DInit($event)"
+          ></div>
+          <div class="flex flex-wrap gap-3 justify-center mt-2 text-xs">
+            <span class="flex gap-1 items-center">
+              <span class="bg-blue-500 h-3 rounded-full w-3"></span> Class 1
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="bg-red-400 h-3 rounded-full w-3"></span> Class 2
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="bg-purple-600 h-1 w-4"></span> Your direction
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="border-dashed border-green-500 border-t-2 h-0.5 w-4"></span> Fisher
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="border-dashed border-t-2 border-yellow-500 h-0.5 w-4"></span> PCA
+            </span>
+          </div>
+        </div>
+
+        <!-- Histogram -->
+        <div class="w-full">
+          <h3 class="font-semibold mb-2 text-center">Projected Distributions</h3>
+          <div
+            echarts
+            [options]="optionHistogram"
+            class="aspect-square graph"
+            (chartInit)="onChartHistogramInit($event)"
+          ></div>
+          <div class="mt-2 text-center text-gray-600 text-sm">
+            Overlap: <span class="font-bold font-mono" [ngClass]="overlapPercentage < 20 ? 'text-green-600' : 'text-orange-600'">
+              {{ formatNumber(overlapPercentage, 1) }}%
+            </span>
+            &nbsp;|&nbsp;
+            Fisher criterion J(w): <span class="font-bold font-mono">{{ formatNumber(fisherCriterion) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="max-w-96">
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <span class="flex gap-2 items-center">
+            <span class="bg-blue-500 h-3 rounded-full w-3"></span>
+            Class 1 (Blue)
+          </span>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <h4 class="font-semibold mb-2">Mean</h4>
+      <div class="gap-2 grid grid-cols-2">
+        <app-labelled-sliders
+          [(value)]="mean1[0]"
+          [min]="-4"
+          [max]="4"
+          [step]="0.1"
+          title="μ_x"
+          (valueChange)="onClassParameterChange()"
+        ></app-labelled-sliders>
+        <app-labelled-sliders
+          [(value)]="mean1[1]"
+          [min]="-4"
+          [max]="4"
+          [step]="0.1"
+          title="μ_y"
+          (valueChange)="onClassParameterChange()"
+        ></app-labelled-sliders>
+      </div>
+
+      <h4 class="font-semibold mb-2 mt-4">Covariance</h4>
+      <app-labelled-sliders
+        [(value)]="var1X"
+        [min]="0.2"
+        [max]="3"
+        [step]="0.1"
+        title="σ²_x"
+        (valueChange)="onClassParameterChange()"
+      ></app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="var1Y"
+        [min]="0.2"
+        [max]="3"
+        [step]="0.1"
+        title="σ²_y"
+        (valueChange)="onClassParameterChange()"
+      ></app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="cov1XY"
+        [min]="-1.5"
+        [max]="1.5"
+        [step]="0.1"
+        title="cov(x,y)"
+        (valueChange)="onClassParameterChange()"
+      ></app-labelled-sliders>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <span class="flex gap-2 items-center">
+            <span class="bg-red-400 h-3 rounded-full w-3"></span>
+            Class 2 (Red)
+          </span>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <h4 class="font-semibold mb-2">Mean</h4>
+      <div class="gap-2 grid grid-cols-2">
+        <app-labelled-sliders
+          [(value)]="mean2[0]"
+          [min]="-4"
+          [max]="4"
+          [step]="0.1"
+          title="μ_x"
+          (valueChange)="onClassParameterChange()"
+        ></app-labelled-sliders>
+        <app-labelled-sliders
+          [(value)]="mean2[1]"
+          [min]="-4"
+          [max]="4"
+          [step]="0.1"
+          title="μ_y"
+          (valueChange)="onClassParameterChange()"
+        ></app-labelled-sliders>
+      </div>
+
+      <h4 class="font-semibold mb-2 mt-4">Covariance</h4>
+      <app-labelled-sliders
+        [(value)]="var2X"
+        [min]="0.2"
+        [max]="3"
+        [step]="0.1"
+        title="σ²_x"
+        (valueChange)="onClassParameterChange()"
+      ></app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="var2Y"
+        [min]="0.2"
+        [max]="3"
+        [step]="0.1"
+        title="σ²_y"
+        (valueChange)="onClassParameterChange()"
+      ></app-labelled-sliders>
+      <app-labelled-sliders
+        [(value)]="cov2XY"
+        [min]="-1.5"
+        [max]="1.5"
+        [step]="0.1"
+        title="cov(x,y)"
+        (valueChange)="onClassParameterChange()"
+      ></app-labelled-sliders>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Settings</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <app-labelled-sliders
+        [(value)]="nSamplesPerClass"
+        [min]="50"
+        [max]="300"
+        [step]="25"
+        title="Samples per class"
+        (valueChange)="generateData()"
+      ></app-labelled-sliders>
+
+      <button 
+        mat-raised-button 
+        class="mt-4 w-full" 
+        color="primary" 
+        (click)="generateData()">
+        Regenerate Data
+      </button>
+    </mat-expansion-panel>
+
+</div>  
+</ng-container>
+</app-tutorial-template>
