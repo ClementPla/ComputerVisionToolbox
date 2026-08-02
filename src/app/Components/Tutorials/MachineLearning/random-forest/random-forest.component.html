@@ -1,0 +1,68 @@
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="false">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-4">
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">Trees</label>
+          <span class="bg-emerald-100 font-bold px-2 py-0.5 rounded text-emerald-700 text-xs">{{ nTrees }}</span>
+        </div>
+        <mat-slider min="1" max="80" step="1" discrete>
+          <input matSliderThumb [(ngModel)]="nTrees" (ngModelChange)="retrain()" />
+        </mat-slider>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">Max depth</label>
+          <span class="bg-indigo-100 font-bold px-2 py-0.5 rounded text-indigo-700 text-xs">{{ maxDepth }}</span>
+        </div>
+        <mat-slider min="1" max="12" step="1" discrete>
+          <input matSliderThumb [(ngModel)]="maxDepth" (ngModelChange)="retrain()" />
+        </mat-slider>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-slate-600 text-sm">Draw class</label>
+        <mat-button-toggle-group name="ClassChoice" aria-label="Class Choice" [(ngModel)]="classChoice">
+          <mat-button-toggle [value]="Classes.c1" [class.!bg-blue-600]="classChoice === Classes.c1">Class 1</mat-button-toggle>
+          <mat-button-toggle [value]="Classes.c2" [class.!bg-green-600]="classChoice === Classes.c2">Class 2</mat-button-toggle>
+          <mat-button-toggle [value]="Classes.c3" [class.!bg-red-600]="classChoice === Classes.c3">Class 3</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <p class="text-gray-500 text-xs">
+        Draw points, then watch the ensemble vote. With one shallow tree the
+        boundary is blocky; adding trees (bagging) smooths it and reduces overfitting.
+      </p>
+
+      <button mat-flat-button color="warn" (click)="clearPoints()" class="w-full">
+        <mat-icon>delete_sweep</mat-icon> Clear Dataset
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="h-[512px] relative w-[512px]">
+      <canvas
+        #rfCanvas
+        width="512"
+        height="512"
+        class="bg-slate-50 block border border-gray-200"
+        (mousemove)="draw($event)"
+        (mousedown)="startDraw()"
+        (mouseup)="stopDraw()"
+      ></canvas>
+
+      <svg width="512" height="512" viewBox="0 0 512 512" class="absolute left-0 pointer-events-none top-0">
+        @for (point of dataset.points; track point.x + "-" + point.y) {
+          <circle
+            [attr.cx]="point.x"
+            [attr.cy]="point.y"
+            r="5"
+            [attr.fill]="point.class === Classes.c1 ? 'blue' : point.class === Classes.c2 ? 'green' : 'red'"
+          ></circle>
+        }
+      </svg>
+    </div>
+  </ng-container>
+</app-tutorial-template>

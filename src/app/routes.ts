@@ -171,6 +171,13 @@ export const routeConfig: Routes = [
       ),
   },
   {
+    path: 'randomForest',
+    loadComponent: () =>
+      import('./Components/Tutorials/MachineLearning/random-forest/random-forest.component').then(
+        (m) => m.RandomForestComponent
+      ),
+  },
+  {
     path: 'optimizerComparison',
     loadComponent: () =>
       import('./Components/Tutorials/MachineLearning/optimizer-comparison/optimizer-comparison.component').then(

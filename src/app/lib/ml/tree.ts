@@ -57,10 +57,18 @@ export class DecisionTreeClassifier implements Classifier {
   classes: number[] = [];
   root: DecisionNode | null = null;
 
+  /**
+   * @param maxFeatures if set, only this many randomly-chosen features are
+   *   considered at each split (feature bagging, for random forests). Default:
+   *   all features.
+   * @param rng random source for feature sampling.
+   */
   constructor(
     public maxDepth = 5,
     public minSamplesLeaf = 1,
-    public criterion: Criterion = 'gini'
+    public criterion: Criterion = 'gini',
+    public maxFeatures?: number,
+    public rng: () => number = Math.random
   ) {}
 
   private get impurityFn(): (counts: number[]) => number {
@@ -145,7 +153,7 @@ export class DecisionTreeClassifier implements Classifier {
     const nFeatures = rows[0].length;
     let best: { feature: number; threshold: number; gain: number } | null = null;
 
-    for (let f = 0; f < nFeatures; f++) {
+    for (const f of this.candidateFeatures(nFeatures)) {
       const sorted = rows.map((r) => r[f]).sort((a, b) => a - b);
       for (let i = 0; i < sorted.length - 1; i++) {
         if (sorted[i] === sorted[i + 1]) continue;
@@ -168,6 +176,18 @@ export class DecisionTreeClassifier implements Classifier {
       }
     }
     return best;
+  }
+
+  /** Feature indices to consider at a split (all, or a random subset). */
+  private candidateFeatures(nFeatures: number): number[] {
+    const all = Array.from({ length: nFeatures }, (_, i) => i);
+    if (!this.maxFeatures || this.maxFeatures >= nFeatures) return all;
+    // Partial Fisher–Yates: take the first `maxFeatures` after shuffling.
+    for (let i = 0; i < this.maxFeatures; i++) {
+      const j = i + Math.floor(this.rng() * (nFeatures - i));
+      [all[i], all[j]] = [all[j], all[i]];
+    }
+    return all.slice(0, this.maxFeatures);
   }
 
   predict(X: Matrix): number[] {
