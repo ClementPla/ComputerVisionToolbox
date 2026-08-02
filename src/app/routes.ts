@@ -178,6 +178,13 @@ export const routeConfig: Routes = [
       ),
   },
   {
+    path: 'tsne',
+    loadComponent: () =>
+      import('./Components/Tutorials/MachineLearning/tsne/tsne.component').then(
+        (m) => m.TSNEComponent
+      ),
+  },
+  {
     path: 'optimizerComparison',
     loadComponent: () =>
       import('./Components/Tutorials/MachineLearning/optimizer-comparison/optimizer-comparison.component').then(

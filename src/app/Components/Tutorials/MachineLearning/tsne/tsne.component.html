@@ -1,0 +1,44 @@
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="false">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-4">
+      <p class="text-gray-500 text-xs">
+        t-SNE embeds high-dimensional points into 2D so that neighbours stay
+        neighbours. These are {{ nClusters }} Gaussian blobs living in
+        {{ dims }} dimensions — press Run and watch them separate.
+      </p>
+
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">Perplexity</label>
+          <span class="bg-indigo-100 font-bold px-2 py-0.5 rounded text-indigo-700 text-xs">{{ perplexity }}</span>
+        </div>
+        <mat-slider min="5" max="50" step="1" discrete>
+          <input matSliderThumb [(ngModel)]="perplexity" [disabled]="running" />
+        </mat-slider>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">Clusters</label>
+          <span class="bg-emerald-100 font-bold px-2 py-0.5 rounded text-emerald-700 text-xs">{{ nClusters }}</span>
+        </div>
+        <mat-slider min="2" max="5" step="1" discrete>
+          <input matSliderThumb [(ngModel)]="nClusters" [disabled]="running" (ngModelChange)="generateData()" />
+        </mat-slider>
+      </div>
+
+      <div class="flex gap-2">
+        <button mat-flat-button color="primary" (click)="run()" [disabled]="running" class="flex-1">
+          Run
+        </button>
+        <button mat-stroked-button (click)="reset()" class="flex-1">New data</button>
+      </div>
+
+      <p class="text-gray-400 text-xs">Iteration: {{ iter }} / {{ nIter }}</p>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div echarts [options]="option" (chartInit)="onChartInit($event)" class="block h-[560px] w-[560px]"></div>
+  </ng-container>
+</app-tutorial-template>

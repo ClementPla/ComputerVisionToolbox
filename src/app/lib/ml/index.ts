@@ -37,3 +37,5 @@ export type { Criterion, DecisionNode } from './tree';
 export { KNeighborsClassifier } from './neighbors';
 export { GaussianNaiveBayes } from './naive_bayes';
 export { RandomForestClassifier } from './ensemble';
+export { TSNE } from './manifold';
+export type { TSNEOptions } from './manifold';
