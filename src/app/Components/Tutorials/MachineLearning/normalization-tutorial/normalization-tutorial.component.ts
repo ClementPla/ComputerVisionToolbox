@@ -16,8 +16,9 @@ import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } fr
 import { MatSlider, MatSliderThumb } from '@angular/material/slider';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatButton } from '@angular/material/button';
+import { computeNormalizedImages, NormType } from './normalization';
 
-export type NormType = 'batch' | 'layer' | 'instance' | 'group';
+export type { NormType } from './normalization';
 export type Mode = 'train' | 'inference';
 export type ViewMode = 'cubes' | 'images';
 
@@ -175,153 +176,11 @@ export class NormalizationTutorialComponent implements AfterViewInit, OnDestroy 
   }
 
   recomputeAllNormalizations(): void {
-    const eps = 1e-5;
-    const H = this.imageSize;
-    const W = this.imageSize;
-
-    // Reset normalized images
-    for (const img of this.images) {
-      img.normalized = [];
-      for (let y = 0; y < H; y++) {
-        img.normalized[y] = [];
-        for (let x = 0; x < W; x++) {
-          img.normalized[y][x] = [0, 0, 0];
-        }
-      }
-    }
-
-    switch (this.normType) {
-      case 'batch': {
-        // Compute stats per channel across ALL images
-        for (let c = 0; c < 3; c++) {
-          let sum = 0, sumSq = 0, count = 0;
-          
-          for (const img of this.images) {
-            for (let y = 0; y < H; y++) {
-              for (let x = 0; x < W; x++) {
-                const val = img.original[y][x][c];
-                sum += val;
-                sumSq += val * val;
-                count++;
-              }
-            }
-          }
-          
-          const mean = sum / count;
-          const variance = sumSq / count - mean * mean;
-          const std = Math.sqrt(variance + eps);
-          
-          // Normalize all images for this channel
-          for (const img of this.images) {
-            for (let y = 0; y < H; y++) {
-              for (let x = 0; x < W; x++) {
-                const normalized = (img.original[y][x][c] - mean) / std;
-                img.normalized[y][x][c] = Math.max(0, Math.min(255, normalized * 64 + 128));
-              }
-            }
-          }
-        }
-        break;
-      }
-      
-      case 'layer': {
-        // Compute stats per image across all channels
-        for (const img of this.images) {
-          let sum = 0, sumSq = 0, count = 0;
-          
-          for (let y = 0; y < H; y++) {
-            for (let x = 0; x < W; x++) {
-              for (let c = 0; c < 3; c++) {
-                const val = img.original[y][x][c];
-                sum += val;
-                sumSq += val * val;
-                count++;
-              }
-            }
-          }
-          
-          const mean = sum / count;
-          const variance = sumSq / count - mean * mean;
-          const std = Math.sqrt(variance + eps);
-          
-          for (let y = 0; y < H; y++) {
-            for (let x = 0; x < W; x++) {
-              for (let c = 0; c < 3; c++) {
-                const normalized = (img.original[y][x][c] - mean) / std;
-                img.normalized[y][x][c] = Math.max(0, Math.min(255, normalized * 64 + 128));
-              }
-            }
-          }
-        }
-        break;
-      }
-      
-      case 'instance': {
-        // Compute stats per (image, channel)
-        for (const img of this.images) {
-          for (let c = 0; c < 3; c++) {
-            let sum = 0, sumSq = 0, count = 0;
-            
-            for (let y = 0; y < H; y++) {
-              for (let x = 0; x < W; x++) {
-                const val = img.original[y][x][c];
-                sum += val;
-                sumSq += val * val;
-                count++;
-              }
-            }
-            
-            const mean = sum / count;
-            const variance = sumSq / count - mean * mean;
-            const std = Math.sqrt(variance + eps);
-            
-            for (let y = 0; y < H; y++) {
-              for (let x = 0; x < W; x++) {
-                const normalized = (img.original[y][x][c] - mean) / std;
-                img.normalized[y][x][c] = Math.max(0, Math.min(255, normalized * 64 + 128));
-              }
-            }
-          }
-        }
-        break;
-      }
-      
-      case 'group': {
-        // Group: R+G together, B separate
-        const groups = [[0, 1], [2]];
-        
-        for (const img of this.images) {
-          for (const group of groups) {
-            let sum = 0, sumSq = 0, count = 0;
-            
-            for (const c of group) {
-              for (let y = 0; y < H; y++) {
-                for (let x = 0; x < W; x++) {
-                  const val = img.original[y][x][c];
-                  sum += val;
-                  sumSq += val * val;
-                  count++;
-                }
-              }
-            }
-            
-            const mean = sum / count;
-            const variance = sumSq / count - mean * mean;
-            const std = Math.sqrt(variance + eps);
-            
-            for (const c of group) {
-              for (let y = 0; y < H; y++) {
-                for (let x = 0; x < W; x++) {
-                  const normalized = (img.original[y][x][c] - mean) / std;
-                  img.normalized[y][x][c] = Math.max(0, Math.min(255, normalized * 64 + 128));
-                }
-              }
-            }
-          }
-        }
-        break;
-      }
-    }
+    const originals = this.images.map((img) => img.original);
+    const normalized = computeNormalizedImages(originals, this.normType, this.imageSize);
+    this.images.forEach((img, i) => {
+      img.normalized = normalized[i];
+    });
   }
 
   renderImages(): void {
