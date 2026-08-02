@@ -21,15 +21,43 @@ import {
   SequenceToken,
   zeros,
 } from './models/rnn';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatDivider } from '@angular/material/list';
+import { MatFormField } from '@angular/material/select';
+import { MatInput } from '@angular/material/input';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { NgFor, NgIf } from '@angular/common';
 
 type ModelType = 'rnn' | 'lstm' | 'gru';
 type VisualizationStep = 'sequence' | 'unrolled' | 'hidden' | 'gates' | 'cellstate';
 
 @Component({
-  selector: 'app-rnn-tutorial',
-  templateUrl: './rnn-tutorial.component.html',
-  styleUrls: ['./rnn-tutorial.component.scss'],
-  standalone: false,
+    selector: 'app-rnn-tutorial',
+    templateUrl: './rnn-tutorial.component.html',
+    styleUrls: ['./rnn-tutorial.component.scss'],
+    imports: [
+        TutorialTemplateComponent,
+        MatButtonToggleGroup,
+        MatButtonToggle,
+        MatDivider,
+        MatFormField,
+        MatInput,
+        ReactiveFormsModule,
+        FormsModule,
+        MatIconButton,
+        MatIcon,
+        MatSlider,
+        MatSliderThumb,
+        LabelledSlidersComponent,
+        MatButton,
+        NgFor,
+        NgIf,
+    ],
 })
 export class RnnTutorialComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('hiddenCanvas') hiddenCanvas: ElementRef<HTMLCanvasElement>;

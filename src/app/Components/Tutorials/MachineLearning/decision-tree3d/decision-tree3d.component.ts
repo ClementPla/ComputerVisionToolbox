@@ -3,6 +3,16 @@ import { ECharts } from 'echarts';
 import 'echarts-gl';
 import { Matrix } from 'src/app/lib/numpy';
 import { DecisionTreeClassifier, DecisionNode, accuracy } from 'src/app/lib/ml';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { NgClass, NgIf } from '@angular/common';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatButton } from '@angular/material/button';
 
 type Bounds = { min: [number, number, number]; max: [number, number, number] };
 
@@ -176,10 +186,10 @@ function countNodes(node: DecisionNode): { total: number; leaves: number } {
 // ============================================
 
 @Component({
-  selector: 'app-decision-tree-3d',
-  templateUrl: './decision-tree3d.component.html',
-  styleUrls: ['./decision-tree3d.component.scss'],
-  standalone: false
+    selector: 'app-decision-tree-3d',
+    templateUrl: './decision-tree3d.component.html',
+    styleUrls: ['./decision-tree3d.component.scss'],
+    imports: [TutorialTemplateComponent, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatSlider, MatSliderThumb, ReactiveFormsModule, FormsModule, MatButtonToggleGroup, MatButtonToggle, NgClass, MatCheckbox, NgIf, NgxEchartsDirective, LabelledSlidersComponent, MatButton]
 })
 export class DecisionTree3dComponent implements OnInit, OnDestroy {
   // Chart instances

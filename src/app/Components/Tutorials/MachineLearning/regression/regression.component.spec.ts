@@ -8,8 +8,8 @@ describe('RegressionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RegressionComponent ]
-    })
+    imports: [RegressionComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(RegressionComponent);

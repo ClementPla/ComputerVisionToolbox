@@ -8,8 +8,8 @@ describe('CNNComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CNNComponent]
-    })
+    imports: [CNNComponent]
+})
     .compileComponents();
     
     fixture = TestBed.createComponent(CNNComponent);

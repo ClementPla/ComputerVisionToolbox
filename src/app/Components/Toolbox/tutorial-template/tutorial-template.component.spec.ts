@@ -8,7 +8,7 @@ describe('TutorialTemplateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [TutorialTemplateComponent]
+    imports: [TutorialTemplateComponent]
 })
     .compileComponents();
 

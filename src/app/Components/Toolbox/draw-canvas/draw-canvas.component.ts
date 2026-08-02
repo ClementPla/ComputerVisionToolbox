@@ -20,14 +20,27 @@ import { switchMap, takeUntil, pairwise, mapTo } from 'rxjs/operators';
 
 import { HandleComponent } from '../handle/handle.component';
 import { ROIComponent } from '../roi/roi.component';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { NgClass, NgFor } from '@angular/common';
 
 declare var cv: any;
 
 @Component({
-  selector: 'app-draw-canvas',
-  templateUrl: './draw-canvas.component.html',
-  styleUrls: ['./draw-canvas.component.scss'],
-  standalone: false,
+    selector: 'app-draw-canvas',
+    templateUrl: './draw-canvas.component.html',
+    styleUrls: ['./draw-canvas.component.scss'],
+    imports: [
+        MatSlideToggle,
+        ReactiveFormsModule,
+        FormsModule,
+        MatIcon,
+        NgClass,
+        HandleComponent,
+        NgFor,
+        ROIComponent,
+    ],
 })
 export class DrawCanvasComponent implements OnInit {
   @Output() drawingEnded = new EventEmitter<boolean>();

@@ -8,8 +8,8 @@ describe('TransformerTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [TransformerTutorialComponent]
-    })
+    imports: [TransformerTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(TransformerTutorialComponent);

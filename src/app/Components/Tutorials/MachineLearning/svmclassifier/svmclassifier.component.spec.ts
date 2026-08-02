@@ -8,8 +8,8 @@ describe('SVMClassifierComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SVMClassifierComponent]
-    })
+    imports: [SVMClassifierComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(SVMClassifierComponent);

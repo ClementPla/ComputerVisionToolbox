@@ -26,6 +26,17 @@ import {
   generateCheckerboard,
   generateCirclesPattern,
 } from './tokenizer';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider } from '@angular/material/list';
+import { NgIf, NgFor } from '@angular/common';
+import { MatFormField } from '@angular/material/select';
+import { MatInput } from '@angular/material/input';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton } from '@angular/material/button';
 
 type ViewMode = 'text' | 'image';
 type VisualizationStep = 'tokenization' | 'embedding' | 'qkv' | 'attention' | 'multihead' | 'output';
@@ -37,10 +48,25 @@ interface HeadVisualization {
 }
 
 @Component({
-  selector: 'app-transformer-tutorial',
-  templateUrl: './transformer-tutorial.component.html',
-  styleUrls: ['./transformer-tutorial.component.scss'],
-  standalone: false,
+    selector: 'app-transformer-tutorial',
+    templateUrl: './transformer-tutorial.component.html',
+    styleUrls: ['./transformer-tutorial.component.scss'],
+    imports: [
+        TutorialTemplateComponent,
+        MatButtonToggleGroup,
+        MatButtonToggle,
+        MatIcon,
+        MatDivider,
+        NgIf,
+        MatFormField,
+        MatInput,
+        ReactiveFormsModule,
+        FormsModule,
+        LabelledSlidersComponent,
+        MatCheckbox,
+        MatButton,
+        NgFor,
+    ],
 })
 export class TransformerTutorialComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('imageCanvas') imageCanvas: ElementRef<HTMLCanvasElement>;

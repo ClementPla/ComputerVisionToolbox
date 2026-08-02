@@ -1,13 +1,28 @@
 import { Component } from '@angular/core';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatDivider } from '@angular/material/list';
+import { NgIf, NgFor } from '@angular/common';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 type TabType = 'concept' | 'transformer' | 'rnn' | 'comparison';
 type PhaseType = 'training' | 'inference';
 
 @Component({
-  selector: 'app-autoregressive-tutorial',
-  templateUrl: './autoregressive-tutorial.component.html',
-  styleUrls: ['./autoregressive-tutorial.component.scss'],
-  standalone: false,
+    selector: 'app-autoregressive-tutorial',
+    templateUrl: './autoregressive-tutorial.component.html',
+    styleUrls: ['./autoregressive-tutorial.component.scss'],
+    imports: [
+        TutorialTemplateComponent,
+        MatButtonToggleGroup,
+        MatButtonToggle,
+        MatDivider,
+        NgIf,
+        MatIconButton,
+        MatIcon,
+        NgFor,
+    ],
 })
 export class AutoregressiveTutorialComponent {
   currentTab: TabType = 'concept';

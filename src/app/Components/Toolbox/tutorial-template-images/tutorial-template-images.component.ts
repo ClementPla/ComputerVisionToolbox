@@ -4,13 +4,22 @@ import { DrawCanvasComponent } from '../draw-canvas/draw-canvas.component';
 import { TutorialTemplateComponent } from '../tutorial-template/tutorial-template.component';
 
 import { UIControlService } from '../../../Services/uicontrol.service';
+import { NgIf } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { RouterLink } from '@angular/router';
+import { MatDrawerContainer, MatDrawer } from '@angular/material/sidenav';
+import { LoadingButtonsComponent } from '../loading-buttons/loading-buttons.component';
+import { ImagePresetsComponent } from '../../Presets/image-presets/image-presets.component';
 
 @Component({
     selector: 'app-tutorial-template-images',
     templateUrl: './tutorial-template-images.component.html',
     styleUrls: ['./tutorial-template-images.component.scss',
         '../tutorial-template/tutorial-template.component.scss'],
-    standalone: false
+    imports: [NgIf, MatProgressSpinner, MatToolbar, MatToolbarRow, MatIconButton, MatIcon, RouterLink, MatDrawerContainer, MatDrawer, LoadingButtonsComponent, MatButton, ImagePresetsComponent]
 })
 export class TutorialTemplateImagesComponent extends TutorialTemplateComponent implements AfterViewInit {
 

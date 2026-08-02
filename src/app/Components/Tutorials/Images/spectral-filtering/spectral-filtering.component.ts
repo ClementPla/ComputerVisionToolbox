@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
 import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
 
 declare var cv: any;
 
@@ -9,7 +11,7 @@ declare var cv: any;
     selector: 'app-spectral-filtering',
     templateUrl: './spectral-filtering.component.html',
     styleUrls: ['./spectral-filtering.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateImagesComponent, LabelledSlidersComponent, DrawCanvasComponent]
 })
 export class SpectralFilteringComponent extends TutorialImageClass {
 

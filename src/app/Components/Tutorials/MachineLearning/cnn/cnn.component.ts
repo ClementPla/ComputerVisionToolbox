@@ -10,12 +10,18 @@ declare global {
 const ort = window.ort;
 
 import { DrawCanvasComponent } from 'src/app/Components/Toolbox/draw-canvas/draw-canvas.component';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { DrawCanvasComponent as DrawCanvasComponent_1 } from '../../../Toolbox/draw-canvas/draw-canvas.component';
+import { MatButton } from '@angular/material/button';
+import { NgFor, DecimalPipe } from '@angular/common';
 
 @Component({
     selector: 'app-cnn',
     templateUrl: './cnn.component.html',
     styleUrl: './cnn.component.scss',
-    standalone: false
+    imports: [TutorialTemplateComponent, MatCheckbox, LabelledSlidersComponent, DrawCanvasComponent_1, MatButton, NgFor, DecimalPipe]
 })
 export class CNNComponent extends TutorialImageClass implements OnInit {
   @ViewChild('drawCanvas') canvas: DrawCanvasComponent;

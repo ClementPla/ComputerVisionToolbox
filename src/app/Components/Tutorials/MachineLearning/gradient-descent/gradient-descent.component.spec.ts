@@ -8,7 +8,7 @@ describe('GradientDescentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [GradientDescentComponent]
+    imports: [GradientDescentComponent]
 })
     .compileComponents();
 

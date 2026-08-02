@@ -8,7 +8,7 @@ describe('DrawCanvasComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [DrawCanvasComponent]
+    imports: [DrawCanvasComponent]
 })
     .compileComponents();
   });

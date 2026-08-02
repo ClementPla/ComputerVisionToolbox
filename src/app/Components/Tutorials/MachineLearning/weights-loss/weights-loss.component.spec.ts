@@ -8,7 +8,7 @@ describe('WeightsLossComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [WeightsLossComponent]
+    imports: [WeightsLossComponent]
 })
     .compileComponents();
 

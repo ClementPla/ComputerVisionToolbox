@@ -3,12 +3,21 @@ import { ECharts, EChartsOption } from 'echarts';
 
 import { PolynomialRegression } from '../../../../lib/ml';
 import { arange, choice, linspace } from '../../../../utils/math';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatButton } from '@angular/material/button';
+import { NgxEchartsDirective } from 'ngx-echarts';
 
 @Component({
-  selector: 'app-regression',
-  templateUrl: './regression.component.html',
-  styleUrls: ['./regression.component.scss'],
-  standalone: false,
+    selector: 'app-regression',
+    templateUrl: './regression.component.html',
+    styleUrls: ['./regression.component.scss'],
+    imports: [
+        TutorialTemplateComponent,
+        LabelledSlidersComponent,
+        MatButton,
+        NgxEchartsDirective,
+    ],
 })
 export class RegressionComponent implements AfterViewInit {
   graphData: EChartsOption;

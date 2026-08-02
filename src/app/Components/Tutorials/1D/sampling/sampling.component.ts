@@ -3,13 +3,18 @@ import { EChartsOption, number } from 'echarts';
 import { linspace } from '../../../../utils/math';
 import { fft_spectrum } from '../../../../utils/fft';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatLabel } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { NgxEchartsDirective } from 'ngx-echarts';
 
 
 @Component({
     selector: 'app-sampling',
     templateUrl: './sampling.component.html',
     styleUrls: ['./sampling.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateComponent, MatLabel, MatCheckbox, LabelledSlidersComponent, NgxEchartsDirective]
 })
 export class SamplingComponent implements AfterViewInit {
 

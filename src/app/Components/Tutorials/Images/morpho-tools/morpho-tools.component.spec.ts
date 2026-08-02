@@ -8,7 +8,7 @@ describe('MorphoToolsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [MorphoToolsComponent]
+    imports: [MorphoToolsComponent]
 })
     .compileComponents();
 

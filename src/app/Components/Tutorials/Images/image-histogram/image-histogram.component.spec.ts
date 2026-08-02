@@ -8,7 +8,7 @@ describe('ImageHistogramComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [ImageHistogramComponent]
+    imports: [ImageHistogramComponent]
 })
     .compileComponents();
 

@@ -8,8 +8,8 @@ describe('KMeansTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [KMeansTutorialComponent]
-    })
+    imports: [KMeansTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(KMeansTutorialComponent);

@@ -7,7 +7,7 @@ import { Point2D } from '../../../utils/geometry';
     selector: 'app-roi',
     templateUrl: './roi.component.html',
     styleUrls: ['./roi.component.scss'],
-    standalone: false
+    imports: [HandleComponent]
 })
 export class ROIComponent implements OnInit, AfterViewInit{
 

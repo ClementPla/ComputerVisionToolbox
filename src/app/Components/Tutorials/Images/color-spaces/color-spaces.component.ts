@@ -1,15 +1,30 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
-import { FormControl } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ColorEvent } from 'ngx-color';
 import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { ColorSketchModule } from 'ngx-color/sketch';
+import { MatFormField, MatLabel, MatSelect, MatOption } from '@angular/material/select';
 declare var cv: any;
 
 @Component({
-  selector: 'app-color-spaces',
-  templateUrl: './color-spaces.component.html',
-  styleUrls: ['./color-spaces.component.scss'],
-  standalone: false,
+    selector: 'app-color-spaces',
+    templateUrl: './color-spaces.component.html',
+    styleUrls: ['./color-spaces.component.scss'],
+    imports: [
+        TutorialTemplateImagesComponent,
+        LabelledSlidersComponent,
+        ColorSketchModule,
+        MatFormField,
+        MatLabel,
+        MatSelect,
+        ReactiveFormsModule,
+        FormsModule,
+        MatOption,
+        DrawCanvasComponent,
+    ],
 })
 export class ColorSpacesComponent
   extends TutorialImageClass

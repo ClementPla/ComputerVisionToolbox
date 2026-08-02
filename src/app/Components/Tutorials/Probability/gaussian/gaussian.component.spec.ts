@@ -8,8 +8,8 @@ describe('GaussianComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [GaussianComponent]
-    })
+    imports: [GaussianComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(GaussianComponent);

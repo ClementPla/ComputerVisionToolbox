@@ -1,9 +1,21 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { MatFormField, MatLabel } from '@angular/material/select';
+import { MatInput } from '@angular/material/input';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
 @Component({
-  selector: 'app-labelled-sliders',
-  templateUrl: './labelled-sliders.component.html',
-  styleUrls: ['./labelled-sliders.component.scss'],
-  standalone: false,
+    selector: 'app-labelled-sliders',
+    templateUrl: './labelled-sliders.component.html',
+    styleUrls: ['./labelled-sliders.component.scss'],
+    imports: [
+        MatFormField,
+        MatLabel,
+        MatInput,
+        ReactiveFormsModule,
+        FormsModule,
+        MatSlider,
+        MatSliderThumb,
+    ],
 })
 export class LabelledSlidersComponent implements OnInit {
   @Input() min: number = 1;

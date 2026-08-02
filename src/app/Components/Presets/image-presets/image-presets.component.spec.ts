@@ -8,7 +8,7 @@ describe('ImagePresetsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [ImagePresetsComponent]
+    imports: [ImagePresetsComponent]
 })
     .compileComponents();
 

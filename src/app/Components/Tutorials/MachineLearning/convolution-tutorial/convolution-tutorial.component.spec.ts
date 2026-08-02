@@ -8,8 +8,8 @@ describe('ConvolutionTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ConvolutionTutorialComponent]
-    })
+    imports: [ConvolutionTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(ConvolutionTutorialComponent);

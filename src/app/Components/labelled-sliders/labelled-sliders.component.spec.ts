@@ -8,7 +8,7 @@ describe('LabelledSlidersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [LabelledSlidersComponent]
+    imports: [LabelledSlidersComponent]
 })
     .compileComponents();
   });

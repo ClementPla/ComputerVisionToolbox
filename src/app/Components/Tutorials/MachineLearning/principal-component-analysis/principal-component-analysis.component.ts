@@ -15,6 +15,14 @@ function ellipsoidTransform(covariance: number[][]): Matrix {
 }
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { NgClass } from '@angular/common';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
@@ -180,10 +188,10 @@ function generatePhiIndicator(
 // ============================================
 
 @Component({
-  selector: 'app-principal-component-analysis',
-  templateUrl: './principal-component-analysis.component.html',
-  styleUrls: ['./principal-component-analysis.component.scss'],
-  standalone: false
+    selector: 'app-principal-component-analysis',
+    templateUrl: './principal-component-analysis.component.html',
+    styleUrls: ['./principal-component-analysis.component.scss'],
+    imports: [TutorialTemplateComponent, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatSlider, MatSliderThumb, ReactiveFormsModule, FormsModule, MatButton, NgClass, NgxEchartsDirective, LabelledSlidersComponent]
 })
 export class PrincipalComponentAnalysisComponent implements OnInit, OnDestroy {
     // Chart instances

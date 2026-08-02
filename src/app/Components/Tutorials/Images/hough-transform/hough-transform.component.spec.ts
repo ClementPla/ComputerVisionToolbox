@@ -8,8 +8,8 @@ describe('HoughTransformComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [HoughTransformComponent]
-    })
+    imports: [HoughTransformComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(HoughTransformComponent);

@@ -8,8 +8,8 @@ describe('LinearClassifierComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LinearClassifierComponent]
-    })
+    imports: [LinearClassifierComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(LinearClassifierComponent);

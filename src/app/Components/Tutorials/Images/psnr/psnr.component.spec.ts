@@ -8,7 +8,7 @@ describe('PSNRComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [PSNRComponent]
+    imports: [PSNRComponent]
 })
     .compileComponents();
 

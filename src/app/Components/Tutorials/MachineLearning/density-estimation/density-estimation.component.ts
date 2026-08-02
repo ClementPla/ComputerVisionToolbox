@@ -1,5 +1,12 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { normalPdf, isotropicNormalPdf } from 'src/app/lib/ml';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatDivider } from '@angular/material/list';
+import { NgIf, NgFor } from '@angular/common';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 type TabType = 'gmm' | 'kde';
 type DimensionType = '1d' | '2d';
@@ -17,10 +24,21 @@ interface GaussianComponent {
 }
 
 @Component({
-  selector: 'app-density-estimation-tutorial',
-  templateUrl: './density-estimation.component.html',
-  styleUrls: ['./density-estimation.component.scss'],
-  standalone: false,
+    selector: 'app-density-estimation-tutorial',
+    templateUrl: './density-estimation.component.html',
+    styleUrls: ['./density-estimation.component.scss'],
+    imports: [
+        TutorialTemplateComponent,
+        MatButtonToggleGroup,
+        MatButtonToggle,
+        MatDivider,
+        NgIf,
+        MatSlider,
+        MatSliderThumb,
+        NgFor,
+        MatButton,
+        MatIcon,
+    ],
 })
 export class DensityEstimationComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas1d', { static: false }) canvas1dRef!: ElementRef<HTMLCanvasElement>;

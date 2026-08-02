@@ -8,6 +8,14 @@ import {
 } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton } from '@angular/material/button';
 
 export type NormType = 'batch' | 'layer' | 'instance' | 'group';
 export type Mode = 'train' | 'inference';
@@ -26,10 +34,10 @@ interface ImageDataStore {
 }
 
 @Component({
-  selector: 'app-normalization-tutorial',
-  templateUrl: './normalization-tutorial.component.html',
-  styleUrl: './normalization-tutorial.component.scss',
-  standalone: false
+    selector: 'app-normalization-tutorial',
+    templateUrl: './normalization-tutorial.component.html',
+    styleUrl: './normalization-tutorial.component.scss',
+    imports: [TutorialTemplateComponent, MatButtonToggleGroup, ReactiveFormsModule, FormsModule, MatButtonToggle, MatIcon, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatSlider, MatSliderThumb, MatCheckbox, MatButton]
 })
 export class NormalizationTutorialComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvasContainer', { static: true }) canvasContainer!: ElementRef<HTMLDivElement>;

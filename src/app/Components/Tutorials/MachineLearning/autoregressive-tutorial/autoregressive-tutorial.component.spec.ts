@@ -8,8 +8,8 @@ describe('AutoregressiveTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AutoregressiveTutorialComponent]
-    })
+    imports: [AutoregressiveTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(AutoregressiveTutorialComponent);

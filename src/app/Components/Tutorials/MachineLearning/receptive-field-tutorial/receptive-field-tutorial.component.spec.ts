@@ -8,8 +8,8 @@ describe('ReceptiveFieldTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ReceptiveFieldTutorialComponent]
-    })
+    imports: [ReceptiveFieldTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(ReceptiveFieldTutorialComponent);

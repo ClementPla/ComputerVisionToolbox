@@ -8,8 +8,8 @@ describe('DensityEstimationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DensityEstimationComponent]
-    })
+    imports: [DensityEstimationComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(DensityEstimationComponent);

@@ -8,7 +8,7 @@ describe('SpatialFilteringComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [SpatialFilteringComponent]
+    imports: [SpatialFilteringComponent]
 })
     .compileComponents();
   });

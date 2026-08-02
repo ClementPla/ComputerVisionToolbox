@@ -8,8 +8,8 @@ describe('RnnTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RnnTutorialComponent]
-    })
+    imports: [RnnTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(RnnTutorialComponent);

@@ -8,12 +8,16 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { Kernel } from '../kernel';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { NgClass, NgIf, NgFor } from '@angular/common';
+import { MatMiniFabButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'app-kernel-element',
     templateUrl: './kernel-element.component.html',
     styleUrls: ['./kernel-element.component.scss'],
-    standalone: false
+    imports: [MatExpansionPanel, NgClass, MatExpansionPanelHeader, MatExpansionPanelTitle, MatMiniFabButton, NgIf, MatIcon, NgFor]
 })
 export class KernelElementComponent implements OnInit {
   @Input() kernel: Kernel;

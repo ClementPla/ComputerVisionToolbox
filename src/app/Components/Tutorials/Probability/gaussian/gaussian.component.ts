@@ -3,12 +3,36 @@ import { color, ECharts, EChartsOption } from 'echarts';
 import { Matrix } from 'src/app/lib/numpy';
 import { normalPdf, MultivariateNormal } from 'src/app/lib/ml';
 import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatFormField, MatLabel } from '@angular/material/select';
+import { MatInput } from '@angular/material/input';
 
 @Component({
-  selector: 'app-gaussian',
-  standalone: false,
-  templateUrl: './gaussian.component.html',
-  styleUrl: './gaussian.component.scss',
+    selector: 'app-gaussian',
+    templateUrl: './gaussian.component.html',
+    styleUrl: './gaussian.component.scss',
+    imports: [
+        TutorialTemplateComponent,
+        MatButtonToggleGroup,
+        ReactiveFormsModule,
+        FormsModule,
+        MatButtonToggle,
+        MatCheckbox,
+        NgxEchartsDirective,
+        MatExpansionPanel,
+        MatExpansionPanelHeader,
+        MatExpansionPanelTitle,
+        LabelledSlidersComponent,
+        MatFormField,
+        MatLabel,
+        MatInput,
+    ],
 })
 export class GaussianComponent extends TutorialClass {
   step = 0.25;

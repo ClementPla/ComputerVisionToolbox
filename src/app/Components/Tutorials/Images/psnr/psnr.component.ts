@@ -4,11 +4,16 @@ import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-i
 
 
 import { gaussianRandom, getMean, getStandardDeviation } from '../../../../utils/math';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatButton } from '@angular/material/button';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
+import { MatDivider } from '@angular/material/list';
 @Component({
     selector: 'app-psnr',
     templateUrl: './psnr.component.html',
     styleUrls: ['./psnr.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateImagesComponent, LabelledSlidersComponent, MatButton, DrawCanvasComponent, MatDivider]
 })
 export class PSNRComponent extends TutorialImageClass implements AfterViewInit, OnInit
 { 

@@ -20,12 +20,36 @@ import { Trainer, TrainerConfig } from '../NN/trainer';
 import { CrossEntropyLoss } from '../NN/loss';
 import { SGD, Adam, RMSProp } from '../NN/optim';
 import { spectral } from 'src/app/utils/colormap';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButton } from '@angular/material/button';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { NgFor, NgIf, NgStyle } from '@angular/common';
+import { NgxEchartsDirective } from 'ngx-echarts';
 
 @Component({
-  selector: 'app-gradient-descent',
-  templateUrl: './gradient-descent.component.html',
-  styleUrls: ['./gradient-descent.component.scss'],
-  standalone: false,
+    selector: 'app-gradient-descent',
+    templateUrl: './gradient-descent.component.html',
+    styleUrls: ['./gradient-descent.component.scss'],
+    imports: [
+        TutorialTemplateComponent,
+        MatButton,
+        MatAccordion,
+        MatExpansionPanel,
+        MatExpansionPanelHeader,
+        MatExpansionPanelTitle,
+        MatButtonToggleGroup,
+        ReactiveFormsModule,
+        FormsModule,
+        MatButtonToggle,
+        LabelledSlidersComponent,
+        NgFor,
+        NgIf,
+        NgxEchartsDirective,
+        NgStyle,
+    ],
 })
 export class GradientDescentComponent
   extends TutorialClass

@@ -1,5 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatButton } from '@angular/material/button';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { NgIf } from '@angular/common';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
 
 declare var cv: any;
 
@@ -7,7 +16,7 @@ declare var cv: any;
     selector: 'app-fast-fourier-transform',
     templateUrl: './fast-fourier-transform.component.html',
     styleUrls: ['./fast-fourier-transform.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateImagesComponent, MatButtonToggleGroup, ReactiveFormsModule, FormsModule, MatButtonToggle, LabelledSlidersComponent, MatButton, MatSlideToggle, NgIf, NgxEchartsDirective, DrawCanvasComponent]
 })
 export class FastFourierTransformComponent extends TutorialImageClass {
   angle: number | null = 0;

@@ -4,13 +4,16 @@ import { sampleGaussian2D } from '../../../../utils/sampling';
 import { clamp } from '../../../../utils/math';
 import { EChartsOption, SeriesOption } from 'echarts';
 
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
+import { MatButtonToggleChange, MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { NgxEchartsDirective } from 'ngx-echarts';
 
 @Component({
     selector: 'app-weights-loss',
     templateUrl: './weights-loss.component.html',
     styleUrls: ['./weights-loss.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateComponent, LabelledSlidersComponent, MatButtonToggleGroup, MatButtonToggle, NgxEchartsDirective]
 })
 export class WeightsLossComponent implements OnInit {
   x_range = [-10, 10];

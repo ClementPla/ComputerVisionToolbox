@@ -6,6 +6,15 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { SVMClassifier, SVMDatapoint, SVMResult, SVMKernel } from 'src/app/lib/ml';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatFormField, MatLabel, MatSelect, MatOption } from '@angular/material/select';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 export enum SVMClasses {
   Positive = 1,
@@ -19,10 +28,28 @@ export interface Datapoint {
 }
 
 @Component({
-  selector: 'app-svm-classifier',
-  templateUrl: './svmclassifier.component.html',
-  styleUrl: './svmclassifier.component.scss',
-  standalone: false,
+    selector: 'app-svm-classifier',
+    templateUrl: './svmclassifier.component.html',
+    styleUrl: './svmclassifier.component.scss',
+    imports: [
+        TutorialTemplateComponent,
+        MatButtonToggleGroup,
+        ReactiveFormsModule,
+        FormsModule,
+        MatButtonToggle,
+        MatExpansionPanel,
+        MatExpansionPanelHeader,
+        MatExpansionPanelTitle,
+        MatFormField,
+        MatLabel,
+        MatSelect,
+        MatOption,
+        MatSlider,
+        MatSliderThumb,
+        MatCheckbox,
+        MatIcon,
+        MatButton,
+    ],
 })
 export class SVMClassifierComponent implements AfterViewInit, OnDestroy {
   @ViewChild('svmCanvas', { static: true })

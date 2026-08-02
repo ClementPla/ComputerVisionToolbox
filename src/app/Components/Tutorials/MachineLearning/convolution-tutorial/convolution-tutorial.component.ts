@@ -1,4 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 interface GridCell {
   row: number;
@@ -17,10 +23,10 @@ interface OutputCell {
 }
 
 @Component({
-  selector: 'app-convolution-tutorial',
-  templateUrl: './convolution-tutorial.component.html',
-  styleUrl: './convolution-tutorial.component.scss',
-  standalone: false
+    selector: 'app-convolution-tutorial',
+    templateUrl: './convolution-tutorial.component.html',
+    styleUrl: './convolution-tutorial.component.scss',
+    imports: [TutorialTemplateComponent, MatIconButton, MatIcon, MatButton, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatSlider, MatSliderThumb, ReactiveFormsModule, FormsModule]
 })
 export class ConvolutionTutorialComponent implements OnInit, OnDestroy {
   

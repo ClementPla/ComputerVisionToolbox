@@ -8,7 +8,7 @@ describe('KernelElementComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [KernelElementComponent]
+    imports: [KernelElementComponent]
 })
     .compileComponents();
   });

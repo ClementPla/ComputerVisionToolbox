@@ -2,13 +2,20 @@ import { AfterViewInit, Component } from '@angular/core';
 import { EChartsOption, graphic } from 'echarts';
 import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
 import { OpenCVState } from 'ngx-opencv';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
 declare var cv: any;
 
 @Component({
     selector: 'app-image-histogram',
     templateUrl: './image-histogram.component.html',
     styleUrls: ['./image-histogram.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateImagesComponent, MatButtonToggleGroup, ReactiveFormsModule, FormsModule, MatButtonToggle, MatButton, LabelledSlidersComponent, NgxEchartsDirective, DrawCanvasComponent]
 })
 export class ImageHistogramComponent
   extends TutorialImageClass

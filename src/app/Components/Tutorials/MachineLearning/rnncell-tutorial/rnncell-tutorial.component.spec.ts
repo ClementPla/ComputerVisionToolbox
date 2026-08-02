@@ -8,8 +8,8 @@ describe('RNNCellTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RNNCellTutorialComponent]
-    })
+    imports: [RNNCellTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(RNNCellTutorialComponent);

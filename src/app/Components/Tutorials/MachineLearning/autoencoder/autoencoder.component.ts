@@ -10,6 +10,11 @@ import mnist_data_autoencoder from '../../../../../assets/autoencoder/mnist_enco
 import mnist_data_sparse from '../../../../../assets/autoencoder/mnist_sparse_encoded_2D.json';
 import { ECharts, EChartsOption } from 'echarts';
 import { linspace } from 'src/app/utils/sampling';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { NgxEchartsDirective } from 'ngx-echarts';
 declare global {
   interface Window {
     ort: any; // ou mieux : typeof import('onnxruntime-web') si tu veux le typage
@@ -18,10 +23,18 @@ declare global {
 const ort = window.ort;
 
 @Component({
-  selector: 'app-autoencoder',
-  standalone: false,
-  templateUrl: './autoencoder.component.html',
-  styleUrl: './autoencoder.component.scss',
+    selector: 'app-autoencoder',
+    templateUrl: './autoencoder.component.html',
+    styleUrl: './autoencoder.component.scss',
+    imports: [
+        TutorialTemplateComponent,
+        MatButtonToggleGroup,
+        ReactiveFormsModule,
+        FormsModule,
+        MatButtonToggle,
+        LabelledSlidersComponent,
+        NgxEchartsDirective,
+    ],
 })
 export class AutoencoderComponent
   extends TutorialClass

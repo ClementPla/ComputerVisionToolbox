@@ -8,8 +8,8 @@ describe('NormalizationTutorialComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [NormalizationTutorialComponent]
-    })
+    imports: [NormalizationTutorialComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(NormalizationTutorialComponent);

@@ -1,6 +1,14 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import { Optimizer, OptimizerType, createOptimizer, Point2D, GradientResult } from './optimizers';
 import { TestFunction, FunctionType, getTestFunction } from './test-functions';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatFormField, MatLabel, MatSelect, MatOption } from '@angular/material/select';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 interface TracePoint extends Point2D {
   iteration: number;
@@ -16,10 +24,10 @@ interface OptimizerState {
 }
 
 @Component({
-  selector: 'app-optimizer-comparison',
-  templateUrl: './optimizer-comparison.component.html',
-  styleUrl: './optimizer-comparison.component.scss',
-  standalone: false
+    selector: 'app-optimizer-comparison',
+    templateUrl: './optimizer-comparison.component.html',
+    styleUrl: './optimizer-comparison.component.scss',
+    imports: [TutorialTemplateComponent, MatButton, MatIcon, MatFormField, MatLabel, MatSelect, ReactiveFormsModule, FormsModule, MatOption, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatSlider, MatSliderThumb, MatCheckbox]
 })
 export class OptimizerComparisonComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;

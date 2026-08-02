@@ -8,7 +8,7 @@ describe('ROIComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [ROIComponent]
+    imports: [ROIComponent]
 })
     .compileComponents();
 

@@ -1,6 +1,14 @@
 import { AfterContentInit, Component } from '@angular/core';
 import { Kernel, KernelGenerator } from './kernel';
 import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatMiniFabButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { NgIf, NgFor } from '@angular/common';
+import { KernelElementComponent } from './kernel-element/kernel-element.component';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
 
 declare var cv: any;
 
@@ -9,7 +17,7 @@ declare var cv: any;
     selector: 'app-spatial-filtering',
     templateUrl: './spatial-filtering.component.html',
     styleUrls: ['./spatial-filtering.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateImagesComponent, LabelledSlidersComponent, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatMiniFabButton, MatIcon, MatButton, NgIf, NgFor, KernelElementComponent, DrawCanvasComponent]
 })
 export class SpatialFilteringComponent extends TutorialImageClass implements AfterContentInit {
 

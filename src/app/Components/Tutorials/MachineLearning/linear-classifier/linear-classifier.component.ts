@@ -10,6 +10,14 @@ import {
   PolynomialFeatures,
   RBFSampler,
 } from 'src/app/lib/ml';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatFormField, MatLabel, MatSelect, MatOption } from '@angular/material/select';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { MatButton } from '@angular/material/button';
 
 // --- Types for Preprocessing ---
 export type PreprocessMode = 'None' | 'Polynomial' | 'RBF-Random' | 'RBF-KMeans';
@@ -32,10 +40,10 @@ export enum Model {
 }
 
 @Component({
-  selector: 'app-linear-classifier',
-  templateUrl: './linear-classifier.component.html',
-  styleUrl: './linear-classifier.component.scss',
-  standalone: false
+    selector: 'app-linear-classifier',
+    templateUrl: './linear-classifier.component.html',
+    styleUrl: './linear-classifier.component.scss',
+    imports: [TutorialTemplateComponent, MatButtonToggleGroup, ReactiveFormsModule, FormsModule, MatButtonToggle, MatIcon, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatSelect, MatOption, MatSlider, MatSliderThumb, MatButton]
 })
 export class LinearClassifierComponent {
   @ViewChild('linearClassifier', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;

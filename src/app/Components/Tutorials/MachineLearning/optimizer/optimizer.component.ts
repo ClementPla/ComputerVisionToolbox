@@ -11,14 +11,33 @@ import { TutorialClass } from '../../../Toolbox/tutorial-parents/tutorial';
 import { ECharts, EChartsOption } from 'echarts';
 import { ToyModel } from './toy_model';
 import { Adam, Optimizer, RMSProp, SGD } from '../NN/optim';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButton } from '@angular/material/button';
+import { MatDivider } from '@angular/material/list';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { NgxEchartsDirective } from 'ngx-echarts';
 
 type OptimizerType = 'sgd' | 'adam' | 'rmsprop';
 
 @Component({
-  selector: 'app-optimizer',
-  templateUrl: './optimizer.component.html',
-  styleUrls: ['./optimizer.component.scss'],
-  standalone: false,
+    selector: 'app-optimizer',
+    templateUrl: './optimizer.component.html',
+    styleUrls: ['./optimizer.component.scss'],
+    imports: [
+        TutorialTemplateComponent,
+        MatButton,
+        MatDivider,
+        LabelledSlidersComponent,
+        MatButtonToggleGroup,
+        ReactiveFormsModule,
+        FormsModule,
+        MatButtonToggle,
+        MatCheckbox,
+        NgxEchartsDirective,
+    ],
 })
 export class OptimizerComponent
   extends TutorialClass

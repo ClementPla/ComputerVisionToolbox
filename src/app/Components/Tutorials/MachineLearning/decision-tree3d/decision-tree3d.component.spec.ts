@@ -8,8 +8,8 @@ describe('DecisionTree3dComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DecisionTree3dComponent]
-    })
+    imports: [DecisionTree3dComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(DecisionTree3dComponent);

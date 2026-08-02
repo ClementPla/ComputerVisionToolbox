@@ -7,12 +7,20 @@ import {
   createLayer,
   getLayerRFContribution
 } from './models/receptive-field';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription } from '@angular/material/expansion';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { NgStyle } from '@angular/common';
 
 @Component({
-  selector: 'app-receptive-field-tutorial',
-  templateUrl: './receptive-field-tutorial.component.html',
-  styleUrl: './receptive-field-tutorial.component.scss',
-  standalone: false
+    selector: 'app-receptive-field-tutorial',
+    templateUrl: './receptive-field-tutorial.component.html',
+    styleUrl: './receptive-field-tutorial.component.scss',
+    imports: [TutorialTemplateComponent, MatButton, MatIcon, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatSlider, MatSliderThumb, ReactiveFormsModule, FormsModule, MatIconButton, MatCheckbox, NgStyle]
 })
 export class ReceptiveFieldTutorialComponent implements OnInit {
 

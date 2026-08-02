@@ -2,15 +2,19 @@ import {
   Component,
   OnInit,
 } from '@angular/core';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatDivider } from '@angular/material/list';
+import { NgIf, NgFor } from '@angular/common';
 
 type TabType = 'rnn' | 'lstm' | 'architectures';
 type ArchitectureType = 'seq2one' | 'seq2seq' | 'stacked' | 'bidirectional';
 
 @Component({
-  selector: 'app-rnncell-tutorial',
-  standalone: false,
-  templateUrl: './rnncell-tutorial.component.html',
-  styleUrl: './rnncell-tutorial.component.scss'
+    selector: 'app-rnncell-tutorial',
+    templateUrl: './rnncell-tutorial.component.html',
+    styleUrl: './rnncell-tutorial.component.scss',
+    imports: [TutorialTemplateComponent, MatButtonToggleGroup, MatButtonToggle, MatDivider, NgIf, NgFor]
 })
 export class RNNCellTutorialComponent implements OnInit {
   currentTab: TabType = 'rnn';

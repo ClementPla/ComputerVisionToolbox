@@ -2,13 +2,18 @@ import { AfterViewInit, Component } from '@angular/core';
 import { TutorialImageClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial-image';
 import { getColorValueToHex } from 'src/app/utils/colormap';
 import { SVGElementInterface } from 'src/app/utils/interface';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton } from '@angular/material/button';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
 declare var cv: any;
 
 @Component({
-  selector: 'app-hough-transform',
-  standalone: false,
-  templateUrl: './hough-transform.component.html',
-  styleUrl: './hough-transform.component.scss'
+    selector: 'app-hough-transform',
+    templateUrl: './hough-transform.component.html',
+    styleUrl: './hough-transform.component.scss',
+    imports: [TutorialTemplateImagesComponent, LabelledSlidersComponent, MatCheckbox, MatButton, DrawCanvasComponent]
 })
 export class HoughTransformComponent extends TutorialImageClass implements AfterViewInit {
 

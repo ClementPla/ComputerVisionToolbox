@@ -9,13 +9,23 @@ import { OpenCVState } from 'ngx-opencv';
 import { __values } from 'tslib';
 import { StructuralElement } from './structuralElement';
 import { TutorialImageClass } from '../../../Toolbox/tutorial-parents/tutorial-image';
+import { TutorialTemplateImagesComponent } from '../../../Toolbox/tutorial-template-images/tutorial-template-images.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { NgFor } from '@angular/common';
+import { StructuralElementComponent } from './structural-element/structural-element.component';
+import { DrawCanvasComponent } from '../../../Toolbox/draw-canvas/draw-canvas.component';
 declare var cv: any;
 
 @Component({
     selector: 'app-morpho-tools',
     templateUrl: './morpho-tools.component.html',
     styleUrls: ['./morpho-tools.component.scss'],
-    standalone: false
+    imports: [TutorialTemplateImagesComponent, LabelledSlidersComponent, MatButtonToggleGroup, ReactiveFormsModule, FormsModule, MatButtonToggle, MatIcon, MatButton, NgxEchartsDirective, NgFor, StructuralElementComponent, DrawCanvasComponent]
 })
 export class MorphoToolsComponent
   extends TutorialImageClass

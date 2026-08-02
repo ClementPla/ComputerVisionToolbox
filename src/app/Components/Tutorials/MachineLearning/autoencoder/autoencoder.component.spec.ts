@@ -8,8 +8,8 @@ describe('AutoencoderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AutoencoderComponent]
-    })
+    imports: [AutoencoderComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(AutoencoderComponent);

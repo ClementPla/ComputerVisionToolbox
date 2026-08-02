@@ -4,11 +4,20 @@ import { color, ECharts } from 'echarts';
 import { Matrix } from 'src/app/lib/numpy';
 import { BayesianLinearRegression } from 'src/app/lib/ml';
 import { sampleGaussian2D } from 'src/app/utils/sampling';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { LabelledSlidersComponent } from '../../../labelled-sliders/labelled-sliders.component';
+import { MatButton } from '@angular/material/button';
+import { NgxEchartsDirective } from 'ngx-echarts';
 @Component({
-  selector: 'app-bayesian-regression',
-  templateUrl: './bayesian-regression.component.html',
-  styleUrl: './bayesian-regression.component.scss',
-  standalone: false,
+    selector: 'app-bayesian-regression',
+    templateUrl: './bayesian-regression.component.html',
+    styleUrl: './bayesian-regression.component.scss',
+    imports: [
+        TutorialTemplateComponent,
+        LabelledSlidersComponent,
+        MatButton,
+        NgxEchartsDirective,
+    ],
 })
 export class BayesianRegressionComponent
   extends TutorialClass

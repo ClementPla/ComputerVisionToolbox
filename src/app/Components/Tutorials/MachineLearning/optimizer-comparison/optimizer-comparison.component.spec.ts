@@ -8,8 +8,8 @@ describe('OptimizerComparisonComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [OptimizerComparisonComponent]
-    })
+    imports: [OptimizerComparisonComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(OptimizerComparisonComponent);

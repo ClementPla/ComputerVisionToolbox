@@ -8,8 +8,8 @@ describe('FisherDiscriminantComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FisherDiscriminantComponent]
-    })
+    imports: [FisherDiscriminantComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(FisherDiscriminantComponent);

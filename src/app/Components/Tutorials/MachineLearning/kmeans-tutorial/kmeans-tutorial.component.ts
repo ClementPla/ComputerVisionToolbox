@@ -20,14 +20,22 @@ import {
   computeWCSS,
   CLUSTER_COLORS
 } from './kmeans';
+import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 type DataDistribution = 'clustered' | 'uniform';
 
 @Component({
-  selector: 'app-kmeans-tutorial',
-  templateUrl: './kmeans-tutorial.component.html',
-  styleUrl: './kmeans-tutorial.component.scss',
-  standalone: false
+    selector: 'app-kmeans-tutorial',
+    templateUrl: './kmeans-tutorial.component.html',
+    styleUrl: './kmeans-tutorial.component.scss',
+    imports: [TutorialTemplateComponent, MatButton, MatIcon, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatSlider, MatSliderThumb, ReactiveFormsModule, FormsModule, MatButtonToggleGroup, MatButtonToggle, MatCheckbox]
 })
 export class KMeansTutorialComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;

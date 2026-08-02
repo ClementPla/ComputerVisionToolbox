@@ -1,11 +1,17 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
 import { StructuralElement } from '../structuralElement';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { NgClass, NgIf, NgFor } from '@angular/common';
+import { MatMiniFabButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatFormField, MatLabel, MatSelect, MatOption } from '@angular/material/select';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-structural-element',
     templateUrl: './structural-element.component.html',
     styleUrls: ['./structural-element.component.scss'],
-    standalone: false
+    imports: [MatExpansionPanel, NgClass, MatExpansionPanelHeader, MatExpansionPanelTitle, MatMiniFabButton, NgIf, MatIcon, MatFormField, MatLabel, MatSelect, ReactiveFormsModule, FormsModule, MatOption, NgFor]
 })
 export class StructuralElementComponent implements OnInit {
 
