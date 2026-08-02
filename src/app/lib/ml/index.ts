@@ -26,3 +26,9 @@ export { KMeans } from './cluster';
 export { PolynomialFeatures, RBFSampler } from './preprocessing';
 export { SVMClassifier } from './svm';
 export type { SVMConfig, SVMDatapoint, SVMResult, SVMKernel } from './svm';
+export {
+  normalPdf,
+  isotropicNormalPdf,
+  MultivariateNormal,
+  multivariateNormalPdf,
+} from './distributions';

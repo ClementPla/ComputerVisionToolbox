@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { color, ECharts, EChartsOption } from 'echarts';
-import { det, not } from 'mathjs';
-import { title } from 'process';
+import { Matrix } from 'src/app/lib/numpy';
+import { normalPdf, MultivariateNormal } from 'src/app/lib/ml';
 import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial';
 
 @Component({
@@ -143,6 +143,10 @@ export class GaussianComponent extends TutorialClass {
   stdDev2D: number[] = [1, 1];
   rho: number = 0;
 
+  // Cached joint distribution for the 2D surface (rebuilt when params change),
+  // so the covariance is inverted once per render rather than per grid point.
+  private surfaceDist!: MultivariateNormal;
+
   addSecondDistribution: boolean = false;
   operation: string = 'add';
   constructor() {
@@ -168,14 +172,10 @@ export class GaussianComponent extends TutorialClass {
     const data_Y: [number, number][] = [];
     const step = 0.1;
     for (let x = -15; x <= 15; x += step) {
-      const y =
-        (1 / (this.stdDev1D * Math.sqrt(2 * Math.PI))) *
-        Math.exp(-0.5 * Math.pow((x - this.mean1D) / this.stdDev1D, 2));
+      const y = normalPdf(x, this.mean1D, this.stdDev1D * this.stdDev1D);
       data.push([x, y]);
       if (this.addSecondDistribution) {
-        const y_Y =
-          (1 / (this.stdDev1D_Y * Math.sqrt(2 * Math.PI))) *
-          Math.exp(-0.5 * Math.pow((x - this.mean1D_Y) / this.stdDev1D_Y, 2));
+        const y_Y = normalPdf(x, this.mean1D_Y, this.stdDev1D_Y * this.stdDev1D_Y);
         data_Y.push([x, y_Y]);
       }
     }
@@ -220,22 +220,15 @@ export class GaussianComponent extends TutorialClass {
     const step = 0.1;
     for (let x = -this.MAX_2D_VALUE; x <= this.MAX_2D_VALUE; x += step) {
       if (this.operation === 'add') {
+        // Sum of independent Gaussians: means and variances add.
         const mean = this.mean1D + this.mean1D_Y;
-        const stdDev = Math.sqrt(
-          this.stdDev1D * this.stdDev1D + this.stdDev1D_Y * this.stdDev1D_Y
-        );
-        const y =
-          (1 / (stdDev * Math.sqrt(2 * Math.PI))) *
-          Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
-        data_combined.push([x, y]);
+        const variance =
+          this.stdDev1D * this.stdDev1D + this.stdDev1D_Y * this.stdDev1D_Y;
+        data_combined.push([x, normalPdf(x, mean, variance)]);
         this.option1D_combined.title! = { text: 'p(X+Y)' };
       } else if (this.operation === 'multiply') {
-        const y1 =
-          (1 / (this.stdDev1D * Math.sqrt(2 * Math.PI))) *
-          Math.exp(-0.5 * Math.pow((x - this.mean1D) / this.stdDev1D, 2));
-        const y2 =
-          (1 / (this.stdDev1D_Y * Math.sqrt(2 * Math.PI))) *
-          Math.exp(-0.5 * Math.pow((x - this.mean1D_Y) / this.stdDev1D_Y, 2));
+        const y1 = normalPdf(x, this.mean1D, this.stdDev1D * this.stdDev1D);
+        const y2 = normalPdf(x, this.mean1D_Y, this.stdDev1D_Y * this.stdDev1D_Y);
         data_combined.push([x, y1 * y2]);
         this.option1D_combined.title! = { text: 'p(X) * p(Y)' };
       }
@@ -272,27 +265,10 @@ export class GaussianComponent extends TutorialClass {
                 return v;
               },
               z: (u: number, v: number) => {
-                const cov = [
-                  [this.stdDev1D * this.stdDev1D, 0],
-                  [0, this.stdDev1D_Y * this.stdDev1D_Y],
-                ];
-
-                const invCov = [
-                  [1 / cov[0][0], 0],
-                  [0, 1 / cov[1][1]],
-                ];
-
-                const mean2D = [this.mean1D, this.mean1D_Y];
-
-                const dx = u - mean2D[0];
-                const dy = v - mean2D[1];
-
-                const exponent =
-                  -0.5 * (dx * invCov[0][0] * dx + dy * invCov[1][1] * dy);
-
+                // Independent X, Y: joint is the product of the 1D marginals.
                 return (
-                  (1 / (2 * Math.PI * Math.sqrt(cov[0][0] * cov[1][1]))) *
-                  Math.exp(exponent)
+                  normalPdf(u, this.mean1D, this.stdDev1D * this.stdDev1D) *
+                  normalPdf(v, this.mean1D_Y, this.stdDev1D_Y * this.stdDev1D_Y)
                 );
               },
             },
@@ -313,41 +289,27 @@ export class GaussianComponent extends TutorialClass {
   }
 
   generateGaussian2D() {
+    this.surfaceDist = this.buildDist2D();
     this.updateConditionalLine(this.marginalY);
     if (this.chart2D) {
       this.chart2D.setOption(this.option2D);
     }
   }
 
-  parametricEquationZ(u: number, v: number): number {
-    let rho = Math.min(Math.max(this.rho, -0.999), 0.999);
-    const cov = [
-      [
-        this.stdDev2D[0] * this.stdDev2D[0],
-        rho * this.stdDev2D[0] * this.stdDev2D[1],
-      ],
-      [
-        rho * this.stdDev2D[0] * this.stdDev2D[1],
-        this.stdDev2D[1] * this.stdDev2D[1],
-      ],
-    ];
-    const det = cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
+  /** Joint N(mean2D, Σ(ρ)) for the current 2D parameters. */
+  private buildDist2D(): MultivariateNormal {
+    const rho = Math.min(Math.max(this.rho, -0.999), 0.999);
+    const sx = this.stdDev2D[0];
+    const sy = this.stdDev2D[1];
+    const cov = Matrix.fromRows([
+      [sx * sx, rho * sx * sy],
+      [rho * sx * sy, sy * sy],
+    ]);
+    return new MultivariateNormal([this.mean2D[0], this.mean2D[1]], cov);
+  }
 
-    const invCov = [
-      [cov[1][1] / det, -cov[0][1] / det],
-      [-cov[1][0] / det, cov[0][0] / det],
-    ];
-    const mean2D = this.mean2D;
-    return (
-      (1 / (2 * Math.PI * Math.sqrt(det))) *
-      Math.exp(
-        -0.5 *
-          ((u - mean2D[0]) *
-            (invCov[0][0] * (u - mean2D[0]) + invCov[0][1] * (v - mean2D[1])) +
-            (v - mean2D[1]) *
-              (invCov[1][0] * (u - mean2D[0]) + invCov[1][1] * (v - mean2D[1])))
-      )
-    );
+  parametricEquationZ(u: number, v: number): number {
+    return (this.surfaceDist ?? this.buildDist2D()).pdf([u, v]);
   }
   plotConditional(event: any) {
     if (event.seriesType === 'surface' && event.seriesIndex === 0) {
@@ -365,33 +327,20 @@ export class GaussianComponent extends TutorialClass {
     const muX = this.mean2D[0];
     const muY = this.mean2D[1];
 
-    const cov = [
-      [sigmaX ** 2, rho * sigmaX * sigmaY],
-      [rho * sigmaX * sigmaY, sigmaY ** 2],
-    ];
-    const det = cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
-    const invCov = [
-      [cov[1][1] / det, -cov[0][1] / det],
-      [-cov[1][0] / det, cov[0][0] / det],
-    ];
-    const muXY = muX + (cov[0][1] / cov[1][1]) * (y0 - muY);
-    const covXY = cov[0][0] - (cov[0][1] * cov[1][0]) / cov[1][1];
+    const dist = this.surfaceDist ?? this.buildDist2D();
+
+    // Conditional distribution p(X | Y = y0): mean shifts, variance shrinks.
+    const c01 = rho * sigmaX * sigmaY;
+    const c11 = sigmaY * sigmaY;
+    const muXY = muX + (c01 / c11) * (y0 - muY);
+    const covXY = sigmaX * sigmaX - (c01 * c01) / c11;
     const points: [number, number, number][] = [];
     const XYpoints: [number, number, number][] = [];
 
-    // Compute joint slice and accumulate for normalization
     for (let u = -this.MAX_2D_VALUE; u <= this.MAX_2D_VALUE; u += this.step) {
-      const dx = u - muX;
-      const dy = y0 - muY;
-      const exponent =
-        -0.5 *
-        (dx * (invCov[0][0] * dx + invCov[0][1] * dy) +
-          dy * (invCov[1][0] * dx + invCov[1][1] * dy));
-      const joint = (1 / (2 * Math.PI * Math.sqrt(det))) * Math.exp(exponent);
-      points.push([u, y0, joint]); // temporarily store joint
-      const conditional =
-        (1 / Math.sqrt(2 * Math.PI * covXY)) *
-        Math.exp((-0.5 * (u - muXY) ** 2) / covXY);
+      const joint = dist.pdf([u, y0]);
+      points.push([u, y0, joint]);
+      const conditional = normalPdf(u, muXY, covXY);
       XYpoints.push([u, y0, conditional + 0.01]);
     }
 

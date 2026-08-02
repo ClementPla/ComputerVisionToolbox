@@ -1,4 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { normalPdf, isotropicNormalPdf } from 'src/app/lib/ml';
 
 type TabType = 'gmm' | 'kde';
 type DimensionType = '1d' | '2d';
@@ -170,15 +171,11 @@ export class DensityEstimationComponent implements OnInit, AfterViewInit {
   }
 
   private gaussian1D(x: number, mean: number, variance: number): number {
-    const coef = 1 / Math.sqrt(2 * Math.PI * variance);
-    const exp = Math.exp(-Math.pow(x - mean, 2) / (2 * variance));
-    return coef * exp;
+    return normalPdf(x, mean, variance);
   }
 
   private gaussian2D(x: number, y: number, meanX: number, meanY: number, variance: number): number {
-    const coef = 1 / (2 * Math.PI * variance);
-    const exp = Math.exp(-(Math.pow(x - meanX, 2) + Math.pow(y - meanY, 2)) / (2 * variance));
-    return coef * exp;
+    return isotropicNormalPdf([x, y], [meanX, meanY], variance);
   }
 
   draw(): void {
