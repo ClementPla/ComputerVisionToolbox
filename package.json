@@ -22,7 +22,6 @@
     "@angular/router": "^20.3.2",
     "echarts": "^5.4.0",
     "echarts-gl": "^2.0.9",
-    "mathjs": "14.8.1",
     "ngx-color": "^10.1.0",
     "ngx-color-picker": "^20.1.1",
     "ngx-echarts": "^20.0.2",

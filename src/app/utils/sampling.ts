@@ -1,7 +1,16 @@
 import { Point2D } from './geometry';
-import { MMt_solution } from './linalg';
-import { matVecMul, choleskyDecomposition } from './linalg';
+import { Matrix, eigSymmetric } from '../lib/numpy';
 
+/**
+ * Symmetric square root A of a covariance Σ (A Aᵀ = Σ), for drawing correlated
+ * Gaussian samples: x = mean + A·z with z ~ N(0, I). Built from the
+ * eigendecomposition, so it is robust to (near-)singular Σ.
+ */
+function covSqrt(cov: number[][]): Matrix {
+  const { values, vectors } = eigSymmetric(Matrix.fromRows(cov));
+  const s = Matrix.diag(values.map((v) => Math.sqrt(Math.max(0, v))));
+  return vectors.matmul(s);
+}
 
 export function randn_bm(mean = 0, std = 1) {
   /* Sampling using Box-Muller algorithm */
@@ -39,13 +48,13 @@ export function sampleGaussian2D(
         };
       }
     } else {
-      let A = MMt_solution(std);
+      const A = covSqrt(std);
       for (let i = 0; i < nPoints; i++) {
         let sx = randn_bm(0, 1);
         let sy = randn_bm(0, 1);
         output[i] = {
-          x: mean.x + A[0][0] * sx + A[0][1] * sy,
-          y: mean.y + A[1][0] * sx + A[1][1] * sy,
+          x: mean.x + A.get(0, 0) * sx + A.get(0, 1) * sy,
+          y: mean.y + A.get(1, 0) * sx + A.get(1, 1) * sy,
         };
       }
     }
@@ -80,7 +89,7 @@ export function sampleGaussian3D(
   mean: number[],
   covariance: number[][]
 ): number[][] {
-  const L = choleskyDecomposition(covariance);
+  const A = covSqrt(covariance);
   const samples: number[][] = [];
 
   for (let i = 0; i < n; i++) {
@@ -91,8 +100,8 @@ export function sampleGaussian3D(
       const u2 = Math.random();
       z.push(Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2));
     }
-    // Transform: x = mean + L * z
-    const transformed = matVecMul(L, z);
+    // Transform: x = mean + A * z
+    const transformed = A.matvec(z);
     samples.push([
       mean[0] + transformed[0],
       mean[1] + transformed[1],
