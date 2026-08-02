@@ -1,7 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ECharts } from 'echarts';
-import { choleskyDecomposition, matVecMul, eigenDecomposition3x3 } from 'src/app/utils/linalg';
+import { Matrix, eigSymmetric } from 'src/app/lib/numpy';
 import { sampleGaussian3D } from 'src/app/utils/sampling';
+
+/**
+ * Symmetric square root A of a covariance Σ (A Aᵀ = Σ), used to map the unit
+ * sphere onto the covariance ellipsoid. Built from the eigendecomposition, so
+ * it is robust to (near-)singular Σ — negative eigenvalues are clamped to 0.
+ */
+function ellipsoidTransform(covariance: number[][]): Matrix {
+  const { values, vectors } = eigSymmetric(Matrix.fromRows(covariance));
+  const sqrtLambda = Matrix.diag(values.map((v) => Math.sqrt(Math.max(0, v))));
+  return vectors.matmul(sqrtLambda);
+}
 import * as echarts from 'echarts';
 import 'echarts-gl';
 // ============================================
@@ -19,8 +30,8 @@ function generateEllipsoidWireframe(
   scale: number = 2,
   pointsPerLine: number = 50
 ): { latitudeLines: number[][][], longitudeLines: number[][][] } {
-  const L = choleskyDecomposition(covariance);
-  
+  const A = ellipsoidTransform(covariance);
+
   const latitudeLines: number[][][] = [];
   const longitudeLines: number[][][] = [];
 
@@ -35,7 +46,7 @@ function generateEllipsoidWireframe(
       const y = Math.sin(theta) * Math.sin(phi);
       const z = Math.cos(theta);
       
-      const transformed = matVecMul(L, [x * scale, y * scale, z * scale]);
+      const transformed = A.matvec([x * scale, y * scale, z * scale]);
       line.push([
         center[0] + transformed[0],
         center[1] + transformed[1],
@@ -56,7 +67,7 @@ function generateEllipsoidWireframe(
       const y = Math.sin(theta) * Math.sin(phi);
       const z = Math.cos(theta);
       
-      const transformed = matVecMul(L, [x * scale, y * scale, z * scale]);
+      const transformed = A.matvec([x * scale, y * scale, z * scale]);
       line.push([
         center[0] + transformed[0],
         center[1] + transformed[1],
@@ -253,10 +264,10 @@ export class PrincipalComponentAnalysisComponent implements OnInit, OnDestroy {
     // Generate ellipsoid wireframe
     this.ellipsoidWireframe = generateEllipsoidWireframe(this.covariance, [0, 0, 0], 8, 12, 2, 40);
     
-    // Compute eigendecomposition
-    const eigen = eigenDecomposition3x3(this.covariance);
+    // Compute eigendecomposition (eigenvectors returned as columns -> rows)
+    const eigen = eigSymmetric(Matrix.fromRows(this.covariance));
     this.eigenvalues = eigen.values;
-    this.eigenvectors = eigen.vectors;
+    this.eigenvectors = eigen.vectors.T().toArray();
     this.maxVariance = eigen.values[0];
 
     // Compute axis range from data points

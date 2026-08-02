@@ -14,3 +14,5 @@ export {
   PolynomialRegression,
   BayesianLinearRegression,
 } from './linear';
+export { PCA } from './decomposition';
+export { FisherDiscriminant } from './discriminant';

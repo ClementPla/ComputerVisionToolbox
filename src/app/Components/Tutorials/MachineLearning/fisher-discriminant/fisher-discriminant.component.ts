@@ -1,128 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ECharts } from 'echarts';
-import { cholesky2x2 } from 'src/app/utils/linalg';
-
+import { Matrix, eigSymmetric } from 'src/app/lib/numpy';
+import { PCA, FisherDiscriminant } from 'src/app/lib/ml';
 import { sampleGaussian2D } from 'src/app/utils/sampling';
 
-/**
- * Compute mean of 2D points
- */
-function computeMean(points: [number, number][]): [number, number] {
-  const n = points.length;
-  if (n === 0) return [0, 0];
-  const sum = points.reduce((acc, p) => [acc[0] + p[0], acc[1] + p[1]], [0, 0]);
-  return [sum[0] / n, sum[1] / n];
-}
-
-/**
- * Compute covariance matrix of 2D points
- */
-function computeCovariance(points: [number, number][], mean: [number, number]): number[][] {
-  const n = points.length;
-  if (n <= 1) return [[1, 0], [0, 1]];
-  
-  let s00 = 0, s01 = 0, s11 = 0;
-  for (const p of points) {
-    const dx = p[0] - mean[0];
-    const dy = p[1] - mean[1];
-    s00 += dx * dx;
-    s01 += dx * dy;
-    s11 += dy * dy;
-  }
-  return [[s00 / n, s01 / n], [s01 / n, s11 / n]];
-}
-
-/**
- * Add two 2x2 matrices
- */
-function addMatrix2x2(A: number[][], B: number[][]): number[][] {
-  return [
-    [A[0][0] + B[0][0], A[0][1] + B[0][1]],
-    [A[1][0] + B[1][0], A[1][1] + B[1][1]]
-  ];
-}
-
-/**
- * Invert a 2x2 matrix
- */
-function invertMatrix2x2(M: number[][]): number[][] {
-  const det = M[0][0] * M[1][1] - M[0][1] * M[1][0];
-  if (Math.abs(det) < 1e-10) {
-    return [[1, 0], [0, 1]]; // Return identity if singular
-  }
-  return [
-    [M[1][1] / det, -M[0][1] / det],
-    [-M[1][0] / det, M[0][0] / det]
-  ];
-}
-
-/**
- * Multiply 2x2 matrix by 2D vector
- */
-function matVec2x2(M: number[][], v: [number, number]): [number, number] {
-  return [
-    M[0][0] * v[0] + M[0][1] * v[1],
-    M[1][0] * v[0] + M[1][1] * v[1]
-  ];
-}
-
-/**
- * Compute Fisher's optimal projection direction
- * w* = Sw^(-1) * (m1 - m2)
- */
-function computeFisherDirection(
-  mean1: [number, number],
-  mean2: [number, number],
-  cov1: number[][],
-  cov2: number[][],
-  n1: number,
-  n2: number
-): [number, number] {
-  // Within-class scatter matrix: Sw = S1 + S2 (using sample covariances weighted by n)
-  const Sw = addMatrix2x2(
-    [[cov1[0][0] * n1, cov1[0][1] * n1], [cov1[1][0] * n1, cov1[1][1] * n1]],
-    [[cov2[0][0] * n2, cov2[0][1] * n2], [cov2[1][0] * n2, cov2[1][1] * n2]]
-  );
-  
-  // Mean difference
-  const meanDiff: [number, number] = [mean1[0] - mean2[0], mean1[1] - mean2[1]];
-  
-  // Fisher direction: w = Sw^(-1) * (m1 - m2)
-  const SwInv = invertMatrix2x2(Sw);
-  const w = matVec2x2(SwInv, meanDiff);
-  
-  // Normalize
-  const norm = Math.sqrt(w[0] * w[0] + w[1] * w[1]);
-  if (norm < 1e-10) return [1, 0];
-  return [w[0] / norm, w[1] / norm];
-}
-
-/**
- * Compute PCA direction (first principal component of combined data)
- */
-function computePCADirection(allPoints: [number, number][]): [number, number] {
-  const mean = computeMean(allPoints);
-  const cov = computeCovariance(allPoints, mean);
-  
-  // For 2x2, we can compute eigenvector analytically
-  // Characteristic equation: λ² - trace*λ + det = 0
-  const trace = cov[0][0] + cov[1][1];
-  const det = cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
-  const discriminant = trace * trace - 4 * det;
-  
-  if (discriminant < 0) return [1, 0];
-  
-  const lambda1 = (trace + Math.sqrt(discriminant)) / 2;
-  
-  // Eigenvector for lambda1: (A - λI)v = 0
-  // Use first row: (a-λ)x + by = 0 => v = [b, λ-a] or [λ-d, c]
-  let vx = cov[0][1];
-  let vy = lambda1 - cov[0][0];
-  
-  const norm = Math.sqrt(vx * vx + vy * vy);
-  if (norm < 1e-10) return [1, 0];
-  return [vx / norm, vy / norm];
-}
 
 /**
  * Project points onto a direction and compute statistics
@@ -159,18 +40,15 @@ function generateEllipse(
   nPoints: number = 64,
   scale: number = 2
 ): [number, number][] {
-  const L = cholesky2x2(covariance);
+  // A with A Aᵀ = Σ maps the unit circle onto the covariance ellipse; the
+  // symmetric eig-sqrt is robust to (near-)singular Σ.
+  const { values, vectors } = eigSymmetric(Matrix.fromRows(covariance));
+  const A = vectors.matmul(Matrix.diag(values.map((v) => Math.sqrt(Math.max(0, v)))));
   const points: [number, number][] = [];
-  
+
   for (let i = 0; i <= nPoints; i++) {
     const theta = (i / nPoints) * 2 * Math.PI;
-    const x = Math.cos(theta) * scale;
-    const y = Math.sin(theta) * scale;
-    
-    // Transform by L
-    const tx = L[0][0] * x;
-    const ty = L[1][0] * x + L[1][1] * y;
-    
+    const [tx, ty] = A.matvec([Math.cos(theta) * scale, Math.sin(theta) * scale]);
     points.push([mean[0] + tx, mean[1] + ty]);
   }
   return points;
@@ -321,19 +199,16 @@ export class FisherDiscriminantComponent implements OnInit, OnDestroy {
     this.class1Data = sampleGaussian2D(this.nSamplesPerClass, {x: this.mean1[0], y: this.mean1[1]}, this.covariance1).map(p => [p.x, p.y]);
     this.class2Data = sampleGaussian2D(this.nSamplesPerClass, {x: this.mean2[0], y: this.mean2[1]}, this.covariance2).map(p => [p.x, p.y]);
 
-    // Compute optimal directions
-    const sampleMean1 = computeMean(this.class1Data);
-    const sampleMean2 = computeMean(this.class2Data);
-    const sampleCov1 = computeCovariance(this.class1Data, sampleMean1);
-    const sampleCov2 = computeCovariance(this.class2Data, sampleMean2);
-
-    this.fisherDirection = computeFisherDirection(
-      sampleMean1, sampleMean2, 
-      sampleCov1, sampleCov2,
-      this.class1Data.length, this.class2Data.length
-    );
-    
-    this.pcaDirection = computePCADirection([...this.class1Data, ...this.class2Data]);
+    // Compute optimal directions using the ml/ estimators.
+    const X = Matrix.fromRows([...this.class1Data, ...this.class2Data]);
+    const y = [
+      ...this.class1Data.map(() => 0),
+      ...this.class2Data.map(() => 1),
+    ];
+    this.fisherDirection = new FisherDiscriminant()
+      .fit(X, y)
+      .direction() as [number, number];
+    this.pcaDirection = new PCA(1).fit(X).firstComponent() as [number, number];
 
     // Compute axis range
     const allPoints = [...this.class1Data, ...this.class2Data];
