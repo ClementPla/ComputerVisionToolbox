@@ -1,7 +1,8 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial';
 import { color, ECharts } from 'echarts';
-import { inverse2x2 } from 'src/app/utils/matrix';
+import { Matrix } from 'src/app/lib/numpy';
+import { BayesianLinearRegression } from 'src/app/lib/ml';
 import { sampleGaussian2D } from 'src/app/utils/sampling';
 @Component({
   selector: 'app-bayesian-regression',
@@ -266,47 +267,21 @@ export class BayesianRegressionComponent
   }
 
   updatePosteriorParameters() {
-    let beta = (1 / this.std_noise) ** 2;
-    let S0 = [
-      [this.std_prior * this.std_prior, 0],
-      [0, this.std_prior * this.std_prior],
-    ];
-    let S0_inv = [
-      [1 / S0[0][0], 0],
-      [0, 1 / S0[1][1]],
-    ];
+    const beta = (1 / this.std_noise) ** 2; // noise precision
+    const alpha = 1 / (this.std_prior * this.std_prior); // prior precision
 
-    let XtX = [
-      [0, 0],
-      [0, 0],
-    ];
-    let XtY = [0, 0];
-
-    for (let i = 0; i < this.nObservations; i++) {
-      let x = this.observations[i];
-      let y = this.targets[i];
-      XtX[0][0] += x[0] * x[0];
-      XtX[0][1] += x[0] * x[1];
-      XtX[1][0] += x[1] * x[0];
-      XtX[1][1] += x[1] * x[1];
-
-      XtY[0] += x[0] * y;
-      XtY[1] += x[1] * y;
+    // Design matrix Φ (rows are [1, x]) and targets for the observed points.
+    const n = this.nObservations;
+    const Phi = new Matrix(n, 2);
+    const y = new Array<number>(n);
+    for (let i = 0; i < n; i++) {
+      Phi.setRow(i, this.observations[i]);
+      y[i] = this.targets[i];
     }
 
-    let Sn_inv = [
-      [S0_inv[0][0] + beta * XtX[0][0], S0_inv[0][1] + beta * XtX[0][1]],
-      [S0_inv[1][0] + beta * XtX[1][0], S0_inv[1][1] + beta * XtX[1][1]],
-    ];
-    this.Sn = inverse2x2(Sn_inv);
-    let Mn_part = [0, 0];
-    Mn_part[0] = beta * XtY[0];
-    Mn_part[1] = beta * XtY[1];
-
-    this.Mn = [
-      this.Sn[0][0] * Mn_part[0] + this.Sn[0][1] * Mn_part[1],
-      this.Sn[1][0] * Mn_part[0] + this.Sn[1][1] * Mn_part[1],
-    ];
+    const model = new BayesianLinearRegression(alpha, beta).fit(Phi, y);
+    this.Mn = model.mean;
+    this.Sn = model.cov.toArray();
   }
 
   updateDataSpace() {

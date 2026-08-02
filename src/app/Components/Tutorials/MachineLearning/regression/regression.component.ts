@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ECharts, EChartsOption } from 'echarts';
 
-import { polyfit, polyfit_regularized } from '../../../../utils/linalg';
+import { PolynomialRegression } from '../../../../lib/ml';
 import { arange, choice, linspace } from '../../../../utils/math';
 
 @Component({
@@ -129,13 +129,9 @@ export class RegressionComponent implements AfterViewInit {
   }
 
   updatePolynomial() {
-    this.polyCoefs = polyfit_regularized(
-      this.xi,
-      this.yi,
-      this.degree,
-      this.lambda,
-      this.q
-    );
+    this.polyCoefs = new PolynomialRegression(this.degree, this.lambda, this.q)
+      .fit1d(this.xi, this.yi)
+      .coef;
     if (Array.isArray(this.graphData.series)) {
       (this.graphData.series[0] as any).data = this.xs.map((x) => [
         x,
