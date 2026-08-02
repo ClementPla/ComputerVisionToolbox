@@ -136,6 +136,13 @@ export const routeConfig: Routes = [
       ),
   },
   {
+    path: 'canny',
+    loadComponent: () =>
+      import('./Components/Tutorials/Images/canny/canny.component').then(
+        (m) => m.CannyComponent
+      ),
+  },
+  {
     path: 'fisherDiscriminantAnalysis',
     loadComponent: () =>
       import('./Components/Tutorials/MachineLearning/fisher-discriminant/fisher-discriminant.component').then(

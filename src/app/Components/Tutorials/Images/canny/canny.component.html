@@ -1,0 +1,73 @@
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="false">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-4">
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-slate-600 text-sm">Image</label>
+        <mat-button-toggle-group [(ngModel)]="image" (ngModelChange)="loadImage()">
+          @for (p of presets; track p) {
+            <mat-button-toggle [value]="p">{{ p.split('.')[0] }}</mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-slate-600 text-sm">Show stage</label>
+        <mat-button-toggle-group [(ngModel)]="stage" (ngModelChange)="recompute()">
+          <mat-button-toggle value="blurred">Blur</mat-button-toggle>
+          <mat-button-toggle value="magnitude">Gradient</mat-button-toggle>
+          <mat-button-toggle value="suppressed">Thinned</mat-button-toggle>
+          <mat-button-toggle value="edges">Edges</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">Blur σ</label>
+          <span class="bg-sky-100 font-bold px-2 py-0.5 rounded text-sky-700 text-xs">{{ sigma }}</span>
+        </div>
+        <mat-slider min="0.5" max="3" step="0.1" discrete>
+          <input matSliderThumb [(ngModel)]="sigma" (ngModelChange)="recompute()" />
+        </mat-slider>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">Low threshold</label>
+          <span class="bg-amber-100 font-bold px-2 py-0.5 rounded text-amber-700 text-xs">{{ lowThreshold }}</span>
+        </div>
+        <mat-slider min="0" max="100" step="1" discrete>
+          <input matSliderThumb [(ngModel)]="lowThreshold" (ngModelChange)="recompute()" />
+        </mat-slider>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">High threshold</label>
+          <span class="bg-red-100 font-bold px-2 py-0.5 rounded text-red-700 text-xs">{{ highThreshold }}</span>
+        </div>
+        <mat-slider min="0" max="150" step="1" discrete>
+          <input matSliderThumb [(ngModel)]="highThreshold" (ngModelChange)="recompute()" />
+        </mat-slider>
+      </div>
+
+      <p class="text-gray-500 text-xs">
+        Canny: blur → Sobel gradient → non-maximum suppression (thinning) →
+        double-threshold hysteresis. Strong edges (≥ high) seed the map; weak
+        edges (≥ low) survive only if connected to a strong one.
+      </p>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-wrap gap-4 p-4">
+      <figure class="m-0">
+        <figcaption class="mb-1 text-slate-600 text-sm">Original</figcaption>
+        <canvas #original class="border border-gray-200"></canvas>
+      </figure>
+      <figure class="m-0">
+        <figcaption class="mb-1 text-slate-600 text-sm capitalize">{{ stage }}</figcaption>
+        <canvas #result class="border border-gray-200 bg-black"></canvas>
+      </figure>
+    </div>
+  </ng-container>
+</app-tutorial-template>
