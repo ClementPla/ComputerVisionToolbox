@@ -1,4 +1,5 @@
 import { Tensor } from './tensor';
+import { Matrix } from '../../../../lib/numpy';
 
 /**
  * Argmax along the last dimension
@@ -50,19 +51,16 @@ export function matmul(
   }
 
   const N = inputB.shape[1];
-  const output = new Tensor([M, N]);
 
-  for (let i = 0; i < M; i++) {
-    for (let j = 0; j < N; j++) {
-      let sum = 0;
-      for (let k = 0; k < K; k++) {
-        sum += inputA.data[i * K + k] * inputB.data[k * N + j];
-      }
-      if (bias !== undefined) {
-        sum += bias.data[j];
-      }
-      output.data[i * N + j] = sum;
-    }
+  // Forward matmul delegates to the numpy core (single matmul implementation);
+  // gradient wiring for autograd is handled by the calling layers.
+  const product = new Matrix(M, K, inputA.data.slice()).matmul(
+    new Matrix(K, N, inputB.data.slice())
+  );
+
+  const output = new Tensor([M, N]);
+  for (let idx = 0; idx < M * N; idx++) {
+    output.data[idx] = product.data[idx] + (bias !== undefined ? bias.data[idx % N] : 0);
   }
 
   return output;
