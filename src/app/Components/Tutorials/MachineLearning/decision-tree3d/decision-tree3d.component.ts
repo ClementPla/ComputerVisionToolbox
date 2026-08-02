@@ -1,6 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ECharts } from 'echarts';
 import 'echarts-gl';
+import { Matrix } from 'src/app/lib/numpy';
+import { DecisionTreeClassifier, DecisionNode, accuracy } from 'src/app/lib/ml';
+
+type Bounds = { min: [number, number, number]; max: [number, number, number] };
 
 // ============================================
 // TYPES
@@ -9,32 +13,6 @@ import 'echarts-gl';
 interface DataPoint {
   position: [number, number, number];
   label: number; // 0, 1, 2, or 3
-}
-
-interface TreeNode {
-  // Split information (null for leaf nodes)
-  splitAxis: number | null;  // 0=X, 1=Y, 2=Z
-  splitValue: number | null;
-  
-  // Leaf information
-  isLeaf: boolean;
-  predictedClass: number;
-  classCounts: number[];
-  impurity: number;
-  
-  // Children
-  left: TreeNode | null;
-  right: TreeNode | null;
-  
-  // Bounds of this node's region
-  bounds: {
-    min: [number, number, number];
-    max: [number, number, number];
-  };
-  
-  // For visualization
-  depth: number;
-  samples: number;
 }
 
 interface Partition {
@@ -74,288 +52,6 @@ function sampleGaussian3D(
   return samples;
 }
 
-/**
- * Compute Gini impurity
- */
-function giniImpurity(classCounts: number[]): number {
-  const total = classCounts.reduce((a, b) => a + b, 0);
-  if (total === 0) return 0;
-  
-  let sumSquaredProbs = 0;
-  for (const count of classCounts) {
-    const p = count / total;
-    sumSquaredProbs += p * p;
-  }
-  return 1 - sumSquaredProbs;
-}
-
-/**
- * Compute Cross-entropy (negative log likelihood)
- */
-function crossEntropy(classCounts: number[]): number {
-  const total = classCounts.reduce((a, b) => a + b, 0);
-  if (total === 0) return 0;
-  
-  let entropy = 0;
-  for (const count of classCounts) {
-    if (count > 0) {
-      const p = count / total;
-      entropy -= p * Math.log2(p);
-    }
-  }
-  return entropy;
-}
-
-/**
- * Count classes in a set of data points
- */
-function countClasses(data: DataPoint[], numClasses: number): number[] {
-  const counts = new Array(numClasses).fill(0);
-  for (const point of data) {
-    counts[point.label]++;
-  }
-  return counts;
-}
-
-/**
- * Find the best split for a node
- */
-function findBestSplit(
-  data: DataPoint[],
-  numClasses: number,
-  impurityFn: (counts: number[]) => number
-): { axis: number; value: number; gain: number } | null {
-  if (data.length < 2) return null;
-  
-  const parentCounts = countClasses(data, numClasses);
-  const parentImpurity = impurityFn(parentCounts);
-  
-  let bestGain = 0;
-  let bestAxis = 0;
-  let bestValue = 0;
-  
-  // Try each axis
-  for (let axis = 0; axis < 3; axis++) {
-    // Get unique values and sort
-    const values = data.map(p => p.position[axis]).sort((a, b) => a - b);
-    
-    // Try splits between consecutive unique values
-    for (let i = 0; i < values.length - 1; i++) {
-      if (values[i] === values[i + 1]) continue;
-      
-      const splitValue = (values[i] + values[i + 1]) / 2;
-      
-      // Partition data
-      const leftData = data.filter(p => p.position[axis] <= splitValue);
-      const rightData = data.filter(p => p.position[axis] > splitValue);
-      
-      if (leftData.length === 0 || rightData.length === 0) continue;
-      
-      // Compute impurity reduction
-      const leftCounts = countClasses(leftData, numClasses);
-      const rightCounts = countClasses(rightData, numClasses);
-      
-      const leftImpurity = impurityFn(leftCounts);
-      const rightImpurity = impurityFn(rightCounts);
-      
-      const weightedImpurity = 
-        (leftData.length * leftImpurity + rightData.length * rightImpurity) / data.length;
-      
-      const gain = parentImpurity - weightedImpurity;
-      
-      if (gain > bestGain) {
-        bestGain = gain;
-        bestAxis = axis;
-        bestValue = splitValue;
-      }
-    }
-  }
-  
-  if (bestGain <= 0) return null;
-  
-  return { axis: bestAxis, value: bestValue, gain: bestGain };
-}
-
-/**
- * Build decision tree recursively
- */
-function buildTree(
-  data: DataPoint[],
-  numClasses: number,
-  impurityFn: (counts: number[]) => number,
-  maxDepth: number,
-  minSamplesLeaf: number,
-  bounds: { min: [number, number, number]; max: [number, number, number] },
-  currentDepth: number = 0
-): TreeNode {
-  const classCounts = countClasses(data, numClasses);
-  const impurity = impurityFn(classCounts);
-  const predictedClass = classCounts.indexOf(Math.max(...classCounts));
-  
-  // Check stopping conditions
-  const shouldStop = 
-    currentDepth >= maxDepth ||
-    data.length < minSamplesLeaf * 2 ||
-    impurity === 0;
-  
-  if (shouldStop) {
-    return {
-      splitAxis: null,
-      splitValue: null,
-      isLeaf: true,
-      predictedClass,
-      classCounts,
-      impurity,
-      left: null,
-      right: null,
-      bounds,
-      depth: currentDepth,
-      samples: data.length
-    };
-  }
-  
-  // Find best split
-  const split = findBestSplit(data, numClasses, impurityFn);
-  
-  if (!split) {
-    return {
-      splitAxis: null,
-      splitValue: null,
-      isLeaf: true,
-      predictedClass,
-      classCounts,
-      impurity,
-      left: null,
-      right: null,
-      bounds,
-      depth: currentDepth,
-      samples: data.length
-    };
-  }
-  
-  // Partition data
-  const leftData = data.filter(p => p.position[split.axis] <= split.value);
-  const rightData = data.filter(p => p.position[split.axis] > split.value);
-  
-  // Compute child bounds
-  const leftBounds = {
-    min: [...bounds.min] as [number, number, number],
-    max: [...bounds.max] as [number, number, number]
-  };
-  leftBounds.max[split.axis] = split.value;
-  
-  const rightBounds = {
-    min: [...bounds.min] as [number, number, number],
-    max: [...bounds.max] as [number, number, number]
-  };
-  rightBounds.min[split.axis] = split.value;
-  
-  // Recursively build children
-  const leftChild = buildTree(
-    leftData, numClasses, impurityFn, maxDepth, minSamplesLeaf, 
-    leftBounds, currentDepth + 1
-  );
-  const rightChild = buildTree(
-    rightData, numClasses, impurityFn, maxDepth, minSamplesLeaf, 
-    rightBounds, currentDepth + 1
-  );
-  
-  return {
-    splitAxis: split.axis,
-    splitValue: split.value,
-    isLeaf: false,
-    predictedClass,
-    classCounts,
-    impurity,
-    left: leftChild,
-    right: rightChild,
-    bounds,
-    depth: currentDepth,
-    samples: data.length
-  };
-}
-
-/**
- * Extract leaf partitions from tree for visualization
- */
-function extractPartitions(node: TreeNode): Partition[] {
-  if (node.isLeaf) {
-    return [{
-      bounds: node.bounds,
-      predictedClass: node.predictedClass,
-      impurity: node.impurity
-    }];
-  }
-  
-  const partitions: Partition[] = [];
-  if (node.left) partitions.push(...extractPartitions(node.left));
-  if (node.right) partitions.push(...extractPartitions(node.right));
-  return partitions;
-}
-
-/**
- * Extract split planes from tree for visualization
- */
-function extractSplitPlanes(
-  node: TreeNode, 
-  planes: { axis: number; value: number; bounds: { min: [number, number, number]; max: [number, number, number] }; depth: number }[] = []
-): typeof planes {
-  if (node.isLeaf || node.splitAxis === null || node.splitValue === null) {
-    return planes;
-  }
-  
-  planes.push({
-    axis: node.splitAxis,
-    value: node.splitValue,
-    bounds: node.bounds,
-    depth: node.depth
-  });
-  
-  if (node.left) extractSplitPlanes(node.left, planes);
-  if (node.right) extractSplitPlanes(node.right, planes);
-  
-  return planes;
-}
-
-/**
- * Compute tree accuracy
- */
-function computeAccuracy(tree: TreeNode, data: DataPoint[]): number {
-  let correct = 0;
-  
-  for (const point of data) {
-    let node = tree;
-    while (!node.isLeaf && node.splitAxis !== null && node.splitValue !== null) {
-      if (point.position[node.splitAxis] <= node.splitValue) {
-        node = node.left!;
-      } else {
-        node = node.right!;
-      }
-    }
-    if (node.predictedClass === point.label) {
-      correct++;
-    }
-  }
-  
-  return (correct / data.length) * 100;
-}
-
-/**
- * Count tree nodes
- */
-function countNodes(node: TreeNode): { total: number; leaves: number } {
-  if (node.isLeaf) {
-    return { total: 1, leaves: 1 };
-  }
-  
-  const leftCount = node.left ? countNodes(node.left) : { total: 0, leaves: 0 };
-  const rightCount = node.right ? countNodes(node.right) : { total: 0, leaves: 0 };
-  
-  return {
-    total: 1 + leftCount.total + rightCount.total,
-    leaves: leftCount.leaves + rightCount.leaves
-  };
-}
 
 /**
  * Generate wireframe box lines for a partition
@@ -424,6 +120,57 @@ function generatePlaneSurface(
   return points;
 }
 
+/**
+ * Split a spatial region into the left (<= value) and right (> value) sub-regions.
+ */
+function splitBounds(bounds: Bounds, axis: number, value: number): [Bounds, Bounds] {
+  const left: Bounds = { min: [...bounds.min], max: [...bounds.max] };
+  left.max[axis] = value;
+  const right: Bounds = { min: [...bounds.min], max: [...bounds.max] };
+  right.min[axis] = value;
+  return [left, right];
+}
+
+/**
+ * Walk a fitted decision tree, threading each node's spatial region, to collect
+ * the leaf partitions for visualization.
+ */
+function extractPartitions(node: DecisionNode, bounds: Bounds): Partition[] {
+  if (node.isLeaf || node.splitFeature === null || node.threshold === null) {
+    return [{ bounds, predictedClass: node.predictedClass, impurity: node.impurity }];
+  }
+  const [leftB, rightB] = splitBounds(bounds, node.splitFeature, node.threshold);
+  return [
+    ...(node.left ? extractPartitions(node.left, leftB) : []),
+    ...(node.right ? extractPartitions(node.right, rightB) : []),
+  ];
+}
+
+/** Collect the split planes (with their bounded extent) for visualization. */
+function extractSplitPlanes(
+  node: DecisionNode,
+  bounds: Bounds,
+  depth = 0,
+  planes: { axis: number; value: number; bounds: Bounds; depth: number }[] = []
+): typeof planes {
+  if (node.isLeaf || node.splitFeature === null || node.threshold === null) {
+    return planes;
+  }
+  planes.push({ axis: node.splitFeature, value: node.threshold, bounds, depth });
+  const [leftB, rightB] = splitBounds(bounds, node.splitFeature, node.threshold);
+  if (node.left) extractSplitPlanes(node.left, leftB, depth + 1, planes);
+  if (node.right) extractSplitPlanes(node.right, rightB, depth + 1, planes);
+  return planes;
+}
+
+/** Count total and leaf nodes in a fitted tree. */
+function countNodes(node: DecisionNode): { total: number; leaves: number } {
+  if (node.isLeaf) return { total: 1, leaves: 1 };
+  const l = node.left ? countNodes(node.left) : { total: 0, leaves: 0 };
+  const r = node.right ? countNodes(node.right) : { total: 0, leaves: 0 };
+  return { total: 1 + l.total + r.total, leaves: l.leaves + r.leaves };
+}
+
 // ============================================
 // COMPONENT
 // ============================================
@@ -468,7 +215,7 @@ export class DecisionTree3dComponent implements OnInit, OnDestroy {
 
   // Generated data and tree
   data: DataPoint[] = [];
-  tree: TreeNode | null = null;
+  tree: DecisionNode | null = null;
   partitions: Partition[] = [];
   splitPlanes: { axis: number; value: number; bounds: any; depth: number }[] = [];
 
@@ -583,32 +330,32 @@ export class DecisionTree3dComponent implements OnInit, OnDestroy {
   }
 
   buildDecisionTree(): void {
-    const impurityFn = this.lossFunction === 'gini' ? giniImpurity : crossEntropy;
-    
-    const bounds = {
-      min: [-this.axisRange, -this.axisRange, -this.axisRange] as [number, number, number],
-      max: [this.axisRange, this.axisRange, this.axisRange] as [number, number, number]
-    };
-    
-    this.tree = buildTree(
-      this.data,
-      4,
-      impurityFn,
+    if (this.data.length === 0) return;
+
+    // Fit the CART classifier from the library.
+    const X = Matrix.fromRows(this.data.map(p => p.position));
+    const y = this.data.map(p => p.label);
+    const clf = new DecisionTreeClassifier(
       this.maxDepth,
       this.minSamplesLeaf,
-      bounds
-    );
-    
-    // Extract visualization data
-    this.partitions = extractPartitions(this.tree);
-    this.splitPlanes = extractSplitPlanes(this.tree);
-    
-    // Compute metrics
-    this.accuracy = computeAccuracy(this.tree, this.data);
-    const nodeCounts = countNodes(this.tree);
-    this.totalNodes = nodeCounts.total;
-    this.leafNodes = nodeCounts.leaves;
-    
+      this.lossFunction
+    ).fit(X, y);
+    this.tree = clf.root;
+
+    // Derive the 3D visualization from the fitted tree by threading bounds.
+    const bounds: Bounds = {
+      min: [-this.axisRange, -this.axisRange, -this.axisRange],
+      max: [this.axisRange, this.axisRange, this.axisRange]
+    };
+    if (this.tree) {
+      this.partitions = extractPartitions(this.tree, bounds);
+      this.splitPlanes = extractSplitPlanes(this.tree, bounds);
+      const nodeCounts = countNodes(this.tree);
+      this.totalNodes = nodeCounts.total;
+      this.leafNodes = nodeCounts.leaves;
+    }
+    this.accuracy = accuracy(y, clf.predict(X)) * 100;
+
     // Update charts
     if (this.chart3D && this.chart3DInitialized) {
       this.update3DChartData();
@@ -826,13 +573,13 @@ export class DecisionTree3dComponent implements OnInit, OnDestroy {
     });
   }
 
-  private buildTreeData(node: TreeNode): any {
+  private buildTreeData(node: DecisionNode): any {
     const data: any = {
       name: node.isLeaf ? this.classNames[node.predictedClass] : 'Split',
       isLeaf: node.isLeaf,
       predictedClass: node.predictedClass,
-      splitAxis: node.splitAxis,
-      splitValue: node.splitValue,
+      splitAxis: node.splitFeature,
+      splitValue: node.threshold,
       samples: node.samples,
       impurity: node.impurity,
       itemStyle: {

@@ -32,3 +32,5 @@ export {
   MultivariateNormal,
   multivariateNormalPdf,
 } from './distributions';
+export { DecisionTreeClassifier, giniImpurity, entropyImpurity } from './tree';
+export type { Criterion, DecisionNode } from './tree';
