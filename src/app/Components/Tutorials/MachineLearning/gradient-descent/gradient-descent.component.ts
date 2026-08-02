@@ -19,7 +19,12 @@ import { Datapoint, Dataset } from '../NN/dataset';
 import { Trainer, TrainerConfig } from '../NN/trainer';
 import { CrossEntropyLoss } from '../NN/loss';
 import { SGD, Adam, RMSProp } from '../NN/optim';
-import { spectral } from 'src/app/utils/colormap';
+import {
+  makeInputGrid,
+  spectralColor,
+  emptyNormChart,
+  lossChartOption,
+} from './gradient-descent.charts';
 import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
 import { MatButton } from '@angular/material/button';
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
@@ -113,16 +118,7 @@ export class GradientDescentComponent
       [this.gridResolution * this.gridResolution, 2],
       false
     );
-    
-    const data: number[] = [];
-    for (let i = 0; i < this.gridResolution; i++) {
-      for (let j = 0; j < this.gridResolution; j++) {
-        const x = (i / this.gridResolution) * 2 - 1;
-        const y = (j / this.gridResolution) * 2 - 1;
-        data.push(x, y);
-      }
-    }
-    this.inputData.data = data;
+    this.inputData.data = makeInputGrid(this.gridResolution);
   }
 
   ngOnInit(): void {
@@ -239,35 +235,8 @@ export class GradientDescentComponent
   private initializeNormCharts(): void {
     this.allParamsNorms = [];
     for (let i = 0; i < this.n_layers + 2; i++) {
-      this.allParamsNorms.push(this.createEmptyNormChart());
+      this.allParamsNorms.push(emptyNormChart());
     }
-  }
-
-  /**
-   * Create an empty norm chart configuration
-   */
-  private createEmptyNormChart(maxEpoch: number = 10): EChartsOption {
-    return {
-      legend: {
-        show: true,
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-      },
-      tooltip: {},
-      xAxis: {
-        type: 'value',
-        name: 'Epochs',
-        min: 0,
-        max: maxEpoch,
-      },
-      yAxis: {
-        type: 'value',
-        name: 'Norm',
-      },
-      series: [
-        { data: [], type: 'line', name: 'Weights' },
-        { data: [], type: 'line', name: 'Bias' },
-      ],
-    };
   }
 
   ngAfterViewInit(): void {
@@ -296,7 +265,7 @@ export class GradientDescentComponent
   buildHeatmapLegend(): void {
     const ctx = this.legendHeatmap.nativeElement.getContext('2d')!;
     for (let i = 0; i < this.gridResolution; i++) {
-      ctx.fillStyle = this.colormap(i / this.gridResolution);
+      ctx.fillStyle = spectralColor(i / this.gridResolution);
       ctx.fillRect(i, 0, 1, 1);
     }
   }
@@ -376,7 +345,7 @@ export class GradientDescentComponent
       // Add layers
       for (let i = 0; i < this.n_layers - currentLayers; i++) {
         this.allParamsNorms.push(
-          this.createEmptyNormChart(this.trainer.currentEpoch + 10)
+          emptyNormChart(this.trainer.currentEpoch + 10)
         );
         
         // Insert before output layer
@@ -451,7 +420,7 @@ export class GradientDescentComponent
   resetEchartsNorms(): void {
     this.allParamsNorms = [];
     for (let i = 0; i < this.n_layers + 2; i++) {
-      const chart = this.createEmptyNormChart();
+      const chart = emptyNormChart();
       this.allParamsNorms.push(chart);
       
       if (this.paramsNormsEcharts[i]) {
@@ -668,20 +637,6 @@ export class GradientDescentComponent
   }
 
   /**
-   * Map value to color
-   */
-  colormap(x: number): string {
-    if (isNaN(x)) x = 0;
-
-    const l = spectral.length;
-    let idx = Math.floor(x * l);
-    idx = Math.max(0, Math.min(l - 1, idx));
-
-    const color = spectral[idx];
-    return `rgb(${color[0] * 255}, ${color[1] * 255}, ${color[2] * 255})`;
-  }
-
-  /**
    * Get dataset length
    */
   getDatasetLength(): number {
@@ -706,7 +661,7 @@ export class GradientDescentComponent
     for (let i = 0; i < this.gridResolution; i++) {
       for (let j = 0; j < this.gridResolution; j++) {
         const val = this.heatmap[j * this.gridResolution + i]?.label ?? 0;
-        this.ctx.fillStyle = this.colormap(val);
+        this.ctx.fillStyle = spectralColor(val);
         this.ctx.fillRect(j, i, 1, 1);
       }
     }
@@ -716,24 +671,7 @@ export class GradientDescentComponent
    * Update loss chart
    */
   private updateLossChart(): void {
-    this.lossOptions = {
-      xAxis: {
-        type: 'value',
-        name: 'Epochs',
-        min: 0,
-        max: this.trainer.losses.length + 10,
-      },
-      yAxis: {
-        type: 'value',
-        name: 'Loss',
-      },
-      series: [
-        {
-          data: this.trainer.losses.map((loss, i) => [i, loss]),
-          type: 'line',
-        },
-      ],
-    };
+    this.lossOptions = lossChartOption(this.trainer.losses);
   }
 
   /**
