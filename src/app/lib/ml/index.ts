@@ -34,3 +34,5 @@ export {
 } from './distributions';
 export { DecisionTreeClassifier, giniImpurity, entropyImpurity } from './tree';
 export type { Criterion, DecisionNode } from './tree';
+export { KNeighborsClassifier } from './neighbors';
+export { GaussianNaiveBayes } from './naive_bayes';
