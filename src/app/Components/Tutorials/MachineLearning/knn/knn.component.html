@@ -1,0 +1,84 @@
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="false">
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-4">
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-slate-600 text-sm">Model</label>
+        <mat-button-toggle-group
+          name="ModelChoice"
+          aria-label="Model Choice"
+          [(ngModel)]="modelChoice"
+          (ngModelChange)="retrain()"
+        >
+          <mat-button-toggle [value]="Model.KNN" class="flex-1">k-NN</mat-button-toggle>
+          <mat-button-toggle [value]="Model.NaiveBayes" class="flex-1">Naive Bayes</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      @if (modelChoice === Model.KNN) {
+        <div class="flex flex-col">
+          <div class="flex justify-between mb-1">
+            <label class="font-medium text-slate-600 text-sm">Neighbours (k)</label>
+            <span class="bg-indigo-100 font-bold px-2 py-0.5 rounded text-indigo-700 text-xs">{{ k }}</span>
+          </div>
+          <mat-slider min="1" max="25" step="1" discrete>
+            <input matSliderThumb [(ngModel)]="k" (ngModelChange)="retrain()" />
+          </mat-slider>
+        </div>
+      }
+
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-slate-600 text-sm">Draw class</label>
+        <mat-button-toggle-group
+          name="ClassChoice"
+          aria-label="Class Choice"
+          [(ngModel)]="classChoice"
+        >
+          <mat-button-toggle [value]="Classes.c1" [class.!bg-blue-600]="classChoice === Classes.c1">Class 1</mat-button-toggle>
+          <mat-button-toggle [value]="Classes.c2" [class.!bg-green-600]="classChoice === Classes.c2">Class 2</mat-button-toggle>
+          <mat-button-toggle [value]="Classes.c3" [class.!bg-red-600]="classChoice === Classes.c3">Class 3</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <p class="text-gray-500 text-xs">
+        Click and drag on the canvas to scatter points of the selected class. The
+        background shows the decision region each model predicts.
+      </p>
+
+      <button mat-flat-button color="warn" (click)="clearPoints()" class="w-full">
+        <mat-icon>delete_sweep</mat-icon> Clear Dataset
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="h-[512px] relative w-[512px]">
+      <canvas
+        #knnCanvas
+        width="512"
+        height="512"
+        class="bg-slate-50 block border border-gray-200"
+        (mousemove)="draw($event)"
+        (mousedown)="startDraw()"
+        (mouseup)="stopDraw()"
+      ></canvas>
+
+      <svg
+        width="512"
+        height="512"
+        viewBox="0 0 512 512"
+        class="absolute left-0 pointer-events-none top-0"
+      >
+        @for (point of dataset.points; track point.x + "-" + point.y) {
+          <circle
+            [attr.cx]="point.x"
+            [attr.cy]="point.y"
+            r="5"
+            [attr.fill]="
+              point.class === Classes.c1 ? 'blue' : point.class === Classes.c2 ? 'green' : 'red'
+            "
+          ></circle>
+        }
+      </svg>
+    </div>
+  </ng-container>
+</app-tutorial-template>

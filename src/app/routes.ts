@@ -164,6 +164,13 @@ export const routeConfig: Routes = [
       ),
   },
   {
+    path: 'knn',
+    loadComponent: () =>
+      import('./Components/Tutorials/MachineLearning/knn/knn.component').then(
+        (m) => m.KNNComponent
+      ),
+  },
+  {
     path: 'optimizerComparison',
     loadComponent: () =>
       import('./Components/Tutorials/MachineLearning/optimizer-comparison/optimizer-comparison.component').then(
