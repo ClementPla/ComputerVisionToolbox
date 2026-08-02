@@ -1,177 +1,339 @@
 import { Layer } from './layer';
 import { Tensor } from './tensor';
 
-export class Activation extends Layer {
+export abstract class Activation extends Layer {
   override name: string = 'Activation';
-
-  override forward(input: Tensor): Tensor {
-    throw new Error('Method not implemented.');
-  }
-
-  override backward(gradient: Tensor): Tensor {
-    throw new Error('Method not implemented.');
-  }
 }
+
+/**
+ * ReLU Activation
+ * f(x) = max(0, x)
+ * f'(x) = 1 if x > 0, else 0
+ */
 export class RELU extends Activation {
   override name: string = 'RELU';
 
   override forward(input: Tensor): Tensor {
-    let output = input.new_like();
-    this.ctx = [input];
-    for (let i = 0; i < output.data.length; i++) {
+    const output = input.new_like();
+    this.ctx = [input, output];
+
+    for (let i = 0; i < input.length(); i++) {
       output.data[i] = Math.max(0, input.data[i]);
     }
+
     return output;
   }
 
-  override backward(gradient: Tensor): Tensor {
-    let input = this.ctx[0];
-    for (let i = 0; i < input.data.length; i++) {
-      input.grad[i] = input.data[i] > 0 ? gradient.grad[i] : 0;
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+
+    for (let i = 0; i < input.length(); i++) {
+      // Gradient is passed through where input > 0, else 0
+      input.grad[i] = input.data[i] > 0 ? gradOutput.grad[i] : 0;
     }
+
     return input;
   }
 }
 
+/**
+ * Leaky ReLU Activation
+ * f(x) = x if x > 0, else alpha * x
+ */
+export class LeakyRELU extends Activation {
+  override name: string = 'LeakyRELU';
+  alpha: number;
+
+  constructor(alpha: number = 0.01) {
+    super();
+    this.alpha = alpha;
+  }
+
+  override forward(input: Tensor): Tensor {
+    const output = input.new_like();
+    this.ctx = [input];
+
+    for (let i = 0; i < input.length(); i++) {
+      output.data[i] = input.data[i] > 0 ? input.data[i] : this.alpha * input.data[i];
+    }
+
+    return output;
+  }
+
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+
+    for (let i = 0; i < input.length(); i++) {
+      input.grad[i] = input.data[i] > 0 ? gradOutput.grad[i] : this.alpha * gradOutput.grad[i];
+    }
+
+    return input;
+  }
+}
+
+/**
+ * Sigmoid Activation
+ * f(x) = 1 / (1 + exp(-x))
+ * f'(x) = f(x) * (1 - f(x))
+ */
 export class Sigmoid extends Activation {
   override name: string = 'Sigmoid';
 
   override forward(input: Tensor): Tensor {
-    let output = input.new_like();
+    const output = input.new_like();
     this.ctx = [input, output];
-    for (let i = 0; i < output.data.length; i++) {
-      output.data[i] = 1 / (1 + Math.exp(-input.data[i]));
+
+    for (let i = 0; i < input.length(); i++) {
+      // Numerically stable sigmoid
+      const x = input.data[i];
+      if (x >= 0) {
+        output.data[i] = 1 / (1 + Math.exp(-x));
+      } else {
+        const expX = Math.exp(x);
+        output.data[i] = expX / (1 + expX);
+      }
     }
+
     return output;
   }
 
-  override backward(gradient: Tensor): Tensor {
-    let input = this.ctx[0];
-    let output = this.ctx[1];
-    for (let i = 0; i < output.data.length; i++) {
-      input.grad[i] = gradient.grad[i] * output.data[i] * (1 - output.data[i]);
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+    const output = this.ctx[1];
+
+    for (let i = 0; i < input.length(); i++) {
+      const s = output.data[i];
+      input.grad[i] = gradOutput.grad[i] * s * (1 - s);
     }
+
     return input;
   }
 }
 
+/**
+ * Tanh Activation
+ * f(x) = tanh(x)
+ * f'(x) = 1 - tanh(x)^2
+ */
 export class TanH extends Activation {
   override name: string = 'TanH';
 
   override forward(input: Tensor): Tensor {
-    let output = input.new_like();
+    const output = input.new_like();
     this.ctx = [input, output];
 
-    for (let i = 0; i < output.data.length; i++) {
+    for (let i = 0; i < input.length(); i++) {
       output.data[i] = Math.tanh(input.data[i]);
     }
 
     return output;
   }
 
-  override backward(gradient: Tensor): Tensor {
-    let input = this.ctx[0];
-    let output = this.ctx[1];
-    for (let i = 0; i < input.data.length; i++) {
-      input.grad[i] = gradient.grad[i] * (1 - output.data[i] * output.data[i]);
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+    const output = this.ctx[1];
+
+    for (let i = 0; i < input.length(); i++) {
+      const t = output.data[i];
+      input.grad[i] = gradOutput.grad[i] * (1 - t * t);
     }
+
     return input;
   }
 }
 
+/**
+ * Identity Activation (pass-through)
+ */
 export class Identity extends Activation {
   override name: string = 'Identity';
+
   override forward(input: Tensor): Tensor {
+    this.ctx = [input];
     return input;
   }
-  override backward(gradient: Tensor): Tensor {
-    return gradient;
+
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+    input.grad = gradOutput.grad.slice();
+    return input;
   }
 }
 
+/**
+ * Softmax Activation
+ * f(x)_i = exp(x_i) / sum(exp(x_j))
+ * 
+ * Note: Typically used with CrossEntropyLoss which handles
+ * the combined gradient more efficiently.
+ */
 export class Softmax extends Activation {
   override name: string = 'Softmax';
 
   override forward(input: Tensor): Tensor {
-    let output = input.new_like();
-    let B = input.shape[0];
-    let C = input.shape[1];
+    const output = input.new_like();
+    const B = input.shape[0];
+    const C = input.shape[1];
 
-    this.ctx = [];
-    this.ctx.push(input);
-    let sums = new Tensor([B]);
+    this.ctx = [input, output];
+
     for (let i = 0; i < B; i++) {
+      // Find max for numerical stability
+      let maxVal = -Infinity;
+      for (let j = 0; j < C; j++) {
+        maxVal = Math.max(maxVal, input.data[i * C + j]);
+      }
+
+      // Compute exp and sum
       let sum = 0;
       for (let j = 0; j < C; j++) {
-        output.data[i * C + j] = Math.exp(input.data[i * C + j]);
+        output.data[i * C + j] = Math.exp(input.data[i * C + j] - maxVal);
         sum += output.data[i * C + j];
       }
+
+      // Normalize
       for (let j = 0; j < C; j++) {
         output.data[i * C + j] /= sum;
       }
-      sums.data[i] = sum;
     }
-    this.ctx.push(sums);
+
     return output;
   }
-  override backward(gradient: Tensor): Tensor {
-    let input = this.ctx[0];
-    let sums = this.ctx[1];
-    let B = input.shape[0];
-    let C = input.shape[1];
-    let grad = new Tensor(input.shape);
-    for (let i = 0; i < B; i++) {
-      for (let j = 0; j < C; j++) {
-        grad.data[i * C + j] =
-          (gradient.data[i * C + j] *
-            (sums.data[i] - Math.exp(input.data[i * C + j]))) /
-          (sums.data[i] * sums.data[i]);
+
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+    const output = this.ctx[1];
+    const B = input.shape[0];
+    const C = input.shape[1];
+
+    // Full Jacobian-based gradient (correct but expensive)
+    // dL/dx_i = sum_j(dL/dy_j * dy_j/dx_i)
+    // dy_j/dx_i = y_i * (delta_ij - y_j)
+    
+    for (let b = 0; b < B; b++) {
+      for (let i = 0; i < C; i++) {
+        let gradSum = 0;
+        const yi = output.data[b * C + i];
+        
+        for (let j = 0; j < C; j++) {
+          const yj = output.data[b * C + j];
+          const gradJ = gradOutput.grad[b * C + j];
+          
+          if (i === j) {
+            gradSum += gradJ * yi * (1 - yi);
+          } else {
+            gradSum += gradJ * (-yi * yj);
+          }
+        }
+        
+        input.grad[b * C + i] = gradSum;
       }
     }
-    input.grad = grad.data;
-    // We assume the gradient is already calculated in the loss function
+
     return input;
   }
 }
+
+/**
+ * Log Softmax Activation
+ * f(x)_i = log(softmax(x)_i) = x_i - log(sum(exp(x_j)))
+ */
 export class LogSoftmax extends Activation {
   override name: string = 'LogSoftmax';
 
   override forward(input: Tensor): Tensor {
-    let output = input.new_like();
-    let B = input.shape[0];
-    let C = input.shape[1];
+    const output = input.new_like();
+    const B = input.shape[0];
+    const C = input.shape[1];
 
-    this.ctx = [input];
-    let sums = new Tensor([B]);
+    const logSumExp = new Tensor([B]);
+    this.ctx = [input, logSumExp];
+
     for (let i = 0; i < B; i++) {
-      let sum = 0;
+      // Find max for numerical stability
+      let maxVal = -Infinity;
       for (let j = 0; j < C; j++) {
-        sum += Math.exp(input.data[i * C + j]);
+        maxVal = Math.max(maxVal, input.data[i * C + j]);
       }
+
+      // Compute log-sum-exp
+      let sumExp = 0;
       for (let j = 0; j < C; j++) {
-        output.data[i * C + j] = input.data[i * C + j] - Math.log(sum);
+        sumExp += Math.exp(input.data[i * C + j] - maxVal);
       }
-      sums.data[i] = sum;
+      logSumExp.data[i] = maxVal + Math.log(sumExp);
+
+      // Compute log softmax
+      for (let j = 0; j < C; j++) {
+        output.data[i * C + j] = input.data[i * C + j] - logSumExp.data[i];
+      }
     }
-    this.ctx.push(sums);
+
     return output;
   }
-  override backward(gradient: Tensor): Tensor {
-    let input = this.ctx[0];
-    let sums = this.ctx[1];
-    let B = input.shape[0];
-    let C = input.shape[1];
-    let grad = new Tensor(input.shape);
+
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+    const logSumExp = this.ctx[1];
+    const B = input.shape[0];
+    const C = input.shape[1];
+
     for (let i = 0; i < B; i++) {
+      // Compute softmax for this sample
+      let sumGrad = 0;
       for (let j = 0; j < C; j++) {
-        grad.data[i * C + j] =
-          gradient.data[i * C + j] -
-          (Math.exp(input.data[i * C + j]) * gradient.data[i * C + j]) /
-            sums.data[i];
+        sumGrad += gradOutput.grad[i * C + j];
+      }
+
+      for (let j = 0; j < C; j++) {
+        const softmax = Math.exp(input.data[i * C + j] - logSumExp.data[i]);
+        input.grad[i * C + j] = gradOutput.grad[i * C + j] - softmax * sumGrad;
       }
     }
-    input.grad = grad.data;
-    // We assume the gradient is already calculated in the loss function
+
+    return input;
+  }
+}
+
+/**
+ * GELU Activation (Gaussian Error Linear Unit)
+ * Used in Transformers (BERT, GPT)
+ * f(x) ≈ 0.5 * x * (1 + tanh(sqrt(2/π) * (x + 0.044715 * x^3)))
+ */
+export class GELU extends Activation {
+  override name: string = 'GELU';
+  private static readonly SQRT_2_PI = Math.sqrt(2 / Math.PI);
+
+  override forward(input: Tensor): Tensor {
+    const output = input.new_like();
+    this.ctx = [input, output];
+
+    for (let i = 0; i < input.length(); i++) {
+      const x = input.data[i];
+      const inner = GELU.SQRT_2_PI * (x + 0.044715 * x * x * x);
+      output.data[i] = 0.5 * x * (1 + Math.tanh(inner));
+    }
+
+    return output;
+  }
+
+  override backward(gradOutput: Tensor): Tensor {
+    const input = this.ctx[0];
+
+    for (let i = 0; i < input.length(); i++) {
+      const x = input.data[i];
+      const x3 = x * x * x;
+      const inner = GELU.SQRT_2_PI * (x + 0.044715 * x3);
+      const tanhInner = Math.tanh(inner);
+      const sech2 = 1 - tanhInner * tanhInner;
+      
+      // Derivative using chain rule
+      const dInner = GELU.SQRT_2_PI * (1 + 3 * 0.044715 * x * x);
+      const dGelu = 0.5 * (1 + tanhInner) + 0.5 * x * sech2 * dInner;
+      
+      input.grad[i] = gradOutput.grad[i] * dGelu;
+    }
+
     return input;
   }
 }

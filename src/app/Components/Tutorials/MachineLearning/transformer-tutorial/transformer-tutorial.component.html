@@ -1,0 +1,503 @@
+<app-tutorial-template [rightDrawer]="true">
+  <!-- Left Drawer: Controls -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4">
+      <!-- Mode Toggle -->
+      <div class="flex flex-col gap-2">
+        <span class="font-semibold">Input Mode</span>
+        <mat-button-toggle-group 
+          [value]="viewMode" 
+          (change)="setViewMode($event.value)"
+          class="w-full"
+        >
+          <mat-button-toggle value="text" class="flex-1">
+            <mat-icon>text_fields</mat-icon> Text
+          </mat-button-toggle>
+          <mat-button-toggle value="image" class="flex-1">
+            <mat-icon>image</mat-icon> Image
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Text Input -->
+      <div *ngIf="viewMode === 'text'" class="flex flex-col gap-2">
+        <span class="font-semibold">Input Text</span>
+        <mat-form-field appearance="outline" class="w-full">
+          <textarea 
+            matInput 
+            [(ngModel)]="inputText" 
+            (ngModelChange)="onTextChange()"
+            rows="3"
+            placeholder="Enter text to tokenize..."
+          ></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- Image Settings -->
+      <div *ngIf="viewMode === 'image'" class="flex flex-col gap-2">
+        <span class="font-semibold">Image Pattern</span>
+        <mat-button-toggle-group 
+          [value]="selectedImagePattern" 
+          (change)="selectedImagePattern = $event.value; generateImage()"
+          class="w-full"
+        >
+          <mat-button-toggle value="gradient" class="flex-1">Gradient</mat-button-toggle>
+          <mat-button-toggle value="checkerboard" class="flex-1">Checker</mat-button-toggle>
+          <mat-button-toggle value="circles" class="flex-1">Circles</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <app-labelled-sliders
+          [min]="8"
+          [max]="32"
+          [step]="8"
+          [title]="'Patch Size'"
+          [(value)]="patchSize"
+          (valueChange)="onSettingsChange()"
+        ></app-labelled-sliders>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Special Tokens -->
+      <div class="flex flex-col gap-2">
+        <span class="font-semibold">Special Tokens</span>
+        
+        <mat-checkbox 
+          [(ngModel)]="useClsToken" 
+          (change)="processInput()"
+        >
+          Add [CLS] token
+        </mat-checkbox>
+
+        <app-labelled-sliders
+          [min]="0"
+          [max]="4"
+          [step]="1"
+          [title]="'Register Tokens'"
+          [(value)]="numRegisters"
+          (valueChange)="processInput()"
+        ></app-labelled-sliders>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Model Settings -->
+      <div class="flex flex-col gap-2">
+        <span class="font-semibold">Model Configuration</span>
+
+        <app-labelled-sliders
+          [min]="16"
+          [max]="128"
+          [step]="16"
+          [title]="'Embedding Dimension'"
+          [(value)]="d_model"
+          (valueChange)="onSettingsChange()"
+        ></app-labelled-sliders>
+
+        <app-labelled-sliders
+          [min]="1"
+          [max]="8"
+          [step]="1"
+          [title]="'Number of Heads'"
+          [(value)]="numHeads"
+          (valueChange)="onSettingsChange()"
+        ></app-labelled-sliders>
+
+        <mat-checkbox 
+          [(ngModel)]="showPositionalEncoding" 
+          (change)="processInput()"
+        >
+          Add Positional Encoding
+        </mat-checkbox>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <button mat-raised-button color="primary" (click)="resetWeights()">
+        <mat-icon>refresh</mat-icon>
+        Randomize Weights
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Center Content -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col gap-6 p-4">
+      
+      <!-- Step Navigation -->
+      <div class="flex justify-center">
+        <mat-button-toggle-group [value]="currentStep" (change)="setVisualizationStep($event.value)">
+          <mat-button-toggle value="tokenization">1. Tokenization</mat-button-toggle>
+          <mat-button-toggle value="embedding">2. Embeddings</mat-button-toggle>
+          <mat-button-toggle value="attention">3. Attention</mat-button-toggle>
+          <mat-button-toggle value="multihead">4. Multi-Head</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <!-- Step 1: Tokenization -->
+      <div *ngIf="currentStep === 'tokenization'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">Tokenization</h2>
+        
+        <div class="flex gap-8 items-start">
+          <!-- Input visualization -->
+          <div class="flex-1">
+            <h3 class="font-semibold mb-2" *ngIf="viewMode === 'text'">Input Text</h3>
+            <h3 class="font-semibold mb-2" *ngIf="viewMode === 'image'">Input Image</h3>
+            
+            <!-- Text input display -->
+            <div *ngIf="viewMode === 'text'" class="bg-gray-100 input-box p-4 rounded-lg">
+              <span class="text-lg">{{ inputText }}</span>
+            </div>
+
+            <!-- Image display -->
+            <div *ngIf="viewMode === 'image'" class="image-container relative">
+              <canvas 
+                #imageCanvas 
+                class="border image-canvas rounded"
+                [style.width.px]="imageWidth * 3"
+                [style.height.px]="imageHeight * 3"
+              ></canvas>
+              <canvas 
+                #patchCanvas 
+                class="absolute left-0 patch-overlay top-0"
+                [style.width.px]="imageWidth * 3"
+                [style.height.px]="imageHeight * 3"
+              ></canvas>
+            </div>
+          </div>
+
+          <!-- Arrow -->
+          <div class="flex items-center">
+            <mat-icon class="text-4xl text-gray-400">arrow_forward</mat-icon>
+          </div>
+
+          <!-- Tokens -->
+          <div class="flex-1">
+            <h3 class="font-semibold mb-2">Tokens ({{ currentTokens.length }})</h3>
+            <div class="tokens-grid">
+              <div 
+                *ngFor="let token of currentTokens; let i = index"
+                class="token-chip"
+                [style.backgroundColor]="token.color"
+                [class.token-special]="token.type === 'special'"
+                [class.token-register]="token.type === 'register'"
+                [class.token-selected]="selectedTokenIndex === i"
+                [class.token-hovered]="hoveredTokenIndex === i"
+                (mouseenter)="onTokenHover(i)"
+                (mouseleave)="onTokenLeave()"
+                (click)="onTokenClick(i)"
+              >
+                <span class="token-text">{{ token.text }}</span>
+                <span class="token-position">{{ token.position }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">How Tokenization Works</h4>
+          <p *ngIf="viewMode === 'text'" class="text-blue-700">
+            Text is split into tokens (words or subwords). Special tokens like <strong>[CLS]</strong> 
+            are added for classification tasks. <strong>Register tokens</strong> act as scratch space 
+            for the model to store intermediate computations.
+          </p>
+          <p *ngIf="viewMode === 'image'" class="text-blue-700">
+            Images are divided into <strong>patches</strong> ({{ patchSize }}×{{ patchSize }} pixels each).
+            Each patch becomes a token, similar to words in text. The <strong>[CLS]</strong> token 
+            aggregates information from all patches for classification.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2: Embeddings -->
+      <div *ngIf="currentStep === 'embedding'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">Token Embeddings</h2>
+
+        <!-- Tokens row - clickable -->
+        <div class="mb-4">
+          <div class="tokens-grid">
+            <div 
+              *ngFor="let token of currentTokens; let i = index"
+              class="token-chip"
+              [style.backgroundColor]="token.color"
+              [class.token-special]="token.type === 'special'"
+              [class.token-register]="token.type === 'register'"
+              [class.token-selected]="selectedTokenIndex === i"
+              [class.token-hovered]="hoveredTokenIndex === i"
+              (mouseenter)="onTokenHover(i)"
+              (mouseleave)="onTokenLeave()"
+              (click)="onTokenClick(i)"
+            >
+              <span class="token-text">{{ token.text }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="embeddings-container">
+          <div class="embeddings-header">
+            <span class="w-20">Token</span>
+            <span class="flex-1 text-center">Embedding Vector (d={{ d_model }})</span>
+          </div>
+
+          <div 
+            *ngFor="let token of currentTokens; let i = index"
+            class="embedding-row"
+            [class.selected]="selectedTokenIndex === i"
+            (mouseenter)="onTokenHover(i)"
+            (mouseleave)="onTokenLeave()"
+            (click)="onTokenClick(i)"
+          >
+            <div class="token-label" [style.backgroundColor]="token.color">
+              {{ token.text }}
+            </div>
+            <div class="embedding-bars">
+              <div 
+                *ngFor="let value of currentEmbeddings[i]?.slice(0, 32); let j = index"
+                class="embedding-bar"
+                [style.height.px]="getEmbeddingBarHeight(value)"
+                [style.backgroundColor]="getEmbeddingBarColor(value)"
+                [title]="'Dim ' + j + ': ' + value.toFixed(3)"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">Embeddings + Positional Encoding</h4>
+          <p class="text-blue-700">
+            Each token is converted to a <strong>{{ d_model }}-dimensional vector</strong>.
+            <span *ngIf="showPositionalEncoding">
+              <strong>Positional encoding</strong> is added so the model knows the order of tokens
+              (Transformers have no inherent notion of sequence order).
+            </span>
+            <span *ngIf="!showPositionalEncoding">
+              Positional encoding is disabled - the model doesn't know token order!
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3: Single-Head Attention -->
+      <div [hidden]="currentStep !== 'attention'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">Self-Attention Mechanism</h2>
+
+        <!-- Tokens row - clickable -->
+        <div class="mb-6">
+          <h3 class="font-semibold mb-2">Click a token to explore its attention:</h3>
+          <div class="tokens-grid">
+            <div 
+              *ngFor="let token of currentTokens; let i = index"
+              class="token-chip"
+              [style.backgroundColor]="token.color"
+              [class.token-special]="token.type === 'special'"
+              [class.token-register]="token.type === 'register'"
+              [class.token-selected]="selectedTokenIndex === i"
+              [class.token-hovered]="hoveredTokenIndex === i"
+              (mouseenter)="onTokenHover(i)"
+              (mouseleave)="onTokenLeave()"
+              (click)="onTokenClick(i)"
+            >
+              <span class="token-text">{{ token.text }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-6">
+          <!-- Attention Matrix -->
+          <div class="attention-matrix-container">
+            <h3 class="font-semibold mb-2">Attention Weights</h3>
+            <canvas #attentionCanvas class="attention-canvas"></canvas>
+            
+            <div class="attention-legend flex gap-2 items-center mt-2">
+              <span class="text-sm">Low</span>
+              <div class="legend-gradient"></div>
+              <span class="text-sm">High</span>
+            </div>
+          </div>
+
+          <!-- Token Attention Details -->
+          <div class="flex-1" *ngIf="selectedTokenIndex !== null">
+            <h3 class="font-semibold mb-2">
+              "{{ currentTokens[selectedTokenIndex]?.text }}" attends to:
+            </h3>
+            <div class="attention-bars">
+              <div 
+                *ngFor="let item of getAttentionForToken(selectedTokenIndex)"
+                class="attention-bar-row"
+              >
+                <div class="attention-bar-label" [style.backgroundColor]="item.token.color">
+                  {{ item.token.text }}
+                </div>
+                <div class="attention-bar-track">
+                  <div 
+                    class="attention-bar-fill"
+                    [style.width.%]="getAttentionWidthPercent(item.weight)"
+                  ></div>
+                </div>
+                <span class="attention-bar-value">{{ (item.weight * 100).toFixed(1) }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 text-center text-gray-500" *ngIf="selectedTokenIndex === null">
+            <mat-icon class="text-6xl">touch_app</mat-icon>
+            <p>Select a token above to see its attention distribution</p>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">Self-Attention Formula</h4>
+          <p class="font-mono my-2 text-blue-700 text-center">
+            Attention(Q, K, V) = softmax(Q × K<sup>T</sup> / √d) × V
+          </p>
+          <p class="text-blue-700">
+            Each token computes <strong>Query (Q)</strong>, <strong>Key (K)</strong>, and 
+            <strong>Value (V)</strong> vectors. The attention weight between tokens is the 
+            dot product of Q and K, scaled and normalized with softmax.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 4: Multi-Head Attention -->
+      <div [hidden]="currentStep !== 'multihead'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">Multi-Head Attention ({{ numHeads }} heads)</h2>
+
+        <!-- Tokens row - clickable -->
+        <div class="mb-6">
+          <h3 class="font-semibold mb-2">Tokens:</h3>
+          <div class="tokens-grid">
+            <div 
+              *ngFor="let token of currentTokens; let i = index"
+              class="token-chip"
+              [style.backgroundColor]="token.color"
+              [class.token-special]="token.type === 'special'"
+              [class.token-register]="token.type === 'register'"
+              [class.token-selected]="selectedTokenIndex === i"
+              [class.token-hovered]="hoveredTokenIndex === i"
+              (mouseenter)="onTokenHover(i)"
+              (mouseleave)="onTokenLeave()"
+              (click)="onTokenClick(i)"
+            >
+              <span class="token-text">{{ token.text }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <!-- Head selector -->
+          <div class="heads-grid">
+            <div 
+              *ngFor="let head of headVisualizations; let i = index"
+              class="head-card"
+              [class.head-selected]="head.isSelected"
+              (click)="selectHead(i)"
+            >
+              <div class="head-title">Head {{ i + 1 }}</div>
+              <div class="head-mini-matrix">
+                <div 
+                  *ngFor="let row of head.attention; let ri = index"
+                  class="mini-row"
+                >
+                  <div 
+                    *ngFor="let val of row; let ci = index"
+                    class="mini-cell"
+                    [style.backgroundColor]="getAttentionColor(val)"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected head details -->
+          <div class="selected-head-view">
+            <h3 class="font-semibold mb-2">Head {{ selectedHeadIndex + 1 }} - Attention Matrix</h3>
+            <canvas #multiheadCanvas class="attention-canvas"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">Why Multiple Heads?</h4>
+          <p class="text-blue-700">
+            Each attention head can learn <strong>different patterns</strong>:
+          </p>
+          <ul class="list-disc list-inside mt-2 text-blue-700">
+            <li>Some heads focus on <strong>nearby tokens</strong> (local context)</li>
+            <li>Others capture <strong>long-range dependencies</strong></li>
+            <li>Some learn <strong>syntactic relationships</strong> (subject-verb)</li>
+            <li>Others learn <strong>semantic relationships</strong> (word meaning)</li>
+          </ul>
+          <p class="mt-2 text-blue-700">
+            The outputs of all heads are <strong>concatenated</strong> and projected back to the 
+            model dimension.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- Right Drawer: Info Panel -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="flex flex-col gap-4 p-2">
+      <h3 class="font-bold text-lg">Statistics</h3>
+      
+      <div class="stat-card">
+        <span class="stat-label">Tokens</span>
+        <span class="stat-value">{{ currentTokens.length }}</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Embedding Dim</span>
+        <span class="stat-value">{{ d_model }}</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Attention Heads</span>
+        <span class="stat-value">{{ numHeads }}</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Head Dimension</span>
+        <span class="stat-value">{{ d_model / numHeads }}</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <h3 class="font-bold text-lg">Token Types</h3>
+      
+      <div class="token-type-legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #1a237e;"></div>
+          <span>[CLS] - Classification</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #ff6f00;"></div>
+          <span>[REG] - Register</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #4CAF50;"></div>
+          <span>Word / Patch</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #b71c1c;"></div>
+          <span>[SEP] - Separator</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <h3 class="font-bold text-lg">Selected Token</h3>
+      <div *ngIf="selectedTokenIndex !== null" class="selected-token-info">
+        <p><strong>Text:</strong> {{ currentTokens[selectedTokenIndex]?.text }}</p>
+        <p><strong>Position:</strong> {{ currentTokens[selectedTokenIndex]?.position }}</p>
+        <p><strong>Type:</strong> {{ currentTokens[selectedTokenIndex]?.type }}</p>
+      </div>
+      <p *ngIf="selectedTokenIndex === null" class="italic text-gray-500">
+        Click a token to select it
+      </p>
+    </div>
+  </ng-container>
+</app-tutorial-template>

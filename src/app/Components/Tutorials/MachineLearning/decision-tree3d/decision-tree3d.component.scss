@@ -1,0 +1,27 @@
+// Decision Tree 3D Tutorial Component Styles
+// Most styling is handled via Tailwind utility classes in the template
+
+.graph {
+  width: 100%;
+  min-height: 400px;
+}
+
+// Button toggle group styling
+mat-button-toggle-group {
+  &.w-full {
+    width: 100%;
+    
+    mat-button-toggle {
+      flex: 1;
+    }
+  }
+}
+
+// Scrollable split details
+.max-h-64 {
+  max-height: 16rem;
+  
+  &.overflow-y-auto {
+    overflow-y: auto;
+  }
+}

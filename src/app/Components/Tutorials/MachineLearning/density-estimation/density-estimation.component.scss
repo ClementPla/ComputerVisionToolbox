@@ -1,0 +1,349 @@
+// Density Estimation Tutorial - Dark Theme
+
+:host {
+  display: block;
+  color: #e0e0e0;
+}
+
+// ==================== Variables ====================
+
+$bg-primary: #1a1a1a;
+$bg-secondary: #252525;
+$bg-tertiary: #2d2d2d;
+$bg-elevated: #383838;
+
+$text-primary: #e0e0e0;
+$text-secondary: #a0a0a0;
+$text-muted: #707070;
+
+$accent-blue: #64B5F6;
+$accent-green: #81C784;
+$accent-orange: #FFB74D;
+$accent-red: #E57373;
+$accent-purple: #CE93D8;
+
+$border-color: #404040;
+
+// ==================== Layout ====================
+
+.content-container {
+  padding: 16px;
+  min-height: 100%;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: $text-primary;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dim-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: $accent-blue;
+  color: #000;
+  border-radius: 12px;
+}
+
+// ==================== Canvas ====================
+
+.canvas-container {
+  background: $bg-secondary;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.density-canvas {
+  border-radius: 8px;
+  display: block;
+}
+
+// ==================== Component Legend ====================
+
+.component-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+// ==================== Bandwidth Hints ====================
+
+.bandwidth-hints {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-top: 4px;
+
+  .hint-label {
+    color: $accent-blue;
+    font-weight: 600;
+    min-width: 60px;
+  }
+
+  .hint-desc {
+    color: $text-muted;
+  }
+}
+
+// ==================== Info Grid ====================
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.info-box {
+  background: $bg-secondary;
+  border-radius: 10px;
+  border: 1px solid $border-color;
+  padding: 16px;
+
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: $text-primary;
+  }
+
+  p {
+    font-size: 13px;
+    color: $text-secondary;
+    line-height: 1.5;
+    margin: 0;
+
+    strong {
+      color: $accent-blue;
+    }
+  }
+}
+
+// ==================== Formula Panel ====================
+
+.formula-panel {
+  background: $bg-secondary;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  text-align: center;
+
+  .formula-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .formula-main {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 24px;
+    color: $text-primary;
+    margin-bottom: 12px;
+
+    sub, sup {
+      font-size: 14px;
+    }
+
+    .sum {
+      font-size: 28px;
+      vertical-align: middle;
+      margin: 0 4px;
+    }
+
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 4px;
+      font-size: 16px;
+
+      .num {
+        border-bottom: 1px solid $text-primary;
+        padding: 0 4px 2px;
+      }
+
+      .denom {
+        padding: 2px 4px 0;
+      }
+    }
+
+    .paren {
+      font-size: 28px;
+      vertical-align: middle;
+    }
+  }
+
+  .formula-note {
+    font-size: 13px;
+    color: $text-muted;
+    font-style: italic;
+
+    sub {
+      font-size: 10px;
+    }
+  }
+}
+
+// ==================== Explanation Panel ====================
+
+.explanation-panel {
+  background: $bg-secondary;
+  border-radius: 10px;
+  border: 1px solid $border-color;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    color: $text-primary;
+    font-size: 14px;
+  }
+
+  strong {
+    color: $accent-blue;
+  }
+}
+
+// ==================== Info Cards (Right Drawer) ====================
+
+.info-card {
+  background: $bg-secondary;
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid $border-color;
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: $text-primary;
+  }
+
+  p {
+    font-size: 13px;
+    color: $text-secondary;
+    margin: 0 0 6px 0;
+    line-height: 1.4;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 16px;
+
+    li {
+      font-size: 12px;
+      color: $text-secondary;
+      margin-bottom: 4px;
+
+      strong {
+        color: $text-primary;
+      }
+    }
+  }
+
+  .info-note {
+    font-size: 11px;
+    color: $text-muted;
+    margin-top: 8px;
+  }
+}
+
+// ==================== Slider Styling ====================
+
+::ng-deep {
+  .mat-mdc-slider {
+    width: 100%;
+  }
+
+  .mat-mdc-slider .mdc-slider__track--active_fill {
+    background-color: $accent-blue !important;
+    border-color: $accent-blue !important;
+  }
+
+  .mat-mdc-slider .mdc-slider__thumb-knob {
+    background-color: $accent-blue !important;
+    border-color: $accent-blue !important;
+  }
+}
+
+// ==================== Button Styling ====================
+
+button[mat-stroked-button] {
+  width: 100%;
+  border-color: $border-color;
+  color: $text-secondary;
+
+  mat-icon {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    background: $bg-tertiary;
+    color: $text-primary;
+  }
+}
+
+// ==================== Responsive ====================
+
+@media (max-width: 700px) {
+  .canvas-container {
+    padding: 8px;
+  }
+
+  .density-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .formula-panel .formula-main {
+    font-size: 20px;
+
+    .sum {
+      font-size: 24px;
+    }
+
+    .frac {
+      font-size: 14px;
+    }
+  }
+}

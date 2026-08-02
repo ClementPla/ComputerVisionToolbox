@@ -6,6 +6,7 @@
         title="Sampling"
         imgURL="assets/images/home-cards/sampling.png"
       >
+        Explore signal sampling theory, Nyquist theorem, and the effects of sampling rate on signal reconstruction.
       </app-home-card>
     </a>
 
@@ -16,6 +17,7 @@
         imgURL="assets/images/home-cards/metric.jpg"
         title="Classification Metrics"
       >
+        Learn about evaluation metrics for classification models including accuracy, precision, recall, F1-score, and confusion matrices.
       </app-home-card>
     </a>
   </div>
@@ -26,6 +28,7 @@
         title="Image Quality and Noise"
         imgURL="assets/image_presets/phantom.png"
       >
+        Understand image quality metrics like PSNR, SNR, and MSE, and visualize the effects of different noise types on images.
       </app-home-card>
     </a>
 
@@ -34,6 +37,7 @@
         title="Fourier Transform 2D"
         imgURL="assets/images/home-cards/fourierTransform.jpg"
       >
+        Visualize the frequency spectrum of images and understand how spatial patterns translate to frequency components.
       </app-home-card>
     </a>
     <a routerLink="/spatialFiltering"
@@ -41,6 +45,7 @@
         title="Spatial Filtering"
         imgURL="assets/images/home-cards/spatial_filtering.jpg"
       >
+        Apply convolution kernels for image smoothing, sharpening, edge detection, and other spatial domain operations.
       </app-home-card>
     </a>
 
@@ -49,6 +54,7 @@
         title="Spectral Filtering"
         imgURL="assets/image_presets/CTandstripes.jpeg"
       >
+        Perform filtering operations in the frequency domain using low-pass, high-pass, and band-pass filters.
       </app-home-card>
     </a>
     <a routerLink="/colorspaces"
@@ -56,6 +62,7 @@
         title="Colorspaces"
         imgURL="assets/images/home-cards/colorspace.jpg"
       >
+        Explore different color representations including RGB, HSV, LAB, and understand conversions between color spaces.
       </app-home-card>
     </a>
 
@@ -64,6 +71,7 @@
         title="Morphology"
         imgURL="assets/images/home-cards/morphology.jpg"
       >
+        Learn morphological operations like erosion, dilation, opening, and closing for binary and grayscale image processing.
       </app-home-card>
     </a>
 
@@ -72,15 +80,16 @@
         title="Image Histogram"
         imgURL="assets/images/home-cards/histogram.jpg"
       >
+        Analyze pixel intensity distributions and apply histogram equalization for contrast enhancement.
       </app-home-card>
     </a>
 
     <a routerLink="/houghTransform"
       ><app-home-card
         title="Hough Transform"
-        imgURL="assets/images/home-cards/hough_transform.jpg"
+        imgURL="assets/images/home-cards/HoughTransform.png"
       >
-      Still under development
+        Still under development
       </app-home-card>
     </a>
 
@@ -91,6 +100,7 @@
         imgURL="assets/images/home-cards/segmentation_metrics.jpg"
         title="Segmentation Metrics"
       >
+        Understand metrics for evaluating segmentation quality including IoU, Dice coefficient, and pixel accuracy.
       </app-home-card>
     </a>
   </div>
@@ -99,8 +109,9 @@
     <a routerLink="/GaussianDistribution"
       ><app-home-card
         title="Gaussian Distribution Visualized"
-        imgURL="assets/images/home-cards/gaussianDistribution.jpg"
+        imgURL="assets/images/home-cards/Gaussian.png"
       >
+        Visualize the Gaussian (normal) distribution and explore its properties including mean and variance.
       </app-home-card>
     </a>
     </div>
@@ -109,16 +120,45 @@
     <a routerLink="/PCA"
       ><app-home-card
         title="Principal Component Analysis"
-        imgURL="assets/images/home-cards/pca.jpg"
+        imgURL="assets/images/home-cards/PCA.png"
       >
+        Learn dimensionality reduction through PCA, visualize principal components, and understand variance explained by each component.
       </app-home-card>
     </a>
 
     <a routerLink="/fisherDiscriminantAnalysis"
       ><app-home-card
         title="Fisher Discriminant Analysis"
-        imgURL="assets/images/home-cards/pca.jpg"
+        imgURL="assets/images/home-cards/fisher.png"
       >
+        Explore linear discriminant analysis for finding optimal projection directions that maximize class separability.
+      </app-home-card>
+    </a>
+    <a routerLink="/linearClassifier"
+      ><app-home-card
+        title="Linear Classifier"
+        imgURL="assets/images/home-cards/linearModel.png"
+      >
+        Understand linear decision boundaries and how linear models separate classes in feature space.
+      </app-home-card>
+    </a>
+
+    <a routerLink="/svm"
+      ><app-home-card
+        title="SVM Classifier"
+        imgURL="assets/images/home-cards/SVM.png"
+      >
+        Explore support vector machines, maximum margin classifiers, and the kernel trick for non-linear decision boundaries.
+      </app-home-card>
+    </a>
+
+
+    <a routerLink="/decisionTree3D">
+      <app-home-card
+        title="Decision Trees in 3D"
+        imgURL="assets/images/home-cards/decision_tree.png"
+      >
+        Visualize decision tree splits and decision boundaries in three-dimensional feature space.
       </app-home-card>
     </a>
 
@@ -127,6 +167,7 @@
         title="Learning & Loss"
         imgURL="assets/images/home-cards/weight_loss.png"
       >
+        Understand loss functions, optimization landscapes, and how models learn by minimizing error.
       </app-home-card>
     </a>
 
@@ -135,16 +176,29 @@
         title="Regression"
         imgURL="assets/images/home-cards/regression.png"
       >
+        Learn linear and polynomial regression, least squares fitting, and model complexity vs. generalization.
       </app-home-card>
     </a>
     <a routerLink="/bayesianRegression">
-      <app-home-card title="Bayesian Regression" imgURL="assets/images/home-cards/bayesian.png"></app-home-card>
+      <app-home-card title="Bayesian Regression" imgURL="assets/images/home-cards/bayesian.png">
+        Explore probabilistic regression with uncertainty quantification, prior distributions, and posterior predictions.
+      </app-home-card>
     </a>
     <a routerLink="/optimizer"
       ><app-home-card
         title="Gradient Descent & Optimizers"
         imgURL="assets/images/home-cards/gradient_descent.png"
       >
+        Visualize gradient descent optimization, learning rates, and convergence to local minima.
+      </app-home-card>
+    </a>
+
+    <a routerLink="/optimizerComparison"
+      ><app-home-card
+        title="Optimizers comparison"
+        imgURL="assets/images/home-cards/optimizers.png"
+      >
+        Compare optimization algorithms including SGD, momentum, Adam, and RMSprop on different loss landscapes.
       </app-home-card>
     </a>
 
@@ -153,6 +207,34 @@
         title="Fully Connected Networks"
         imgURL="assets/images/home-cards/neural_network.png"
       >
+        Build and train multi-layer perceptrons with backpropagation and understand how deep networks learn representations.
+      </app-home-card>
+    </a>
+
+    <a routerLink="/convolutionTutorial"
+      ><app-home-card
+        title="A single convolution"
+        imgURL="assets/images/home-cards/convolution.png"
+      >
+        Understand how a single convolution operation works, including kernels, stride, padding, and feature extraction.
+      </app-home-card>
+    </a>
+
+     <a routerLink="/receptiveFieldTutorial"
+      ><app-home-card
+        title="Receptive Fields in CNNs"
+        imgURL="assets/images/home-cards/receptive_field.png"
+      >
+        Calculate and visualize receptive fields in convolutional networks and understand how they grow with depth.
+      </app-home-card>
+    </a>
+
+    <a routerLink="/normalizationTutorial"
+      ><app-home-card
+        title="Normalization Layers"
+        imgURL="assets/images/home-cards/layer_normalization.png"
+      >
+        Compare batch normalization, layer normalization, and instance normalization for stabilizing neural network training.
       </app-home-card>
     </a>
 
@@ -160,6 +242,41 @@
       ><app-home-card
         title="A CNN classifier"
         imgURL="assets/images/home-cards/mnist.png"
+      >
+        Experiment with a convolutional neural network for image classification on the MNIST dataset.
+      </app-home-card>
+    </a>
+
+    <a routerLink="/RNNCellTutorial"
+      ><app-home-card
+        title="RNN Cell Tutorial"
+        imgURL="assets/images/home-cards/RNN_cell.png"
+      >
+      </app-home-card>
+    </a>
+
+    <a routerLink="/RNNTutorial"
+      ><app-home-card
+        title="Recurrent Neural Networks"
+        imgURL="assets/images/home-cards/RNN.png"
+      >
+        Experiment with a recurrent neural network for sequence modeling and prediction.
+      </app-home-card>
+    </a>
+
+     <a routerLink="/transformerTutorial"
+      ><app-home-card
+        title="Transformer Architecture"
+        imgURL="assets/images/home-cards/TransformerAttention.png"
+      >
+        An overview of the transformer architecture for sequence modeling and attention visualization.
+      </app-home-card>
+    </a>
+
+    <a routerLink="/AutoregressiveModel"
+      ><app-home-card
+        title="Autoregressive Models"
+        imgURL="assets/images/home-cards/Autoregressive.png"
       >
       </app-home-card>
     </a>
@@ -169,7 +286,27 @@
         title="Autoencoder on MNIST"
         imgURL="assets/images/home-cards/autoencoder.png"
       >
+        Learn unsupervised feature learning through autoencoders, exploring encoding, latent space, and reconstruction.
       </app-home-card>
     </a>
+
+    
+     <a routerLink="/kmeans"
+      ><app-home-card
+        title="K-Means"
+        imgURL="assets/images/home-cards/kmeans.png"
+      >
+      Expectation-maximization clustering algorithm for unsupervised learning, visualizing cluster assignments and centroids.
+      </app-home-card>
+    </a>
+    <a routerLink="/DensityEstimation"
+      ><app-home-card
+        title="Density Estimation"
+        imgURL="assets/images/home-cards/KDE.png"
+      >
+      Parametric and non-parametric density estimation techniques for modeling probability distributions from data: KDE and Gaussian mixtures.
+      </app-home-card>
+    </a>
+
   </div>
 </div>

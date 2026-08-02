@@ -1,0 +1,60 @@
+:host {
+  display: block;
+}
+
+// Image container
+.cursor-crosshair {
+  cursor: crosshair;
+}
+
+// RF overlays
+.border-blue-500 {
+  border-color: #3b82f6;
+}
+
+// Expansion panel adjustments
+::ng-deep {
+  .mat-expansion-panel {
+    border-radius: 8px !important;
+    
+    .mat-expansion-panel-header {
+      padding: 0 12px;
+      height: 48px;
+    }
+    
+    .mat-expansion-panel-body {
+      padding: 0 12px 12px;
+    }
+  }
+
+  .mat-mdc-slider {
+    width: 100%;
+  }
+
+  // Smaller icon buttons
+  .mat-mdc-icon-button {
+    --mdc-icon-button-state-layer-size: 32px;
+    --mdc-icon-button-icon-size: 20px;
+  }
+}
+
+// Stats grid
+.grid {
+  display: grid;
+}
+
+// Smooth transitions for RF rectangles
+[ngStyle] {
+  transition: all 0.2s ease-out;
+}
+
+// Fallback image pattern
+.fallback-pattern {
+  background-image: 
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}

@@ -1,0 +1,83 @@
+:host {
+  display: block;
+}
+
+// Cell base styles
+.cell {
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  background: rgba(128, 128, 128, 0.1);
+  
+  // Smooth transitions for highlighting
+  transition: all 0.15s ease-out;
+}
+
+// Input grid cells
+.cell.padding {
+  background: transparent;
+  border-style: dashed;
+  opacity: 0.4;
+}
+
+.cell.kernel-sample {
+  background: #8b5cf6; // violet-500
+  border-color: #7c3aed; // violet-600
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+  transform: scale(1.05);
+}
+
+.cell.dilation-gap {
+  background: rgba(59, 130, 246, 0.3); // blue with low opacity
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.cell.active:not(.kernel-sample):not(.dilation-gap) {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+// Output grid cells
+.cell.output-active {
+  background: #3b82f6; // blue-500
+  border-color: #2563eb; // blue-600
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+  transform: scale(1.1);
+}
+
+.cell.computed {
+  background: #22c55e; // green-500
+  border-color: #16a34a; // green-600
+}
+
+// Material overrides
+::ng-deep {
+  .mat-expansion-panel {
+    border-radius: 8px !important;
+  }
+
+  .mat-mdc-slider {
+    width: 100%;
+  }
+
+  .mat-mdc-icon-button {
+    --mdc-icon-button-state-layer-size: 40px;
+  }
+}
+
+// Grid container
+.grid {
+  background: rgba(128, 128, 128, 0.05);
+}
+
+// Animation pulse for active output
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.cell.output-active {
+  animation: pulse 0.8s ease-in-out infinite;
+}

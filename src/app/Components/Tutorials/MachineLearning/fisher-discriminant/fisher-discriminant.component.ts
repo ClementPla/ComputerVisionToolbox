@@ -1,46 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ECharts } from 'echarts';
+import { cholesky2x2 } from 'src/app/utils/linalg';
 
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
-
-/**
- * Cholesky decomposition of a 2x2 positive-definite matrix
- */
-function cholesky2x2(matrix: number[][]): number[][] {
-  const L: number[][] = [[0, 0], [0, 0]];
-  L[0][0] = Math.sqrt(Math.max(0.0001, matrix[0][0]));
-  L[1][0] = matrix[1][0] / L[0][0];
-  L[1][1] = Math.sqrt(Math.max(0.0001, matrix[1][1] - L[1][0] * L[1][0]));
-  return L;
-}
-
-/**
- * Generate 2D samples from a bivariate Gaussian distribution
- */
-function sampleGaussian2D(
-  n: number,
-  mean: [number, number],
-  covariance: number[][]
-): [number, number][] {
-  const L = cholesky2x2(covariance);
-  const samples: [number, number][] = [];
-
-  for (let i = 0; i < n; i++) {
-    // Box-Muller transform
-    const u1 = Math.random();
-    const u2 = Math.random();
-    const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-    const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
-
-    // Transform: x = mean + L * z
-    const x = mean[0] + L[0][0] * z0;
-    const y = mean[1] + L[1][0] * z0 + L[1][1] * z1;
-    samples.push([x, y]);
-  }
-  return samples;
-}
+import { sampleGaussian2D } from 'src/app/utils/sampling';
 
 /**
  * Compute mean of 2D points
@@ -356,8 +318,8 @@ export class FisherDiscriminantComponent implements OnInit, OnDestroy {
 
   generateData(): void {
     // Generate samples for both classes
-    this.class1Data = sampleGaussian2D(this.nSamplesPerClass, this.mean1, this.covariance1);
-    this.class2Data = sampleGaussian2D(this.nSamplesPerClass, this.mean2, this.covariance2);
+    this.class1Data = sampleGaussian2D(this.nSamplesPerClass, {x: this.mean1[0], y: this.mean1[1]}, this.covariance1).map(p => [p.x, p.y]);
+    this.class2Data = sampleGaussian2D(this.nSamplesPerClass, {x: this.mean2[0], y: this.mean2[1]}, this.covariance2).map(p => [p.x, p.y]);
 
     // Compute optimal directions
     const sampleMean1 = computeMean(this.class1Data);

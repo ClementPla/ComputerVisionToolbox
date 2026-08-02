@@ -2,7 +2,7 @@ import { AfterViewInit, Component } from '@angular/core';
 import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial';
 import { color, ECharts } from 'echarts';
 import { inverse2x2 } from 'src/app/utils/matrix';
-import { sample_randn_2D } from 'src/app/utils/sampling';
+import { sampleGaussian2D } from 'src/app/utils/sampling';
 @Component({
   selector: 'app-bayesian-regression',
   templateUrl: './bayesian-regression.component.html',
@@ -314,7 +314,7 @@ export class BayesianRegressionComponent
       return;
     }
 
-    let sampleLines = sample_randn_2D(
+    let sampleLines = sampleGaussian2D(
       5,
       { x: this.Mn[0], y: this.Mn[1] },
       this.Sn

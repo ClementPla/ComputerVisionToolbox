@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+
+// Canvas styling
+canvas {
+  touch-action: none;
+  user-select: none;
+}
+
+// SVG text styling
+svg text {
+  pointer-events: none;
+  user-select: none;
+}
+
+// Panel styling overrides
+::ng-deep {
+  .mat-expansion-panel {
+    border-radius: 8px !important;
+    
+    .mat-expansion-panel-header {
+      padding: 0 16px;
+    }
+  }
+
+  .mat-button-toggle-group {
+    border-radius: 8px;
+    overflow: hidden;
+    
+    .mat-button-toggle {
+      border: none;
+      
+      .mat-button-toggle-label-content {
+        line-height: 36px;
+        padding: 0 12px;
+      }
+    }
+  }
+
+  .mat-mdc-slider {
+    width: 100%;
+  }
+
+  .mat-mdc-form-field {
+    width: 100%;
+  }
+
+  // Checkbox alignment
+  .mat-mdc-checkbox {
+    .mdc-form-field {
+      align-items: center;
+    }
+  }
+}
+
+// Animation for point appearance
+@keyframes point-appear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+svg circle {
+  animation: point-appear 0.15s ease-out;
+}
+
+// Legend styling
+.legend {
+  backdrop-filter: blur(4px);
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  :host {
+    ::ng-deep {
+      .mat-expansion-panel-header {
+        padding: 0 12px;
+      }
+      
+      .mat-button-toggle-label-content {
+        padding: 0 8px;
+        font-size: 12px;
+      }
+    }
+  }
+}

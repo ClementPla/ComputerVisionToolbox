@@ -1,0 +1,663 @@
+// RNN Tutorial - Dark Theme
+
+:host {
+  display: block;
+  color: #e0e0e0;
+}
+
+// ==================== Variables ====================
+
+$bg-primary: #1a1a1a;
+$bg-secondary: #252525;
+$bg-tertiary: #2d2d2d;
+$bg-elevated: #383838;
+
+$text-primary: #e0e0e0;
+$text-secondary: #a0a0a0;
+$text-muted: #707070;
+
+$accent-blue: #64B5F6;
+$accent-green: #81C784;
+$accent-orange: #FFB74D;
+$accent-red: #E57373;
+$accent-purple: #CE93D8;
+
+$border-color: #404040;
+
+// Gate colors
+$forget-color: #E57373;
+$input-color: #81C784;
+$candidate-color: #64B5F6;
+$output-color: #FFB74D;
+$cell-color: #CE93D8;
+
+// ==================== Layout ====================
+
+.content-container {
+  padding: 16px;
+  min-height: 100%;
+}
+
+.tab-content {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: $text-primary;
+}
+
+// ==================== Diagram Wrapper ====================
+
+.diagram-wrapper {
+  background: $bg-secondary;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  padding: 16px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+// ==================== SVG Common Styles ====================
+
+.rnn-diagram,
+.lstm-diagram,
+.arch-diagram {
+  width: 100%;
+  max-width: 650px;
+  display: block;
+  margin: 0 auto;
+}
+
+svg {
+  // Labels
+  .label {
+    font-family: 'Times New Roman', serif;
+    font-size: 16px;
+    fill: $text-primary;
+    text-anchor: middle;
+  }
+
+  .label.math {
+    font-style: italic;
+  }
+
+  .label-small {
+    font-size: 11px;
+    fill: $text-muted;
+    text-anchor: middle;
+  }
+
+  // Weight boxes
+  .weight-box {
+    fill: $bg-tertiary;
+    stroke: $accent-orange;
+    stroke-width: 2;
+    transition: all 0.2s;
+  }
+
+  .weight-box.hidden-weight {
+    stroke: $accent-blue;
+  }
+
+  .weight-box.input-weight {
+    stroke: $accent-green;
+  }
+
+  .weight-label {
+    font-family: 'Times New Roman', serif;
+    font-size: 14px;
+    fill: $text-primary;
+    text-anchor: middle;
+  }
+
+  // Bias box
+  .bias-box {
+    fill: $bg-tertiary;
+    stroke: $accent-purple;
+    stroke-width: 2;
+  }
+
+  .bias-label {
+    font-family: 'Times New Roman', serif;
+    font-size: 14px;
+    fill: $accent-purple;
+    text-anchor: middle;
+  }
+
+  // Nodes
+  .node-circle {
+    fill: $bg-elevated;
+    stroke: $text-secondary;
+    stroke-width: 2;
+  }
+
+  .node-symbol {
+    font-size: 22px;
+    fill: $text-primary;
+    text-anchor: middle;
+  }
+
+  // Activation
+  .activation-box {
+    fill: $accent-green;
+  }
+
+  .activation-label {
+    font-size: 14px;
+    font-weight: 600;
+    fill: #1a1a1a;
+    text-anchor: middle;
+  }
+
+  // Paths
+  .path-hidden { stroke: $text-muted; }
+  .path-input { stroke: $text-muted; }
+  .path-output { stroke: $text-muted; }
+  .path-bias { stroke: $text-muted; }
+  .connector { stroke: $text-muted; }
+
+  .recurrent-path {
+    stroke: $accent-blue;
+    opacity: 0.4;
+  }
+
+  .branch-point {
+    fill: $text-secondary;
+    &.highlighted { fill: $accent-orange; }
+  }
+
+  // Highlight states
+  .highlighted {
+    .path-hidden { stroke: $accent-blue !important; }
+    .path-input { stroke: $accent-green !important; }
+    .path-output { stroke: $accent-orange !important; }
+    
+    .weight-box {
+      filter: drop-shadow(0 0 6px currentColor);
+    }
+
+    .node-circle {
+      stroke: $accent-blue;
+      filter: drop-shadow(0 0 6px $accent-blue);
+    }
+
+    .activation-box {
+      filter: drop-shadow(0 0 8px $accent-green);
+    }
+
+    .recurrent-path {
+      opacity: 1;
+      stroke-width: 3 !important;
+    }
+  }
+
+  .weight-group.highlighted .weight-box.hidden-weight {
+    filter: drop-shadow(0 0 8px $accent-blue);
+  }
+
+  .weight-group.highlighted .weight-box.input-weight {
+    filter: drop-shadow(0 0 8px $accent-green);
+  }
+}
+
+// ==================== LSTM Specific ====================
+
+.lstm-diagram {
+  .highway-line {
+    stroke: $cell-color;
+    opacity: 0.5;
+  }
+
+  .hidden-line {
+    stroke: $text-secondary;
+  }
+
+  .input-line {
+    stroke: $text-muted;
+  }
+
+  .distribute-line {
+    stroke: $text-muted;
+    opacity: 0.5;
+  }
+
+  .concat-point {
+    fill: $bg-elevated;
+    stroke: $text-secondary;
+    stroke-width: 2;
+  }
+
+  .concat-symbol {
+    font-size: 10px;
+    fill: $text-primary;
+    text-anchor: middle;
+  }
+
+  // Gate boxes
+  .gate-box {
+    stroke-width: 2;
+    transition: all 0.2s;
+
+    &.forget { fill: rgba($forget-color, 0.15); stroke: $forget-color; }
+    &.input { fill: rgba($input-color, 0.15); stroke: $input-color; }
+    &.candidate { fill: rgba($candidate-color, 0.15); stroke: $candidate-color; }
+    &.output { fill: rgba($output-color, 0.15); stroke: $output-color; }
+  }
+
+  .gate-sigma, .gate-tanh {
+    font-size: 16px;
+    font-weight: 600;
+    fill: $text-primary;
+    text-anchor: middle;
+  }
+
+  .gate-name {
+    font-size: 10px;
+    fill: $text-secondary;
+    text-anchor: middle;
+  }
+
+  .gate-conn {
+    stroke: $text-muted;
+  }
+
+  // Operation nodes
+  .op-node {
+    fill: $bg-elevated;
+    stroke: $text-secondary;
+    stroke-width: 2;
+
+    &.add {
+      stroke: $cell-color;
+    }
+  }
+
+  .op-symbol {
+    font-size: 16px;
+    fill: $text-primary;
+    text-anchor: middle;
+  }
+
+  // Tanh box
+  .tanh-box {
+    fill: $accent-green;
+  }
+
+  .tanh-label {
+    font-size: 12px;
+    font-weight: 600;
+    fill: #1a1a1a;
+    text-anchor: middle;
+  }
+
+  .branch-dot {
+    fill: $text-secondary;
+  }
+
+  .cell-branch, .tanh-out {
+    stroke: $text-muted;
+  }
+
+  .hidden-out {
+    stroke: $text-secondary;
+  }
+
+  .output-line {
+    stroke: $accent-orange;
+  }
+
+  // LSTM highlights
+  .cell-highway.highlighted .highway-line {
+    opacity: 1;
+    stroke-width: 7 !important;
+    filter: drop-shadow(0 0 8px $cell-color);
+  }
+
+  .forget-gate.highlighted .gate-box { filter: drop-shadow(0 0 8px $forget-color); }
+  .input-gate.highlighted .gate-box { filter: drop-shadow(0 0 8px $input-color); }
+  .candidate-gate.highlighted .gate-box { filter: drop-shadow(0 0 8px $candidate-color); }
+  .output-gate.highlighted .gate-box { filter: drop-shadow(0 0 8px $output-color); }
+
+  .forget-gate.highlighted .gate-conn,
+  .input-gate.highlighted .gate-conn,
+  .candidate-gate.highlighted .gate-conn,
+  .output-gate.highlighted .gate-conn,
+  .mult-ic.highlighted .gate-conn,
+  .cell-tanh.highlighted .cell-branch,
+  .cell-tanh.highlighted .tanh-out,
+  .final-mult.highlighted .gate-conn {
+    stroke: $text-primary;
+    stroke-width: 3 !important;
+  }
+
+  .hidden-output.highlighted .hidden-out {
+    stroke: $accent-purple;
+    stroke-width: 4 !important;
+  }
+
+  .add-node.highlighted .op-node {
+    filter: drop-shadow(0 0 8px $cell-color);
+  }
+}
+
+// ==================== Formulas Panel ====================
+
+.formulas-panel {
+  margin-bottom: 20px;
+}
+
+.formula-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+  }
+}
+
+.state-formulas {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid $border-color;
+}
+
+.formula-card {
+  flex: 1;
+  padding: 12px 16px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $bg-tertiary;
+    border-color: $accent-blue;
+  }
+
+  &.active {
+    background: rgba($accent-blue, 0.12);
+    border-color: $accent-blue;
+  }
+
+  .formula {
+    font-family: 'Times New Roman', serif;
+    font-size: 17px;
+    color: $text-primary;
+  }
+
+  .formula-note {
+    display: block;
+    font-size: 12px;
+    color: $text-muted;
+    margin-top: 4px;
+  }
+
+  .formula-label {
+    display: block;
+    font-size: 11px;
+    color: $text-secondary;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.gate-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gate-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+
+  &.forget { background: $forget-color; }
+  &.input { background: $input-color; }
+  &.candidate { background: $candidate-color; }
+  &.output { background: $output-color; }
+}
+
+// Hoverable terms in formulas
+.term {
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &.term-hidden:hover,
+  &.term-hidden.highlight {
+    background: rgba($accent-blue, 0.25);
+    color: $accent-blue;
+  }
+
+  &.term-input:hover,
+  &.term-input.highlight {
+    background: rgba($accent-green, 0.25);
+    color: $accent-green;
+  }
+}
+
+// ==================== Explanation Panel ====================
+
+.explanation-panel {
+  background: $bg-secondary;
+  border-radius: 10px;
+  border: 1px solid $border-color;
+  padding: 16px 20px;
+
+  p {
+    margin-bottom: 12px;
+    line-height: 1.6;
+    color: $text-primary;
+
+    &:last-child { margin-bottom: 0; }
+  }
+
+  strong { color: $accent-blue; }
+  em { color: $accent-green; font-style: normal; }
+
+  .hl-forget { color: $forget-color; font-weight: 500; }
+  .hl-input { color: $input-color; font-weight: 500; }
+  .hl-candidate { color: $candidate-color; font-weight: 500; }
+  .hl-output { color: $output-color; font-weight: 500; }
+}
+
+.warning-box {
+  background: rgba($accent-red, 0.1);
+  border-left: 4px solid $accent-red;
+  padding: 12px 16px;
+  border-radius: 0 8px 8px 0;
+  margin-top: 12px;
+
+  strong { color: $accent-red; }
+}
+
+// ==================== Legend Panel ====================
+
+.legend-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: $bg-secondary;
+  border-radius: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: $text-secondary;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: $bg-tertiary;
+  }
+
+  &.gate-legend:hover {
+    background: $bg-tertiary;
+  }
+}
+
+.legend-color {
+  width: 16px;
+  height: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+// ==================== Architecture Tab ====================
+
+.arch-panel {
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+}
+
+.arch-diagram {
+  .rnn-cell {
+    fill: $bg-tertiary;
+    stroke: $accent-blue;
+    stroke-width: 2;
+
+    &.encoder { stroke: $accent-green; }
+    &.decoder { stroke: $accent-orange; }
+    &.forward { stroke: $accent-green; }
+    &.backward { stroke: $accent-purple; }
+    &.layer1 { stroke: $accent-blue; }
+    &.layer2 { stroke: $accent-green; }
+    &.layer3 { stroke: $accent-orange; }
+  }
+
+  .cell-text, .cell-text-sm {
+    fill: $text-primary;
+    text-anchor: middle;
+    font-size: 12px;
+  }
+
+  .cell-text-sm { font-size: 10px; }
+
+  .io-text {
+    fill: $text-secondary;
+    font-family: 'Times New Roman', serif;
+    font-size: 13px;
+    text-anchor: middle;
+  }
+
+  .output-text {
+    fill: $accent-orange;
+    font-weight: 600;
+  }
+
+  .section-label {
+    fill: $text-secondary;
+    font-size: 14px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
+
+  .layer-label {
+    fill: $text-muted;
+    font-size: 12px;
+  }
+
+  .context-text {
+    fill: $accent-orange;
+    font-size: 12px;
+    text-anchor: middle;
+  }
+
+  .concat-node {
+    fill: $bg-elevated;
+    stroke: $accent-purple;
+    stroke-width: 2;
+  }
+
+  .concat-symbol {
+    fill: $accent-purple;
+    font-size: 12px;
+    text-anchor: middle;
+  }
+}
+
+.arch-desc {
+  background: $bg-secondary;
+  border-radius: 10px;
+  border: 1px solid $border-color;
+  padding: 16px;
+
+  p {
+    margin-bottom: 8px;
+    color: $text-primary;
+    line-height: 1.5;
+
+    &:last-child { margin-bottom: 0; }
+
+    strong { color: $accent-blue; }
+  }
+}
+
+// ==================== Info Cards (Right Drawer) ====================
+
+.info-card {
+  background: $bg-secondary;
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid $border-color;
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: $text-primary;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
+
+    li {
+      font-size: 13px;
+      color: $text-secondary;
+      margin-bottom: 4px;
+    }
+  }
+
+  p {
+    font-size: 13px;
+    color: $text-secondary;
+    margin: 0;
+    line-height: 1.5;
+
+    em {
+      color: $accent-green;
+      font-style: normal;
+    }
+  }
+
+  .info-note {
+    margin-top: 8px;
+    font-size: 12px;
+    color: $text-muted;
+  }
+}

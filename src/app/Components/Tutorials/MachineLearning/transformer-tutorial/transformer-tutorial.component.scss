@@ -1,0 +1,400 @@
+// Transformer Tutorial Styles
+
+:host {
+  display: block;
+}
+
+// ==================== Tokens ====================
+
+.tokens-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  min-height: 60px;
+}
+
+.token-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  font-weight: 500;
+  min-width: 50px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &.token-selected {
+    outline: 3px solid #FFD700;
+    outline-offset: 2px;
+    transform: translateY(-2px);
+  }
+
+  &.token-hovered {
+    transform: scale(1.05);
+  }
+
+  &.token-special {
+    font-weight: 700;
+  }
+
+  &.token-register {
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+  }
+
+  .token-text {
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .token-position {
+    font-size: 10px;
+    opacity: 0.8;
+    margin-top: 2px;
+  }
+}
+
+// ==================== Embeddings ====================
+
+.embeddings-container {
+  background: #fafafa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.embeddings-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: #e0e0e0;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.embedding-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+
+  &.selected {
+    background-color: #fff3e0;
+  }
+
+  .token-label {
+    width: 70px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .embedding-bars {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 1px;
+    height: 40px;
+    margin-left: 16px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 4px;
+
+    .embedding-bar {
+      flex: 1;
+      min-width: 2px;
+      max-width: 8px;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.3s ease;
+    }
+  }
+}
+
+// ==================== Attention ====================
+
+.attention-matrix-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.attention-canvas {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.attention-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+
+  .legend-gradient {
+    width: 100px;
+    height: 12px;
+    background: linear-gradient(to right, #f7fbff, #08306b);
+    border-radius: 2px;
+  }
+}
+
+.attention-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.attention-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .attention-bar-label {
+    width: 60px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .attention-bar-track {
+    flex: 1;
+    height: 20px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .attention-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #8BC34A);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+  }
+
+  .attention-bar-value {
+    width: 50px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    text-align: right;
+  }
+}
+
+// ==================== Multi-Head ====================
+
+.heads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.head-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #2196F3;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+  }
+
+  &.head-selected {
+    border-color: #1976D2;
+    background: #E3F2FD;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  }
+
+  .head-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  .head-mini-matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 4px;
+    background: #f5f5f5;
+    border-radius: 4px;
+
+    .mini-row {
+      display: flex;
+      gap: 1px;
+
+      .mini-cell {
+        width: 8px;
+        height: 8px;
+        border-radius: 1px;
+      }
+    }
+  }
+}
+
+.selected-head-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+// ==================== Image ====================
+
+.image-container {
+  position: relative;
+  display: inline-block;
+
+  .image-canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  .patch-overlay {
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+}
+
+// ==================== Explanation Box ====================
+
+.explanation-box {
+  border-left: 4px solid #2196F3;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: '💡';
+    }
+  }
+
+  ul {
+    margin-top: 8px;
+  }
+}
+
+// ==================== Stats ====================
+
+.stat-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+
+  .stat-label {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1976D2;
+  }
+}
+
+// ==================== Token Type Legend ====================
+
+.token-type-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+  }
+}
+
+// ==================== Selected Token Info ====================
+
+.selected-token-info {
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  font-size: 13px;
+
+  p {
+    margin: 4px 0;
+  }
+}
+
+// ==================== Step Container ====================
+
+.step-container {
+  min-height: 500px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ==================== Input Box ====================
+
+.input-box {
+  font-family: 'Georgia', serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #333;
+}

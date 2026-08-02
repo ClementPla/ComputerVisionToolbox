@@ -1,0 +1,372 @@
+<app-tutorial-template
+  [rightDrawer]="true"
+  [leftDrawer]="true"
+  [tutorial]="false"
+>
+  <!-- LEFT DRAWER: Controls -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-2">
+
+      <!-- Normalization Type -->
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-sm">Normalization Type</label>
+        <mat-button-toggle-group
+          [(ngModel)]="normType"
+          (ngModelChange)="onNormTypeChangeWithImages()"
+          class="flex-wrap"
+        >
+          <mat-button-toggle value="batch">BatchNorm</mat-button-toggle>
+          <mat-button-toggle value="layer">LayerNorm</mat-button-toggle>
+          <mat-button-toggle value="instance">InstanceNorm</mat-button-toggle>
+          <mat-button-toggle value="group">GroupNorm</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <!-- Mode Toggle (Train/Inference) -->
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-sm">Mode</label>
+        <mat-button-toggle-group
+          [(ngModel)]="mode"
+          (ngModelChange)="onModeChange()"
+        >
+          <mat-button-toggle value="train">
+            <mat-icon class="mr-1" style="font-size: 18px;">school</mat-icon>
+            Training
+          </mat-button-toggle>
+          <mat-button-toggle value="inference">
+            <mat-icon class="mr-1" style="font-size: 18px;">play_arrow</mat-icon>
+            Inference
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <!-- Tensor Dimensions -->
+      <mat-expansion-panel class="shadow-lg" expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="font-bold text-xs tracking-widest uppercase">
+            Tensor Shape
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="flex flex-col gap-4 py-3">
+          <!-- Batch Size -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="text-sm">Batch Size (B)</label>
+              <span class="font-mono text-xs">{{ batchSize }}</span>
+            </div>
+            <mat-slider min="2" max="6" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="batchSize" (ngModelChange)="onDimensionChange()" />
+            </mat-slider>
+          </div>
+
+          <!-- Channels -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="text-sm">Channels (C)</label>
+              <span class="font-mono text-xs">{{ channels }}</span>
+            </div>
+            <mat-slider min="2" max="8" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="channels" (ngModelChange)="onDimensionChange()" />
+            </mat-slider>
+          </div>
+
+          <!-- Spatial -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="text-sm">Spatial (N = H×W)</label>
+              <span class="font-mono text-xs">{{ spatialSize }}</span>
+            </div>
+            <mat-slider min="2" max="6" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="spatialSize" (ngModelChange)="onDimensionChange()" />
+            </mat-slider>
+          </div>
+
+          <!-- Group Size (for GroupNorm) -->
+          @if (normType === 'group') {
+            <div class="flex flex-col">
+              <div class="flex justify-between mb-1">
+                <label class="text-sm">Group Size</label>
+                <span class="font-mono text-xs">{{ groupSize }}</span>
+              </div>
+              <mat-slider min="1" [max]="channels" step="1" class="w-full">
+                <input matSliderThumb [(ngModel)]="groupSize" (ngModelChange)="onNormTypeChange()" />
+              </mat-slider>
+            </div>
+          }
+
+          <div class="font-mono opacity-60 text-xs">
+            Total: {{ batchSize }} × {{ channels }} × {{ spatialSize }} = {{ batchSize * channels * spatialSize }} elements
+          </div>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Selected Element -->
+      <mat-expansion-panel class="shadow-lg">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="font-bold text-xs tracking-widest uppercase">
+            Selected Element
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="flex flex-col gap-4 py-3">
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="text-sm">Batch (b)</label>
+              <span class="font-mono text-xs">{{ selectedB }}</span>
+            </div>
+            <mat-slider min="0" [max]="batchSize - 1" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="selectedB" (ngModelChange)="onSelectionChange()" />
+            </mat-slider>
+          </div>
+
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="text-sm">Channel (c)</label>
+              <span class="font-mono text-xs">{{ selectedC }}</span>
+            </div>
+            <mat-slider min="0" [max]="channels - 1" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="selectedC" (ngModelChange)="onSelectionChange()" />
+            </mat-slider>
+          </div>
+
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="text-sm">Spatial (n)</label>
+              <span class="font-mono text-xs">{{ selectedN }}</span>
+            </div>
+            <mat-slider min="0" [max]="spatialSize - 1" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="selectedN" (ngModelChange)="onSelectionChange()" />
+            </mat-slider>
+          </div>
+
+          <div class="opacity-60 text-xs">
+            Click on a cube in the 3D view to select it.
+          </div>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Legend -->
+      <div class="border p-3 rounded-lg">
+        <h4 class="font-bold mb-2 text-sm">Legend</h4>
+        <div class="flex flex-col gap-2 text-xs">
+          <div class="flex gap-2 items-center">
+            <div class="h-4 rounded w-4" style="background: #fbbf24;"></div>
+            <span>Selected element x[b,c,n]</span>
+          </div>
+          <div class="flex gap-2 items-center">
+            <div class="h-4 rounded w-4" style="background: #3b82f6;"></div>
+            <span>Used for μ, σ² calculation</span>
+          </div>
+          @if (normType === 'batch' && mode === 'inference') {
+            <div class="flex gap-2 items-center">
+              <div class="h-4 rounded w-4" style="background: #22c55e;"></div>
+              <span>Running statistics (pre-computed)</span>
+            </div>
+          }
+          <div class="flex gap-2 items-center">
+            <div class="h-4 opacity-30 rounded w-4" style="background: #64748b;"></div>
+            <span>Not in normalization group</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- CENTER: 3D Visualization or Images -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col gap-4 items-center">
+      
+      <!-- View Mode Toggle -->
+      <mat-button-toggle-group
+        [(ngModel)]="viewMode"
+        (ngModelChange)="onViewModeChange()"
+      >
+        <mat-button-toggle value="cubes">
+          <mat-icon class="mr-1" style="font-size: 18px;">view_in_ar</mat-icon>
+          3D Cubes
+        </mat-button-toggle>
+        <mat-button-toggle value="images">
+          <mat-icon class="mr-1" style="font-size: 18px;">image</mat-icon>
+          Real Images
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- 3D Canvas (always present, hidden in images mode) -->
+      <div 
+        #canvasContainer 
+        class="border overflow-hidden rounded-lg"
+        style="width: 500px; height: 400px;"
+        [style.display]="viewMode === 'cubes' ? 'block' : 'none'"
+      ></div>
+
+      <!-- Image Canvas (Images mode) -->
+      @if (viewMode === 'images') {
+        <div class="flex flex-col gap-3">
+          <!-- Image controls -->
+          <div class="flex gap-4 items-center justify-center">
+            <mat-checkbox 
+              [(ngModel)]="showNormalized" 
+              (ngModelChange)="onImageSettingsChange()"
+              color="primary"
+            >
+              Show normalized
+            </mat-checkbox>
+            <mat-checkbox 
+              [(ngModel)]="showChannelSeparation" 
+              (ngModelChange)="onImageSettingsChange()"
+              color="primary"
+            >
+              Show R/G/B channels
+            </mat-checkbox>
+            <button mat-stroked-button (click)="regenerateImages()">
+              <mat-icon>refresh</mat-icon>
+              Regenerate
+            </button>
+          </div>
+          
+          <!-- Image canvas -->
+          <canvas 
+            #imageCanvas 
+            class="border rounded-lg"
+          ></canvas>
+          
+          <!-- Image mode explanation -->
+          <div class="max-w-lg opacity-60 text-center text-xs">
+            @switch (normType) {
+              @case ('batch') {
+                <p><strong>BatchNorm:</strong> Each channel (R, G, B) is normalized using statistics computed across ALL images in the batch. Notice how the same channel looks similar across images after normalization.</p>
+              }
+              @case ('layer') {
+                <p><strong>LayerNorm:</strong> Each image is normalized independently across all its channels. The relative color relationships within each image are preserved.</p>
+              }
+              @case ('instance') {
+                <p><strong>InstanceNorm:</strong> Each (image, channel) pair is normalized separately. This removes per-channel style information - popular in style transfer.</p>
+              }
+              @case ('group') {
+                <p><strong>GroupNorm:</strong> Channels are grouped (here R+G together, B separate) and normalized per group per image. A middle ground between Layer and Instance norm.</p>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Info Panel -->
+      <div class="border max-w-lg p-4 rounded-lg w-full">
+        <div class="flex gap-2 items-center mb-2">
+          <span class="font-bold text-lg">
+            @switch (normType) {
+              @case ('batch') { BatchNorm }
+              @case ('layer') { LayerNorm }
+              @case ('instance') { InstanceNorm }
+              @case ('group') { GroupNorm }
+            }
+          </span>
+          <span class="font-mono opacity-70 px-2 py-0.5 rounded text-xs">
+            {{ getNormFormula() }}
+          </span>
+        </div>
+        
+        <p class="opacity-80 text-sm">{{ getNormDescription() }}</p>
+        
+        <div class="mt-3 p-2 rounded text-sm" 
+             [class]="normType === 'batch' ? 'border-l-4 border-amber-500' : ''">
+          <p>{{ getTrainInferenceNote() }}</p>
+        </div>
+
+        <div class="mt-3 opacity-60 text-xs">
+          Elements used for normalization: <strong>{{ getElementCount() }}</strong>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- RIGHT DRAWER: Theory -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="max-w-80 p-4">
+      <h3 class="font-bold mb-4 text-lg">Normalization Layers</h3>
+
+      <div class="space-y-4 text-sm">
+        <div>
+          <h4 class="font-semibold">General Formula</h4>
+          <div class="border font-mono mt-2 opacity-80 p-2 rounded text-xs">
+            <p>y = γ × (x - μ) / √(σ² + ε) + β</p>
+            <p class="mt-2 opacity-60">
+              γ, β = learnable parameters<br>
+              μ, σ² = computed statistics<br>
+              ε = small constant
+            </p>
+          </div>
+        </div>
+
+        <hr class="opacity-20" />
+
+        <div>
+          <h4 class="font-semibold">BatchNorm</h4>
+          <p class="mt-1 opacity-80">
+            Computes μ, σ² over batch and spatial dims <strong>per channel</strong>.
+          </p>
+          <p class="mt-1 opacity-60 text-xs">
+            ⚠️ Behavior differs at train/inference time!
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">LayerNorm</h4>
+          <p class="mt-1 opacity-80">
+            Computes μ, σ² over channels and spatial dims <strong>per sample</strong>.
+          </p>
+          <p class="mt-1 opacity-60 text-xs">
+            Popular in Transformers. Independent of batch size.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">InstanceNorm</h4>
+          <p class="mt-1 opacity-80">
+            Computes μ, σ² over spatial dims only, <strong>per (sample, channel)</strong>.
+          </p>
+          <p class="mt-1 opacity-60 text-xs">
+            Popular in style transfer. Removes style information.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">GroupNorm</h4>
+          <p class="mt-1 opacity-80">
+            Like LayerNorm but divides channels into groups.
+          </p>
+          <p class="mt-1 opacity-60 text-xs">
+            Works well with small batch sizes.
+          </p>
+        </div>
+
+        <hr class="opacity-20" />
+
+        <div>
+          <h4 class="font-semibold">When to Use</h4>
+          <ul class="list-disc list-inside mt-2 opacity-80 space-y-1 text-xs">
+            <li><strong>BatchNorm:</strong> CNNs, large batches</li>
+            <li><strong>LayerNorm:</strong> Transformers, RNNs</li>
+            <li><strong>InstanceNorm:</strong> Style transfer</li>
+            <li><strong>GroupNorm:</strong> Small batches, detection</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Train vs Inference</h4>
+          <p class="mt-1 opacity-80 text-xs">
+            Only <strong>BatchNorm</strong> behaves differently:
+          </p>
+          <ul class="list-disc list-inside mt-1 opacity-70 text-xs">
+            <li>Train: batch statistics</li>
+            <li>Inference: running mean/var</li>
+          </ul>
+          <p class="mt-1 opacity-60 text-xs">
+            Other norms are identical in both modes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>

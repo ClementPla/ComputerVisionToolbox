@@ -1,114 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ECharts } from 'echarts';
+import { choleskyDecomposition, matVecMul, eigenDecomposition3x3 } from 'src/app/utils/linalg';
+import { sampleGaussian3D } from 'src/app/utils/sampling';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
-
-/**
- * Cholesky decomposition of a positive-definite matrix
- * Returns lower triangular matrix L such that A = L * L^T
- */
-function choleskyDecomposition(matrix: number[][]): number[][] {
-  const n = matrix.length;
-  const L: number[][] = Array(n).fill(null).map(() => Array(n).fill(0));
-
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j <= i; j++) {
-      let sum = 0;
-      for (let k = 0; k < j; k++) {
-        sum += L[i][k] * L[j][k];
-      }
-      if (i === j) {
-        L[i][j] = Math.sqrt(Math.max(0.0001, matrix[i][i] - sum));
-      } else {
-        L[i][j] = (matrix[i][j] - sum) / L[j][j];
-      }
-    }
-  }
-  return L;
-}
-
-/**
- * Matrix-vector multiplication
- */
-function matVecMul(matrix: number[][], vec: number[]): number[] {
-  return matrix.map(row => row.reduce((sum, val, i) => sum + val * vec[i], 0));
-}
-
-/**
- * Generate 3D samples from a multivariate Gaussian distribution
- */
-function sampleGaussian3D(
-  n: number,
-  mean: number[],
-  covariance: number[][]
-): number[][] {
-  const L = choleskyDecomposition(covariance);
-  const samples: number[][] = [];
-
-  for (let i = 0; i < n; i++) {
-    // Generate standard normal samples using Box-Muller
-    const z: number[] = [];
-    for (let j = 0; j < 3; j++) {
-      const u1 = Math.random();
-      const u2 = Math.random();
-      z.push(Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2));
-    }
-    // Transform: x = mean + L * z
-    const transformed = matVecMul(L, z);
-    samples.push([
-      mean[0] + transformed[0],
-      mean[1] + transformed[1],
-      mean[2] + transformed[2]
-    ]);
-  }
-  return samples;
-}
-
-/**
- * Compute eigenvalues and eigenvectors of a 3x3 symmetric matrix
- * Using power iteration for simplicity (good enough for visualization)
- */
-function eigenDecomposition3x3(matrix: number[][]): { values: number[], vectors: number[][] } {
-  const vectors: number[][] = [];
-  const values: number[] = [];
-  let A = matrix.map(row => [...row]);
-
-  for (let i = 0; i < 3; i++) {
-    // Power iteration
-    let v = [Math.random(), Math.random(), Math.random()];
-    let norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0));
-    v = v.map(x => x / norm);
-
-    for (let iter = 0; iter < 100; iter++) {
-      const Av = matVecMul(A, v);
-      norm = Math.sqrt(Av.reduce((s, x) => s + x * x, 0));
-      if (norm > 0.0001) v = Av.map(x => x / norm);
-    }
-
-    const Av = matVecMul(A, v);
-    const eigenvalue = v.reduce((s, x, j) => s + x * Av[j], 0);
-    
-    values.push(eigenvalue);
-    vectors.push(v);
-
-    // Deflate matrix
-    for (let j = 0; j < 3; j++) {
-      for (let k = 0; k < 3; k++) {
-        A[j][k] -= eigenvalue * v[j] * v[k];
-      }
-    }
-  }
-
-  // Sort by eigenvalue descending
-  const indices = [0, 1, 2].sort((a, b) => values[b] - values[a]);
-  return {
-    values: indices.map(i => values[i]),
-    vectors: indices.map(i => vectors[i])
-  };
-}
 
 /**
  * Generate ellipsoid wireframe lines (latitude and longitude)

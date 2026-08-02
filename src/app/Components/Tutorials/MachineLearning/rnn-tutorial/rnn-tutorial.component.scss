@@ -1,0 +1,539 @@
+// RNN Tutorial Styles - Dark Theme
+
+:host {
+  display: block;
+  color: #e0e0e0;
+}
+
+// ==================== Color Variables ====================
+
+$bg-primary: #1e1e1e;
+$bg-secondary: #2d2d2d;
+$bg-tertiary: #383838;
+$bg-elevated: #424242;
+
+$text-primary: #e0e0e0;
+$text-secondary: #a0a0a0;
+$text-muted: #757575;
+
+$accent-primary: #64B5F6;
+$accent-secondary: #81C784;
+$accent-highlight: #FFD54F;
+
+$positive-color: #81C784;
+$negative-color: #E57373;
+$cell-positive: #64B5F6;
+$cell-negative: #FFB74D;
+
+$border-color: #444;
+
+// ==================== Sequence Tokens ====================
+
+.sequence-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.sequence-label {
+  font-weight: 600;
+  color: $text-secondary;
+  min-width: 50px;
+}
+
+.tokens-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sequence-token {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px;
+  background: $bg-tertiary;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 40px;
+  border: 2px solid transparent;
+  color: $text-primary;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background: $bg-elevated;
+  }
+
+  &.token-active {
+    background: #2E7D32;
+    color: white;
+  }
+
+  &.token-current {
+    background: #1565C0;
+    color: white;
+    border-color: $accent-highlight;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.5);
+  }
+
+  &.token-hovered {
+    border-color: $accent-primary;
+  }
+
+  &.small {
+    padding: 4px 8px;
+    min-width: 30px;
+
+    .token-char {
+      font-size: 14px;
+    }
+
+    .token-index {
+      display: none;
+    }
+  }
+
+  .token-char {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: monospace;
+  }
+
+  .token-index {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+}
+
+// ==================== Unrolled Network ====================
+
+.unrolled-container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 20px 10px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.unrolled-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &.cell-active {
+    .cell-body {
+      background: #2E7D32;
+      color: white;
+    }
+  }
+
+  &.cell-current {
+    .cell-body {
+      background: #1565C0;
+      color: white;
+      box-shadow: 0 4px 12px rgba(21, 101, 192, 0.5);
+    }
+  }
+
+  .cell-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .input-label {
+      font-family: monospace;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 4px 8px;
+      background: #1A237E;
+      color: #90CAF9;
+      border-radius: 4px;
+    }
+
+    .input-arrow {
+      color: $text-secondary;
+      font-size: 20px;
+    }
+  }
+
+  .cell-body {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $bg-elevated;
+    border-radius: 8px;
+    color: $text-primary;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.3s;
+    border: 1px solid $border-color;
+
+    &.lstm-cell {
+      background: #6A1B9A;
+    }
+
+    &.gru-cell {
+      background: #00695C;
+    }
+  }
+
+  .hidden-arrow {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: $text-secondary;
+    white-space: nowrap;
+  }
+
+  .cell-output {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .output-arrow {
+      color: $text-secondary;
+      font-size: 20px;
+    }
+
+    .output-label {
+      font-size: 12px;
+      color: $text-secondary;
+    }
+  }
+}
+
+// ==================== Canvas Containers ====================
+
+.canvas-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+  overflow-x: auto;
+}
+
+.state-canvas {
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  background: $bg-primary;
+}
+
+.gates-canvas {
+  background: $bg-primary;
+  border-radius: 8px;
+}
+
+// ==================== Embedding/Hidden Bars ====================
+
+.embedding-bars,
+.hidden-bars,
+.cell-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 50px;
+  padding: 8px;
+  background: $bg-tertiary;
+  border-radius: 4px;
+  border: 1px solid $border-color;
+}
+
+.embedding-bar-container,
+.hidden-bar-container,
+.cell-bar-container {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+}
+
+.embedding-bar,
+.hidden-bar,
+.cell-bar {
+  width: 100%;
+  max-width: 12px;
+  min-width: 4px;
+  border-radius: 2px 2px 0 0;
+  transition: height 0.3s ease;
+}
+
+.current-embedding {
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+// ==================== Gates ====================
+
+.gates-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.gates-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.gate-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+
+  .gate-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .gate-info {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    color: $text-primary;
+
+    strong {
+      margin-bottom: 2px;
+    }
+
+    .gate-value {
+      font-family: monospace;
+      color: $text-secondary;
+      margin-top: 4px;
+    }
+  }
+}
+
+// ==================== Stats ====================
+
+.stat-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: $bg-secondary;
+  border-radius: 6px;
+  border: 1px solid $border-color;
+
+  .stat-label {
+    font-size: 12px;
+    color: $text-secondary;
+  }
+
+  .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: $accent-primary;
+  }
+}
+
+// ==================== Model Comparison ====================
+
+.model-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.model-row {
+  padding: 12px;
+  background: $bg-secondary;
+  border-radius: 6px;
+  border-left: 4px solid transparent;
+  transition: all 0.2s;
+  border: 1px solid $border-color;
+
+  &.active {
+    background: #1A237E;
+    border-left-color: $accent-primary;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+    color: $text-primary;
+  }
+
+  span {
+    font-size: 12px;
+    color: $text-secondary;
+  }
+}
+
+// ==================== Current Token Info ====================
+
+.current-token-info {
+  padding: 12px;
+  background: $bg-secondary;
+  border-radius: 6px;
+  font-size: 13px;
+  border: 1px solid $border-color;
+
+  p {
+    margin: 4px 0;
+    color: $text-primary;
+  }
+}
+
+// ==================== Explanation Box ====================
+
+.explanation-box {
+  border-left: 4px solid $accent-primary;
+  background: rgba(33, 150, 243, 0.1) !important;
+  border: 1px solid rgba(33, 150, 243, 0.3);
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $accent-primary;
+
+    &::before {
+      content: '💡';
+    }
+  }
+
+  p {
+    color: $text-primary;
+  }
+
+  code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #90CAF9;
+  }
+
+  .text-green-700 {
+    color: $positive-color !important;
+  }
+
+  .text-red-700 {
+    color: $negative-color !important;
+  }
+}
+
+.formula-box {
+  background: $bg-secondary !important;
+  border: 1px solid $border-color;
+
+  code {
+    font-family: 'Times New Roman', serif;
+    font-size: 18px;
+    color: $text-primary;
+  }
+
+  p {
+    color: $text-secondary !important;
+  }
+}
+
+// ==================== Step Container ====================
+
+.step-container {
+  min-height: 400px;
+  animation: fadeIn 0.3s ease;
+
+  h2 {
+    color: $text-primary;
+  }
+
+  h3 {
+    color: $text-primary;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ==================== Hidden Details ====================
+
+.hidden-details,
+.cell-details {
+  padding: 16px;
+  background: $bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+
+  h3 {
+    color: $text-primary;
+  }
+}
+
+// ==================== Override Material Colors ====================
+
+::ng-deep {
+  .mat-mdc-form-field {
+    .mdc-text-field {
+      background-color: $bg-secondary !important;
+    }
+  }
+
+  .mat-button-toggle-group {
+    background: $bg-secondary;
+    border: 1px solid $border-color;
+  }
+
+  .mat-button-toggle {
+    background: transparent;
+    color: $text-secondary;
+
+    &.mat-button-toggle-checked {
+      background: $accent-primary;
+      color: #000;
+    }
+  }
+
+  .mat-mdc-slider {
+    --mdc-slider-active-track-color: #{$accent-primary};
+    --mdc-slider-handle-color: #{$accent-primary};
+    --mdc-slider-inactive-track-color: #{$bg-tertiary};
+  }
+}

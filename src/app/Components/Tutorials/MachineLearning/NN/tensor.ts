@@ -1,5 +1,4 @@
-import { start } from 'repl';
-import { argmax, matmul, strassen_matmul } from './math';
+import { argmax, matmul } from './math';
 
 export class Tensor {
   data: number[];

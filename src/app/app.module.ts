@@ -68,6 +68,19 @@ import { AutoencoderComponent } from './Components/Tutorials/MachineLearning/aut
 import { GaussianComponent } from './Components/Tutorials/Probability/gaussian/gaussian.component';
 import { HoughTransformComponent } from './Components/Tutorials/Images/hough-transform/hough-transform.component';
 import { FisherDiscriminantComponent } from './Components/Tutorials/MachineLearning/fisher-discriminant/fisher-discriminant.component';
+import { LinearClassifierComponent } from './Components/Tutorials/MachineLearning/linear-classifier/linear-classifier.component';
+import { DecisionTree3dComponent } from './Components/Tutorials/MachineLearning/decision-tree3d/decision-tree3d.component';
+import { SVMClassifierComponent } from './Components/Tutorials/MachineLearning/svmclassifier/svmclassifier.component';
+import { OptimizerComparisonComponent } from './Components/Tutorials/MachineLearning/optimizer-comparison/optimizer-comparison.component';
+import { ConvolutionTutorialComponent } from './Components/Tutorials/MachineLearning/convolution-tutorial/convolution-tutorial.component';
+import { ReceptiveFieldTutorialComponent } from './Components/Tutorials/MachineLearning/receptive-field-tutorial/receptive-field-tutorial.component';
+import { NormalizationTutorialComponent } from './Components/Tutorials/MachineLearning/normalization-tutorial/normalization-tutorial.component';
+import { KMeansTutorialComponent } from './Components/Tutorials/MachineLearning/kmeans-tutorial/kmeans-tutorial.component';
+import { TransformerTutorialComponent } from './Components/Tutorials/MachineLearning/transformer-tutorial/transformer-tutorial.component';
+import { RnnTutorialComponent } from './Components/Tutorials/MachineLearning/rnn-tutorial/rnn-tutorial.component';
+import { RNNCellTutorialComponent } from './Components/Tutorials/MachineLearning/rnncell-tutorial/rnncell-tutorial.component';
+import { AutoregressiveTutorialComponent } from './Components/Tutorials/MachineLearning/autoregressive-tutorial/autoregressive-tutorial.component';
+import { DensityEstimationComponent } from './Components/Tutorials/MachineLearning/density-estimation/density-estimation.component';
 echarts.use([BarChart, GridComponent, CanvasRenderer]);
 
 @NgModule({
@@ -104,6 +117,19 @@ echarts.use([BarChart, GridComponent, CanvasRenderer]);
     GaussianComponent,
     HoughTransformComponent,
     FisherDiscriminantComponent,
+    LinearClassifierComponent,
+    DecisionTree3dComponent,
+    SVMClassifierComponent,
+    OptimizerComparisonComponent,
+    ConvolutionTutorialComponent,
+    ReceptiveFieldTutorialComponent,
+    NormalizationTutorialComponent,
+    KMeansTutorialComponent,
+    TransformerTutorialComponent,
+    RnnTutorialComponent,
+    RNNCellTutorialComponent,
+    AutoregressiveTutorialComponent,
+    DensityEstimationComponent,
   ],
   imports: [
     NgxEchartsModule.forRoot({

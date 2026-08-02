@@ -1,0 +1,431 @@
+<app-tutorial-template [rightDrawer]="true">
+  <!-- Left Drawer: Controls -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4">
+      <!-- Tab Selection -->
+      <span class="font-semibold">Topic</span>
+      <mat-button-toggle-group
+        [value]="currentTab"
+        (change)="setTab($event.value)"
+        class="w-full"
+        vertical
+      >
+        <mat-button-toggle value="concept" class="w-full">Autoregressive Concept</mat-button-toggle>
+        <mat-button-toggle value="transformer" class="w-full">Transformer (Masked)</mat-button-toggle>
+        <mat-button-toggle value="rnn" class="w-full">RNN (Sequential)</mat-button-toggle>
+        <mat-button-toggle value="comparison" class="w-full">Training vs Inference</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-divider></mat-divider>
+
+      <!-- Phase selection for comparison tab -->
+      <ng-container *ngIf="currentTab === 'comparison'">
+        <span class="font-semibold">Phase</span>
+        <mat-button-toggle-group
+          [value]="currentPhase"
+          (change)="setPhase($event.value)"
+          class="w-full"
+        >
+          <mat-button-toggle value="training" class="flex-1">Training</mat-button-toggle>
+          <mat-button-toggle value="inference" class="flex-1">Inference</mat-button-toggle>
+        </mat-button-toggle-group>
+      </ng-container>
+
+      <!-- Animation controls for inference -->
+      <ng-container *ngIf="currentTab === 'comparison' && currentPhase === 'inference'">
+        <mat-divider></mat-divider>
+        <span class="font-semibold">Generation Step: {{ currentStep }} / {{ maxSteps }}</span>
+        <div class="flex gap-2">
+          <button mat-icon-button (click)="stepBackward()" [disabled]="currentStep === 0">
+            <mat-icon>skip_previous</mat-icon>
+          </button>
+          <button mat-icon-button (click)="toggleAnimation()">
+            <mat-icon>{{ isAnimating ? 'pause' : 'play_arrow' }}</mat-icon>
+          </button>
+          <button mat-icon-button (click)="stepForward()" [disabled]="currentStep >= maxSteps">
+            <mat-icon>skip_next</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Attention mask legend -->
+      <ng-container *ngIf="currentTab === 'transformer'">
+        <mat-divider></mat-divider>
+        <span class="font-semibold">Causal Mask</span>
+        <div class="legend-panel">
+          <div class="legend-item">
+            <div class="allowed legend-color"></div>
+            <span>Can attend (≤ current pos)</span>
+          </div>
+          <div class="legend-item">
+            <div class="blocked legend-color"></div>
+            <span>Blocked (future tokens)</span>
+          </div>
+        </div>
+        <p class="mt-2 text-secondary text-sm">
+          Hover over matrix rows to see which positions each token can attend to.
+        </p>
+      </ng-container>
+    </div>
+  </ng-container>
+
+  <!-- Center Content -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="content-container">
+
+      <!-- ==================== Concept Tab ==================== -->
+      <div class="tab-content" *ngIf="currentTab === 'concept'">
+        <h2 class="section-title">Autoregressive Language Modeling</h2>
+
+        <!-- Formula as HTML -->
+        <div class="formula-panel">
+          <div class="formula-title">Joint Probability Decomposition</div>
+          <div class="formula-main">
+            P(x<sub>1:T</sub>) = <span class="product">∏</span><sup>T</sup><sub style="margin-left:-8px">t=1</sub> P(x<sub>t</sub> | x<sub>&lt;t</sub>)
+          </div>
+        </div>
+
+        <!-- Token sequence diagram using HTML -->
+        <div class="sequence-diagram-panel">
+          <div class="token-row">
+            <div class="token-box" *ngFor="let token of sampleTokens; let i = index"
+                 [class.highlighted]="highlightToken === i"
+                 (mouseenter)="onTokenHover(i)" 
+                 (mouseleave)="onTokenHover(null)">
+              {{ token }}
+            </div>
+          </div>
+          
+          <div class="arrow-row">
+            <div class="arrow-cell" *ngFor="let i of [0,1,2,3,4]">
+              <span class="arrow">→</span>
+              <span class="prediction">{{ samplePredictions[i] }}</span>
+            </div>
+          </div>
+          
+          <p class="diagram-caption">Each token predicts the next. Every prediction depends on ALL previous tokens.</p>
+        </div>
+
+        <!-- Key points -->
+        <div class="info-grid">
+          <div class="info-box">
+            <h4>🎯 Objective</h4>
+            <p>Predict the <strong>next token</strong> given all previous tokens. The model learns P(x<sub>t</sub> | x<sub>&lt;t</sub>).</p>
+          </div>
+          <div class="info-box">
+            <h4>🔗 Chain Rule</h4>
+            <p>Joint probability factorizes left-to-right. This is the foundation of GPT, LLaMA, and all decoder-only models.</p>
+          </div>
+          <div class="info-box">
+            <h4>⚡ Training Signal</h4>
+            <p>Cross-entropy loss at <strong>every position</strong>. One forward pass = T prediction tasks.</p>
+          </div>
+        </div>
+
+        <div class="explanation-panel">
+          <p>
+            <strong>Autoregressive</strong> means the model generates one token at a time, each conditioned on 
+            all previous tokens. This is fundamentally different from models like BERT that see the entire 
+            sequence at once (bidirectional).
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== Transformer Tab ==================== -->
+      <div class="tab-content" *ngIf="currentTab === 'transformer'">
+        <h2 class="section-title">Transformer: Causal Masking</h2>
+
+        <div class="diagram-wrapper">
+          <div class="mask-container">
+            <!-- Attention Matrix -->
+            <div class="matrix-section">
+              <h4>Attention Matrix (with Causal Mask)</h4>
+              <div class="attention-matrix">
+                <!-- Header row (Keys) -->
+                <div class="matrix-header">
+                  <div class="matrix-corner"></div>
+                  <div class="matrix-key" *ngFor="let token of sampleTokens.slice(0,5)">
+                    {{ token }}
+                  </div>
+                </div>
+                
+                <!-- Matrix rows (Queries) -->
+                <div class="matrix-row" *ngFor="let token of sampleTokens.slice(0,5); let i = index"
+                     (mouseenter)="onMaskRowHover(i)"
+                     (mouseleave)="onMaskRowHover(null)"
+                     [class.row-highlighted]="highlightMask === i">
+                  <div class="matrix-query">{{ token }}</div>
+                  <div class="matrix-cell" *ngFor="let _ of sampleTokens.slice(0,5); let j = index"
+                       [class.allowed]="isAttentionAllowed(i, j)"
+                       [class.blocked]="!isAttentionAllowed(i, j)"
+                       [class.cell-highlighted]="highlightMask === i && isAttentionAllowed(i, j)">
+                    <span *ngIf="isAttentionAllowed(i, j)">✓</span>
+                    <span *ngIf="!isAttentionAllowed(i, j)">−∞</span>
+                  </div>
+                </div>
+              </div>
+              <p class="matrix-caption">Query (row) can only attend to Keys (columns) where j ≤ i</p>
+            </div>
+
+            <!-- Visual representation -->
+            <div class="visual-section">
+              <h4>Parallel Processing During Training</h4>
+              <div class="parallel-diagram">
+                <div class="parallel-column" *ngFor="let token of sampleTokens.slice(0,5); let i = index">
+                  <div class="input-token">{{ token }}</div>
+                  <div class="down-arrow">↓</div>
+                  <div class="transformer-block">TF</div>
+                  <div class="down-arrow green">↓</div>
+                  <div class="output-token">{{ samplePredictions[i] }}</div>
+                </div>
+              </div>
+              <p class="parallel-label">All positions computed in parallel</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="explanation-panel">
+          <p>
+            <strong>Transformers use masking</strong> to prevent tokens from "seeing the future" during training. 
+            The attention scores for future positions are set to <code>−∞</code>, which becomes 0 after softmax.
+          </p>
+          <p>
+            This allows <strong>parallel computation</strong> of all positions during training — a huge speedup 
+            compared to RNNs. All T predictions are computed in a single forward pass.
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== RNN Tab ==================== -->
+      <div class="tab-content" *ngIf="currentTab === 'rnn'">
+        <h2 class="section-title">RNN: Inherent Causality</h2>
+
+        <div class="diagram-wrapper">
+          <h4 class="diagram-title">Training with Teacher Forcing</h4>
+          
+          <div class="rnn-diagram">
+            <div class="rnn-column" *ngFor="let token of sampleTokens.slice(0,5); let i = index">
+              <!-- Input -->
+              <div class="rnn-input">{{ token }}</div>
+              <div class="down-arrow">↓</div>
+              
+              <!-- RNN Cell -->
+              <div class="rnn-cell-wrapper">
+                <div class="rnn-cell">RNN</div>
+                <div class="hidden-arrow" *ngIf="i < 4">
+                  <span class="h-label">h</span>
+                  <span class="h-arrow">→</span>
+                </div>
+              </div>
+              
+              <!-- Output -->
+              <div class="down-arrow green">↓</div>
+              <div class="rnn-output">{{ samplePredictions[i] }}</div>
+              <div class="loss-indicator">Loss</div>
+            </div>
+          </div>
+          
+          <div class="teacher-forcing-note">
+            <span class="note-icon">📝</span>
+            <span>Inputs are ground truth tokens, not model predictions</span>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="highlight-orange info-box">
+            <h4>📚 Teacher Forcing</h4>
+            <p>During training, we feed the <strong>ground truth</strong> tokens as input, not the model's own predictions. This stabilizes training.</p>
+          </div>
+          <div class="info-box">
+            <h4>🔄 Sequential Nature</h4>
+            <p>RNN <strong>must</strong> process tokens one-by-one due to hidden state dependency. No parallelization possible within a sequence.</p>
+          </div>
+          <div class="info-box">
+            <h4>🎯 Built-in Causality</h4>
+            <p>No masking needed! The recurrent structure naturally ensures each output only depends on past inputs.</p>
+          </div>
+        </div>
+
+        <div class="explanation-panel">
+          <p>
+            <strong>RNNs are inherently causal</strong> — the hidden state h<sub>t</sub> only contains information 
+            from x<sub>1</sub> to x<sub>t</sub>. No explicit masking is required.
+          </p>
+          <p class="drawback">
+            <strong>Drawback:</strong> Sequential processing means we can't parallelize across time steps. 
+            Training on long sequences is slow compared to Transformers.
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== Comparison Tab ==================== -->
+      <div class="tab-content" *ngIf="currentTab === 'comparison'">
+        <h2 class="section-title">Training vs Inference</h2>
+
+        <!-- Training Phase -->
+        <div class="phase-section" *ngIf="currentPhase === 'training'">
+          <div class="comparison-grid">
+            <!-- Transformer Training -->
+            <div class="comparison-card">
+              <h3>🤖 Transformer Training</h3>
+              <div class="mini-diagram transformer-mini">
+                <div class="mini-column" *ngFor="let i of [0,1,2,3]">
+                  <div class="mini-token"></div>
+                  <div class="mini-arrow">↓</div>
+                  <div class="mini-block tf"></div>
+                  <div class="green mini-arrow">↓</div>
+                </div>
+              </div>
+              <p class="mini-label">All positions in parallel</p>
+              <ul class="feature-list">
+                <li><span class="check">✓</span> Parallel across all T positions</li>
+                <li><span class="check">✓</span> O(1) sequential steps</li>
+                <li><span class="check">✓</span> Efficient GPU utilization</li>
+                <li><span class="warn">⚠</span> Requires causal mask</li>
+              </ul>
+            </div>
+
+            <!-- RNN Training -->
+            <div class="comparison-card">
+              <h3>🔄 RNN Training</h3>
+              <div class="mini-diagram rnn-mini">
+                <div class="mini-column" *ngFor="let i of [0,1,2,3]">
+                  <div class="mini-token"></div>
+                  <div class="mini-arrow">↓</div>
+                  <div class="mini-block rnn">
+                    <span class="mini-h" *ngIf="i < 3">→</span>
+                  </div>
+                  <div class="green mini-arrow">↓</div>
+                </div>
+              </div>
+              <p class="mini-label">Sequential (must wait for h)</p>
+              <ul class="feature-list">
+                <li><span class="cross">✗</span> Sequential: O(T) steps</li>
+                <li><span class="cross">✗</span> Cannot parallelize</li>
+                <li><span class="check">✓</span> No mask needed</li>
+                <li><span class="check">✓</span> Lower memory (no KV cache)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="key-insight">
+            <strong>Key Insight:</strong> During training, Transformers have a massive advantage — they process 
+            all T tokens in parallel. RNNs must go step-by-step even during training.
+          </div>
+        </div>
+
+        <!-- Inference Phase -->
+        <div class="phase-section" *ngIf="currentPhase === 'inference'">
+          <div class="inference-demo">
+            <h3>Sequential Generation (Both Models)</h3>
+            
+            <!-- Current sequence state -->
+            <div class="sequence-display">
+              <div class="token-display" *ngFor="let token of sampleTokens.slice(0, currentStep + 1); let i = index"
+                   [class.current]="i === currentStep">
+                <span class="token">{{ token }}</span>
+                <span class="position">t={{ i }}</span>
+              </div>
+              <div class="generating token-display" *ngIf="currentStep < maxSteps">
+                <span class="token">{{ samplePredictions[currentStep] }}</span>
+                <span class="position">→ next</span>
+              </div>
+            </div>
+
+            <!-- Step explanation -->
+            <div class="step-explanation">
+              <div class="step-box" *ngIf="currentStep === 0">
+                <p><strong>Step 0:</strong> Start with prompt "The"</p>
+                <p class="dim">Model predicts next token...</p>
+              </div>
+              <div class="step-box" *ngIf="currentStep > 0 && currentStep <= maxSteps">
+                <p><strong>Step {{ currentStep }}:</strong> Model predicted "{{ samplePredictions[currentStep - 1] }}"</p>
+                <p class="dim">Append to sequence, predict next...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="comparison-grid inference-grid">
+            <div class="comparison-card">
+              <h3>🤖 Transformer Inference</h3>
+              <ul class="feature-list">
+                <li><span class="warn">⚠</span> Still sequential generation</li>
+                <li><span class="check">✓</span> KV-cache avoids recomputation</li>
+                <li><span class="check">✓</span> Only compute new token's attention</li>
+                <li><span class="check">✓</span> Still parallelizes across batch</li>
+              </ul>
+              <div class="complexity-note">
+                <strong>Complexity:</strong> O(T) generation steps, but each step is O(T) for attention
+              </div>
+            </div>
+
+            <div class="comparison-card">
+              <h3>🔄 RNN Inference</h3>
+              <ul class="feature-list">
+                <li><span class="warn">⚠</span> Same as training: sequential</li>
+                <li><span class="check">✓</span> Constant memory per step</li>
+                <li><span class="check">✓</span> O(1) compute per step</li>
+                <li><span class="cross">✗</span> No parallel across batch easily</li>
+              </ul>
+              <div class="complexity-note">
+                <strong>Complexity:</strong> O(T) steps, O(1) per step (just h update)
+              </div>
+            </div>
+          </div>
+
+          <div class="key-insight">
+            <strong>Key Insight:</strong> During inference, <em>both</em> models are sequential! The Transformer's 
+            training advantage disappears. This is why RNN-style models (Mamba, RWKV) are making a comeback for 
+            long-context inference.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- Right Drawer: Quick Reference -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="flex flex-col gap-4">
+      <h3 class="font-semibold text-lg">Quick Reference</h3>
+
+      <div class="info-card">
+        <h4>Autoregressive</h4>
+        <p class="formula-sm">P(x<sub>t</sub> | x<sub>1</sub>, ..., x<sub>t−1</sub>)</p>
+        <p class="info-note">Each token conditioned on all previous</p>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="info-card" *ngIf="currentTab === 'transformer'">
+        <h4>Causal Mask</h4>
+        <p>Set attention scores to −∞ for positions j > i</p>
+        <p class="info-note">Enforces left-to-right dependency</p>
+      </div>
+
+      <div class="info-card" *ngIf="currentTab === 'rnn'">
+        <h4>Teacher Forcing</h4>
+        <p>Use ground truth as input during training</p>
+        <p class="info-note">Prevents error accumulation</p>
+      </div>
+
+      <div class="info-card" *ngIf="currentTab === 'comparison'">
+        <h4>Training Complexity</h4>
+        <ul>
+          <li><strong>Transformer:</strong> O(T²) compute, O(1) steps</li>
+          <li><strong>RNN:</strong> O(T) compute, O(T) steps</li>
+        </ul>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="info-card">
+        <h4>Models Using This</h4>
+        <ul>
+          <li><strong>Transformer:</strong> GPT, LLaMA, Mistral</li>
+          <li><strong>RNN-style:</strong> Mamba, RWKV, xLSTM</li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>

@@ -1,0 +1,278 @@
+<app-tutorial-template
+  [rightDrawer]="true"
+  [leftDrawer]="true"
+  [tutorial]="false"
+>
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="max-w-96">
+      <mat-button-toggle-group
+        name="ModeChoice"
+        aria-label="Mode Choice"
+        [(ngModel)]="modelChoice"
+        (ngModelChange)="retrainModel()"
+      >
+        <mat-button-toggle [value]="Model.LDA"> LDA </mat-button-toggle>
+        <mat-button-toggle [value]="Model.QDA"> QDA </mat-button-toggle>
+        <mat-button-toggle [value]="Model.LogisticRegression">
+          Logistic Regression
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-button-toggle-group
+        name="ClassChoice"
+        aria-label="Class Choice"
+        [(ngModel)]="classChoice"
+      >
+        <mat-button-toggle
+          [value]="Classes.c1"
+          [class.!bg-blue-600]="classChoice === Classes.c1"
+        >
+          Class 1
+        </mat-button-toggle>
+
+        <mat-button-toggle
+          [value]="Classes.c2"
+          [class.!bg-green-600]="classChoice === Classes.c2"
+        >
+          Class 2
+        </mat-button-toggle>
+
+        <mat-button-toggle
+          [value]="Classes.c3"
+          [class.!bg-red-600]="classChoice === Classes.c3"
+        >
+          Class 3
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      @if (isModelComplex && dataset.points.length > 0) {
+        <div
+          class="animate-bounce bg-amber-50 border-amber-500 border-l-4 bottom-4 fixed p-4 right-4 shadow-xl z-50"
+        >
+          <div class="flex items-center">
+            <mat-icon class="mr-2 text-amber-600">warning</mat-icon>
+            <span class="font-medium text-amber-800 text-sm">
+              Model may overfit. Add more points!
+            </span>
+          </div>
+        </div>
+      }
+
+      <div class="flex flex-col gap-4 p-4">
+        <mat-expansion-panel
+          class="border-emerald-500 border-t-4 max-w-96 shadow-lg"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title
+              class="font-bold text-emerald-700 text-xs tracking-widest uppercase"
+            >
+              1. Feature Projection
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="flex flex-col gap-4 py-3">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Kernel / Projection</mat-label>
+              <mat-select
+                [(ngModel)]="prepConfig.mode"
+                (selectionChange)="retrainModel()"
+              >
+                <mat-option value="None">Linear (None)</mat-option>
+                <mat-option value="Polynomial">Polynomial expansion</mat-option>
+                <mat-option value="RBF-Random">RBF (Random)</mat-option>
+                <mat-option value="RBF-KMeans">RBF (K-Means)</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            @if (prepConfig.mode === "Polynomial") {
+              <div class="px-2">
+                <label class="text-gray-500 text-xs"
+                  >Degree: {{ prepConfig.degree }}</label
+                >
+                <mat-slider min="1" max="5" step="1" class="w-full">
+                  <input
+                    matSliderThumb
+                    [(ngModel)]="prepConfig.degree"
+                    (ngModelChange)="retrainModel()"
+                  />
+                </mat-slider>
+              </div>
+            }
+
+            @if (prepConfig.mode.includes("RBF")) {
+              <div class="px-2 space-y-4">
+                <div>
+                  <label class="text-gray-500 text-xs"
+                    >Dimensions: {{ prepConfig.dimensions }}</label
+                  >
+                  <mat-slider min="2" max="10" step="1" class="w-full">
+                    <input
+                      matSliderThumb
+                      [(ngModel)]="prepConfig.dimensions"
+                      (ngModelChange)="retrainModel()"
+                    />
+                  </mat-slider>
+                </div>
+                <div>
+                  <label class="text-gray-500 text-xs"
+                    >Spread (σ): {{ prepConfig.sigma }}</label
+                  >
+                  <mat-slider min="10" max="150" step="5" class="w-full">
+                    <input
+                      matSliderThumb
+                      [(ngModel)]="prepConfig.sigma"
+                      (ngModelChange)="retrainModel()"
+                    />
+                  </mat-slider>
+                </div>
+              </div>
+            }
+          </div>
+        </mat-expansion-panel>
+
+        <button
+          mat-flat-button
+          color="warn"
+          (click)="clearPoints()"
+          class="mt-4 w-full"
+        >
+          <mat-icon>delete_sweep</mat-icon> Clear Dataset
+        </button>
+      </div>
+
+      @if (modelChoice === Model.LogisticRegression) {
+        <mat-expansion-panel
+          class="border-indigo-500 border-t-4 mt-4 overflow-hidden shadow-lg"
+          expanded
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title
+              class="font-bold text-indigo-700 text-xs tracking-wider uppercase"
+            >
+              Logistic Regression Settings
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="flex flex-col gap-6 py-4">
+            <div class="flex flex-col">
+              <div class="flex justify-between mb-1">
+                <label class="font-medium text-slate-600 text-sm"
+                  >Iterations</label
+                >
+                <span
+                  class="bg-indigo-100 font-bold px-2 py-0.5 rounded text-indigo-700 text-xs"
+                  >{{ nIterations }}</span
+                >
+              </div>
+              <mat-slider min="10" max="1000" step="10" discrete>
+                <input
+                  matSliderThumb
+                  [(ngModel)]="nIterations"
+                  (ngModelChange)="retrainModel()"
+                />
+              </mat-slider>
+            </div>
+
+            <div class="flex flex-col">
+              <div class="flex justify-between mb-1">
+                <label class="font-medium text-slate-600 text-sm"
+                  >Learning Rate ($\eta$)</label
+                >
+                <span
+                  class="bg-emerald-100 font-bold px-2 py-0.5 rounded text-emerald-700 text-xs"
+                  >{{ learningRate }}</span
+                >
+              </div>
+              <mat-slider min="0.001" max="0.5" step="0.005">
+                <input
+                  matSliderThumb
+                  [(ngModel)]="learningRate"
+                  (ngModelChange)="retrainModel()"
+                />
+              </mat-slider>
+            </div>
+
+            <div class="flex flex-col">
+              <div class="flex justify-between mb-1">
+                <label class="font-medium text-slate-600 text-sm"
+                  >Weight Decay ($\lambda$)</label
+                >
+                <span
+                  class="bg-amber-100 font-bold px-2 py-0.5 rounded text-amber-700 text-xs"
+                  >{{ weightDecay }}</span
+                >
+              </div>
+              <mat-slider min="0" max="0.1" step="0.001">
+                <input
+                  matSliderThumb
+                  [(ngModel)]="weightDecay"
+                  (ngModelChange)="retrainModel()"
+                />
+              </mat-slider>
+            </div>
+
+            <hr class="border-slate-100" />
+
+            <div class="flex flex-col gap-2">
+              <label class="font-medium text-slate-600 text-sm">Strategy</label>
+              <mat-button-toggle-group
+                class="justify-center w-full"
+                [(ngModel)]="lrMode"
+                (ngModelChange)="retrainModel()"
+              >
+                <mat-button-toggle value="OVO" class="flex-1"
+                  >OVO</mat-button-toggle
+                >
+                <mat-button-toggle value="OVA" class="flex-1"
+                  >OVA</mat-button-toggle
+                >
+                <mat-button-toggle value="Softmax" class="flex-1"
+                  >Softmax</mat-button-toggle
+                >
+              </mat-button-toggle-group>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      }
+    </div>
+  </ng-container>
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="h-[512px] relative w-[512px]">
+      <canvas
+        #linearClassifier
+        width="512"
+        height="512"
+        id="linear-classifier-canvas"
+        class="bg-slate-50 block border border-gray-200"
+        (mousemove)="draw($event)"
+        (mousedown)="startDraw()"
+        (mouseup)="stopDraw()"
+      >
+      </canvas>
+
+      <svg
+        #svgOverlay
+        width="512"
+        height="512"
+        viewBox="0 0 512 512"
+        id="linear-classifier-svg-overlay"
+        class="absolute left-0 pointer-events-none top-0"
+      >
+        @for (point of dataset.points; track point.x + "-" + point.y) {
+          <circle
+            [attr.cx]="point.x"
+            [attr.cy]="point.y"
+            r="5"
+            [attr.fill]="
+              point.class === Classes.c1
+                ? 'blue'
+                : point.class === Classes.c2
+                  ? 'green'
+                  : 'red'
+            "
+          ></circle>
+        }
+      </svg>
+    </div>
+  </ng-container>
+</app-tutorial-template>

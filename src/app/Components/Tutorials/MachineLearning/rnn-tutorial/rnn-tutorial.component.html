@@ -1,0 +1,495 @@
+<app-tutorial-template [rightDrawer]="true">
+  <!-- Left Drawer: Controls -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4">
+      <!-- Model Selection -->
+      <div class="flex flex-col gap-2">
+        <span class="font-semibold">Model Type</span>
+        <mat-button-toggle-group 
+          [value]="modelType" 
+          (change)="setModelType($event.value)"
+          class="w-full"
+        >
+          <mat-button-toggle value="rnn" class="flex-1">RNN</mat-button-toggle>
+          <mat-button-toggle value="lstm" class="flex-1">LSTM</mat-button-toggle>
+          <mat-button-toggle value="gru" class="flex-1">GRU</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Input Text -->
+      <div class="flex flex-col gap-2">
+        <span class="font-semibold">Input Sequence</span>
+        <mat-form-field appearance="outline" class="w-full">
+          <input 
+            matInput 
+            [(ngModel)]="inputText" 
+            (ngModelChange)="onTextChange()"
+            placeholder="Enter text..."
+          />
+        </mat-form-field>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Animation Controls -->
+      <div class="flex flex-col gap-2">
+        <span class="font-semibold">Time Step: {{ currentTimeStep + 1 }} / {{ tokens.length }}</span>
+        
+        <div class="flex gap-2 items-center">
+          <button mat-icon-button (click)="stepBackward()" [disabled]="currentTimeStep === 0">
+            <mat-icon>skip_previous</mat-icon>
+          </button>
+          
+          <button mat-icon-button (click)="toggleAnimation()">
+            <mat-icon>{{ isAnimating ? 'pause' : 'play_arrow' }}</mat-icon>
+          </button>
+          
+          <button mat-icon-button (click)="stepForward()" [disabled]="currentTimeStep >= tokens.length - 1">
+            <mat-icon>skip_next</mat-icon>
+          </button>
+        </div>
+
+        <mat-slider 
+          [min]="0" 
+          [max]="tokens.length - 1" 
+          [step]="1"
+          [discrete]="true"
+          class="w-full"
+        >
+          <input matSliderThumb [(ngModel)]="currentTimeStep" (ngModelChange)="goToStep($event)">
+        </mat-slider>
+
+        <app-labelled-sliders
+          [min]="100"
+          [max]="1000"
+          [step]="100"
+          [title]="'Animation Speed (ms)'"
+          [(value)]="animationSpeed"
+        ></app-labelled-sliders>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Model Parameters -->
+      <div class="flex flex-col gap-2">
+        <span class="font-semibold">Model Parameters</span>
+
+        <app-labelled-sliders
+          [min]="8"
+          [max]="64"
+          [step]="8"
+          [title]="'Embedding Size'"
+          [(value)]="embeddingSize"
+          (valueChange)="onSettingsChange()"
+        ></app-labelled-sliders>
+
+        <app-labelled-sliders
+          [min]="8"
+          [max]="64"
+          [step]="8"
+          [title]="'Hidden Size'"
+          [(value)]="hiddenSize"
+          (valueChange)="onSettingsChange()"
+        ></app-labelled-sliders>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <button mat-raised-button color="primary" (click)="resetWeights()">
+        <mat-icon>refresh</mat-icon>
+        Randomize Weights
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Center Content -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col gap-6 p-4">
+      
+      <!-- Step Navigation -->
+      <div class="flex justify-center">
+        <mat-button-toggle-group [value]="currentStep" (change)="setVisualizationStep($event.value)">
+          <mat-button-toggle value="sequence">1. Sequence</mat-button-toggle>
+          <mat-button-toggle value="unrolled">2. Unrolled</mat-button-toggle>
+          <mat-button-toggle value="hidden">3. Hidden State</mat-button-toggle>
+          <mat-button-toggle value="gates" [disabled]="modelType === 'rnn'">4. Gates</mat-button-toggle>
+          <mat-button-toggle value="cellstate" [disabled]="modelType !== 'lstm'">5. Cell State</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <!-- Step 1: Input Sequence -->
+      <div [hidden]="currentStep !== 'sequence'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">Input Sequence</h2>
+
+        <!-- Tokens -->
+        <div class="mb-6 sequence-container">
+          <div class="sequence-label">Input:</div>
+          <div class="tokens-row">
+            <div 
+              *ngFor="let token of tokens; let i = index"
+              class="sequence-token"
+              [class.token-active]="isTokenActive(i)"
+              [class.token-current]="isTokenCurrent(i)"
+              [class.token-hovered]="hoveredTimeStep === i"
+              (mouseenter)="onTokenHover(i)"
+              (mouseleave)="onTokenLeave()"
+              (click)="onTokenClick(i)"
+            >
+              <span class="token-char">{{ token.char === ' ' ? '␣' : token.char }}</span>
+              <span class="token-index">t={{ i }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Embedding visualization for current token -->
+        <div class="current-embedding" *ngIf="tokens[currentTimeStep]">
+          <h3 class="font-semibold mb-2">
+            Embedding for "{{ tokens[currentTimeStep].char === ' ' ? '␣' : tokens[currentTimeStep].char }}" (t={{ currentTimeStep }}):
+          </h3>
+          <div class="embedding-bars">
+            <div 
+              *ngFor="let value of tokens[currentTimeStep].embedding; let j = index"
+              class="embedding-bar-container"
+            >
+              <div 
+                class="embedding-bar"
+                [style.height.px]="getValueBarHeight(value, 40)"
+                [style.backgroundColor]="getValueBarColor(value)"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">Sequential Processing</h4>
+          <p class="text-blue-700">
+            Unlike feedforward networks, <strong>{{ modelType.toUpperCase() }}</strong> processes 
+            inputs <strong>one at a time</strong>, maintaining a hidden state that carries information 
+            from previous steps. Click on tokens to jump to that time step.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2: Unrolled Network -->
+      <div [hidden]="currentStep !== 'unrolled'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">Unrolled {{ modelType.toUpperCase() }}</h2>
+
+        <!-- Unrolled diagram -->
+        <div class="unrolled-container">
+          <div 
+            *ngFor="let token of tokens; let i = index"
+            class="unrolled-cell"
+            [class.cell-active]="isTokenActive(i)"
+            [class.cell-current]="isTokenCurrent(i)"
+            (click)="onTokenClick(i)"
+          >
+            <!-- Input -->
+            <div class="cell-input">
+              <div class="input-label">{{ token.char === ' ' ? '␣' : token.char }}</div>
+              <div class="input-arrow">↓</div>
+            </div>
+
+            <!-- Cell body -->
+            <div class="cell-body" [class.lstm-cell]="modelType === 'lstm'" [class.gru-cell]="modelType === 'gru'">
+              <span *ngIf="modelType === 'rnn'">tanh</span>
+              <span *ngIf="modelType === 'lstm'">LSTM</span>
+              <span *ngIf="modelType === 'gru'">GRU</span>
+            </div>
+
+            <!-- Hidden state arrow -->
+            <div class="hidden-arrow" *ngIf="i < tokens.length - 1">
+              h<sub>{{ i }}</sub> →
+            </div>
+
+            <!-- Output -->
+            <div class="cell-output">
+              <div class="output-arrow">↓</div>
+              <div class="output-label">y<sub>{{ i }}</sub></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">Unrolling Through Time</h4>
+          <p class="text-blue-700">
+            The same {{ modelType.toUpperCase() }} cell is applied at each time step. The hidden state 
+            <strong>h<sub>t</sub></strong> flows from left to right, carrying information about 
+            previous inputs.
+            <span *ngIf="modelType === 'lstm'">
+              LSTM also maintains a <strong>cell state c<sub>t</sub></strong> for long-term memory.
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3: Hidden State -->
+      <div [hidden]="currentStep !== 'hidden'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">Hidden State Evolution</h2>
+
+        <!-- Clickable tokens -->
+        <div class="mb-4 tokens-row">
+          <div 
+            *ngFor="let token of tokens; let i = index"
+            class="sequence-token small"
+            [class.token-active]="isTokenActive(i)"
+            [class.token-current]="isTokenCurrent(i)"
+            (click)="onTokenClick(i)"
+          >
+            <span class="token-char">{{ token.char === ' ' ? '␣' : token.char }}</span>
+          </div>
+        </div>
+
+        <!-- Hidden state canvas -->
+        <div class="canvas-container">
+          <canvas #hiddenCanvas width="600" height="250" class="state-canvas"></canvas>
+        </div>
+
+        <!-- Current hidden state details -->
+        <div class="hidden-details mt-4">
+          <h3 class="font-semibold mb-2">
+            Hidden State at t={{ currentTimeStep }} (after "{{ tokens[currentTimeStep]?.char === ' ' ? '␣' : tokens[currentTimeStep]?.char }}"):
+          </h3>
+          <div class="hidden-bars">
+            <div 
+              *ngFor="let value of getCurrentHidden().slice(0, 32); let j = index"
+              class="hidden-bar-container"
+              [title]="'h[' + j + '] = ' + value.toFixed(3)"
+            >
+              <div 
+                class="hidden-bar"
+                [style.height.px]="getValueBarHeight(value, 30)"
+                [style.backgroundColor]="getValueBarColor(value)"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">Hidden State as Memory</h4>
+          <p class="text-blue-700">
+            The hidden state <strong>h<sub>t</sub></strong> is the network's "memory". It encodes 
+            information about all previous inputs. 
+            <span *ngIf="modelType === 'rnn'">
+              In vanilla RNN, the hidden state is computed as: 
+              <code>h<sub>t</sub> = tanh(W<sub>ih</sub>·x<sub>t</sub> + W<sub>hh</sub>·h<sub>t-1</sub>)</code>
+            </span>
+            <span class="text-green-700">Green = positive</span>, 
+            <span class="text-red-700">Red = negative</span>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 4: Gates (LSTM/GRU) -->
+      <div [hidden]="currentStep !== 'gates'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">
+          {{ modelType === 'lstm' ? 'LSTM' : 'GRU' }} Gates at t={{ currentTimeStep }}
+        </h2>
+
+        <!-- Clickable tokens -->
+        <div class="mb-4 tokens-row">
+          <div 
+            *ngFor="let token of tokens; let i = index"
+            class="sequence-token small"
+            [class.token-active]="isTokenActive(i)"
+            [class.token-current]="isTokenCurrent(i)"
+            (click)="onTokenClick(i)"
+          >
+            <span class="token-char">{{ token.char === ' ' ? '␣' : token.char }}</span>
+          </div>
+        </div>
+
+        <!-- Gates visualization -->
+        <div class="gates-container" *ngIf="modelType === 'lstm'">
+          <canvas #gatesCanvas width="500" height="200" class="gates-canvas"></canvas>
+        </div>
+
+        <!-- Gate descriptions -->
+        <div class="gates-legend mt-4" *ngIf="modelType === 'lstm'">
+          <div class="gate-item">
+            <div class="gate-color" style="background-color: #ef4444;"></div>
+            <div class="gate-info">
+              <strong>Forget Gate (f)</strong>: What to forget from cell state
+              <span class="gate-value" *ngIf="getGateAverages()">μ = {{ getGateAverages()!.forget.toFixed(2) }}</span>
+            </div>
+          </div>
+          <div class="gate-item">
+            <div class="gate-color" style="background-color: #22c55e;"></div>
+            <div class="gate-info">
+              <strong>Input Gate (i)</strong>: What new info to store
+              <span class="gate-value" *ngIf="getGateAverages()">μ = {{ getGateAverages()!.input.toFixed(2) }}</span>
+            </div>
+          </div>
+          <div class="gate-item">
+            <div class="gate-color" style="background-color: #3b82f6;"></div>
+            <div class="gate-info">
+              <strong>Candidate (c̃)</strong>: New candidate values
+              <span class="gate-value" *ngIf="getGateAverages()">μ = {{ getGateAverages()!.candidate.toFixed(2) }}</span>
+            </div>
+          </div>
+          <div class="gate-item">
+            <div class="gate-color" style="background-color: #f59e0b;"></div>
+            <div class="gate-info">
+              <strong>Output Gate (o)</strong>: What to output
+              <span class="gate-value" *ngIf="getGateAverages()">μ = {{ getGateAverages()!.output.toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRU gates -->
+        <div class="gates-legend mt-4" *ngIf="modelType === 'gru'">
+          <div class="gate-item">
+            <div class="gate-color" style="background-color: #ef4444;"></div>
+            <div class="gate-info">
+              <strong>Reset Gate (r)</strong>: How much past info to forget
+            </div>
+          </div>
+          <div class="gate-item">
+            <div class="gate-color" style="background-color: #22c55e;"></div>
+            <div class="gate-info">
+              <strong>Update Gate (z)</strong>: How much to update hidden state
+            </div>
+          </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">Gates Control Information Flow</h4>
+          <p class="text-blue-700" *ngIf="modelType === 'lstm'">
+            LSTM uses 4 gates to control what information to <strong>forget</strong>, what to 
+            <strong>store</strong>, and what to <strong>output</strong>. All gates use sigmoid 
+            (0-1 range) except the candidate which uses tanh (-1 to 1).
+          </p>
+          <p class="text-blue-700" *ngIf="modelType === 'gru'">
+            GRU simplifies LSTM with only 2 gates: <strong>Reset</strong> (controls how much 
+            past info to ignore) and <strong>Update</strong> (controls balance between old and new).
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 5: Cell State (LSTM only) -->
+      <div [hidden]="currentStep !== 'cellstate'" class="step-container">
+        <h2 class="font-bold mb-4 text-xl">LSTM Cell State (Long-Term Memory)</h2>
+
+        <!-- Clickable tokens -->
+        <div class="mb-4 tokens-row">
+          <div 
+            *ngFor="let token of tokens; let i = index"
+            class="sequence-token small"
+            [class.token-active]="isTokenActive(i)"
+            [class.token-current]="isTokenCurrent(i)"
+            (click)="onTokenClick(i)"
+          >
+            <span class="token-char">{{ token.char === ' ' ? '␣' : token.char }}</span>
+          </div>
+        </div>
+
+        <!-- Cell state canvas -->
+        <div class="canvas-container">
+          <canvas #cellCanvas width="600" height="250" class="state-canvas"></canvas>
+        </div>
+
+        <!-- Current cell state details -->
+        <div class="cell-details mt-4">
+          <h3 class="font-semibold mb-2">
+            Cell State at t={{ currentTimeStep }}:
+          </h3>
+          <div class="cell-bars">
+            <div 
+              *ngFor="let value of getCurrentCell().slice(0, 32); let j = index"
+              class="cell-bar-container"
+              [title]="'c[' + j + '] = ' + value.toFixed(3)"
+            >
+              <div 
+                class="cell-bar"
+                [style.height.px]="getValueBarHeight(value, 30)"
+                [style.backgroundColor]="value >= 0 ? '#2196F3' : '#FF9800'"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cell state update formula -->
+        <div class="bg-gray-100 formula-box mt-4 p-4 rounded-lg text-center">
+          <code class="text-lg">
+            c<sub>t</sub> = f<sub>t</sub> ⊙ c<sub>t-1</sub> + i<sub>t</sub> ⊙ c̃<sub>t</sub>
+          </code>
+          <p class="mt-2 text-gray-600 text-sm">
+            (forget × previous cell) + (input × candidate)
+          </p>
+        </div>
+
+        <!-- Explanation -->
+        <div class="bg-blue-50 explanation-box mt-6 p-4 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800">The Cell State Highway</h4>
+          <p class="text-blue-700">
+            The cell state <strong>c<sub>t</sub></strong> acts as a "highway" that allows gradients 
+            to flow unchanged over long sequences. The forget gate removes irrelevant info, while 
+            the input gate adds new info. This solves the <strong>vanishing gradient problem</strong> 
+            that plagues vanilla RNNs.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- Right Drawer: Info Panel -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="flex flex-col gap-4 p-2">
+      <h3 class="font-bold text-lg">{{ modelType.toUpperCase() }} Info</h3>
+      
+      <div class="stat-card">
+        <span class="stat-label">Sequence Length</span>
+        <span class="stat-value">{{ tokens.length }}</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Current Step</span>
+        <span class="stat-value">{{ currentTimeStep + 1 }}</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Embedding Size</span>
+        <span class="stat-value">{{ embeddingSize }}</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Hidden Size</span>
+        <span class="stat-value">{{ hiddenSize }}</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <h3 class="font-bold text-lg">Model Comparison</h3>
+      
+      <div class="model-comparison">
+        <div class="model-row" [class.active]="modelType === 'rnn'">
+          <strong>RNN</strong>
+          <span>Simple, prone to vanishing gradients</span>
+        </div>
+        <div class="model-row" [class.active]="modelType === 'lstm'">
+          <strong>LSTM</strong>
+          <span>4 gates, cell state, long-term memory</span>
+        </div>
+        <div class="model-row" [class.active]="modelType === 'gru'">
+          <strong>GRU</strong>
+          <span>2 gates, simpler than LSTM, similar performance</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <h3 class="font-bold text-lg">Current Token</h3>
+      <div class="current-token-info" *ngIf="tokens[currentTimeStep]">
+        <p><strong>Character:</strong> "{{ tokens[currentTimeStep].char === ' ' ? '␣' : tokens[currentTimeStep].char }}"</p>
+        <p><strong>Position:</strong> t={{ currentTimeStep }}</p>
+        <p><strong>Processed:</strong> {{ currentTimeStep + 1 }} / {{ tokens.length }}</p>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>

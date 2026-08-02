@@ -1,0 +1,366 @@
+<app-tutorial-template
+  [rightDrawer]="true"
+  [leftDrawer]="true"
+  [tutorial]="false"
+>
+  <!-- LEFT DRAWER: Network Builder -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-2">
+
+      <!-- Add Layer Buttons -->
+      <div class="flex gap-2">
+        <button 
+          mat-flat-button 
+          color="primary"
+          (click)="addLayer('conv')"
+          [disabled]="layers.length >= maxLayers"
+          class="flex-1"
+        >
+          <mat-icon>grid_on</mat-icon>
+          + Conv2D
+        </button>
+        <button 
+          mat-flat-button 
+          color="accent"
+          (click)="addLayer('pool')"
+          [disabled]="layers.length >= maxLayers"
+          class="flex-1"
+        >
+          <mat-icon>compress</mat-icon>
+          + MaxPool
+        </button>
+      </div>
+
+      @if (layers.length >= maxLayers) {
+        <div class="opacity-60 text-center text-xs">
+          Maximum {{ maxLayers }} layers reached
+        </div>
+      }
+
+      <!-- Layer List -->
+      <div class="flex flex-col gap-2">
+        @for (layer of layers; track trackByLayerId($index, layer); let i = $index) {
+          <mat-expansion-panel class="shadow">
+            <mat-expansion-panel-header>
+              <mat-panel-title class="flex gap-2 items-center">
+                <mat-icon class="text-sm">{{ getLayerIcon(layer.type) }}</mat-icon>
+                <span class="font-medium">{{ i + 1 }}. {{ getLayerName(layer.type) }}</span>
+              </mat-panel-title>
+              <mat-panel-description class="font-mono text-xs">
+                {{ getLayerSummary(layer) }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="flex flex-col gap-3 py-2">
+              <!-- Kernel Size -->
+              <div class="flex flex-col">
+                <div class="flex justify-between mb-1">
+                  <label class="text-sm">Kernel Size</label>
+                  <span class="font-mono text-xs">{{ layer.kernelSize }}×{{ layer.kernelSize }}</span>
+                </div>
+                <mat-slider [min]="layer.type === 'pool' ? 2 : 1" max="7" step="1" class="w-full">
+                  <input 
+                    matSliderThumb 
+                    [(ngModel)]="layer.kernelSize" 
+                    (ngModelChange)="onLayerChange()" 
+                  />
+                </mat-slider>
+              </div>
+
+              <!-- Stride -->
+              <div class="flex flex-col">
+                <div class="flex justify-between mb-1">
+                  <label class="text-sm">Stride</label>
+                  <span class="font-mono text-xs">{{ layer.stride }}</span>
+                </div>
+                <mat-slider min="1" max="4" step="1" class="w-full">
+                  <input 
+                    matSliderThumb 
+                    [(ngModel)]="layer.stride" 
+                    (ngModelChange)="onLayerChange()" 
+                  />
+                </mat-slider>
+              </div>
+
+              <!-- Padding (Conv only) -->
+              @if (layer.type === 'conv') {
+                <div class="flex flex-col">
+                  <div class="flex justify-between mb-1">
+                    <label class="text-sm">Padding</label>
+                    <span class="font-mono text-xs">{{ layer.padding }}</span>
+                  </div>
+                  <mat-slider min="0" max="4" step="1" class="w-full">
+                    <input 
+                      matSliderThumb 
+                      [(ngModel)]="layer.padding" 
+                      (ngModelChange)="onLayerChange()" 
+                    />
+                  </mat-slider>
+                </div>
+
+                <!-- Dilation -->
+                <div class="flex flex-col">
+                  <div class="flex justify-between mb-1">
+                    <label class="text-sm">Dilation</label>
+                    <span class="font-mono text-xs">{{ layer.dilation }}</span>
+                  </div>
+                  <mat-slider min="1" max="4" step="1" class="w-full">
+                    <input 
+                      matSliderThumb 
+                      [(ngModel)]="layer.dilation" 
+                      (ngModelChange)="onLayerChange()" 
+                    />
+                  </mat-slider>
+                </div>
+              }
+
+              <!-- Layer Actions -->
+              <div class="border-t flex items-center justify-between opacity-70 pt-2">
+                <div class="flex gap-1">
+                  <button mat-icon-button (click)="moveLayerUp(i)" [disabled]="i === 0">
+                    <mat-icon>arrow_upward</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="moveLayerDown(i)" [disabled]="i === layers.length - 1">
+                    <mat-icon>arrow_downward</mat-icon>
+                  </button>
+                </div>
+                <button mat-icon-button color="warn" (click)="removeLayer(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+
+              <!-- Layer Stats -->
+              <div class="border font-mono mt-2 opacity-60 p-2 rounded text-xs">
+                <div>Output: {{ getOutputSizeAtLayer(i) }}×{{ getOutputSizeAtLayer(i) }}</div>
+                <div>RF: {{ getRFAtLayer(i) }} (+{{ getRFContribution(i).growth }} from jump={{ getRFContribution(i).fromJump }})</div>
+                <div>Jump: {{ getJumpAtLayer(i) }}</div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        }
+      </div>
+
+      @if (layers.length === 0) {
+        <div class="border border-dashed opacity-60 p-4 rounded-lg text-center">
+          <p class="text-sm">No layers added</p>
+          <p class="mt-1 text-xs">Add Conv2D or MaxPool layers to build your network</p>
+        </div>
+      }
+
+      <!-- Input Size -->
+      <div class="flex flex-col mt-4">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-sm">Input Size</label>
+          <span class="font-mono text-xs">{{ inputSize }}×{{ inputSize }}</span>
+        </div>
+        <mat-slider min="32" max="512" step="32" class="w-full">
+          <input matSliderThumb [(ngModel)]="inputSize" (ngModelChange)="onLayerChange()" />
+        </mat-slider>
+      </div>
+
+      <!-- Display Options -->
+      <div class="flex flex-col gap-2 mt-2">
+        <mat-checkbox [(ngModel)]="showTheoreticalRF" color="primary">
+          Show Theoretical RF
+        </mat-checkbox>
+        <mat-checkbox [(ngModel)]="showEffectiveRF" color="primary">
+          Show Effective RF
+        </mat-checkbox>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- CENTER: Visualization -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col gap-6 items-center">
+      
+      <!-- Image with RF overlay -->
+      <div 
+        class="cursor-crosshair overflow-hidden relative rounded-lg shadow-lg"
+        [style.width.px]="displaySize"
+        [style.height.px]="displaySize"
+        (click)="onImageClick($event)"
+      >
+        <!-- Background Image -->
+        <img 
+          [src]="imageUrl" 
+          [style.width.px]="displaySize"
+          [style.height.px]="displaySize"
+          class="object-cover"
+          alt="Input image"
+          (error)="imageUrl = ''"
+        />
+
+        <!-- Fallback gradient if no image -->
+        @if (!imageUrl) {
+          <div 
+            class="absolute inset-0"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"
+          ></div>
+        }
+
+        <!-- Theoretical RF Rectangle -->
+        @if (showTheoreticalRF && rfInfo) {
+          <div 
+            class="absolute border-2 border-blue-500 pointer-events-none"
+            [ngStyle]="theoreticalRFStyle"
+            style="box-shadow: 0 0 0 2000px rgba(0,0,0,0.3);"
+          >
+            <div class="-top-6 absolute font-bold left-0 text-blue-400 text-xs whitespace-nowrap">
+              Theoretical: {{ rfInfo.theoreticalRF }}×{{ rfInfo.theoreticalRF }}
+            </div>
+          </div>
+        }
+
+        <!-- Effective RF (Gaussian) -->
+        @if (showEffectiveRF && rfInfo) {
+          <div 
+            class="absolute pointer-events-none rounded-full"
+            [ngStyle]="effectiveRFStyle"
+            [style.background]="erfGradient"
+          >
+            <div class="-bottom-6 -translate-x-1/2 absolute font-bold left-1/2 text-violet-400 text-xs whitespace-nowrap">
+              Effective: ~{{ rfInfo.effectiveRF }}×{{ rfInfo.effectiveRF }}
+            </div>
+          </div>
+        }
+
+        <!-- Center crosshair -->
+        <div 
+          class="absolute h-4 pointer-events-none w-4"
+          [style.left.px]="rfCenterPixelX - 8"
+          [style.top.px]="rfCenterPixelY - 8"
+        >
+          <div class="absolute bg-white h-0.5 left-0 opacity-80 top-1/2 w-full"></div>
+          <div class="absolute bg-white h-full left-1/2 opacity-80 top-0 w-0.5"></div>
+        </div>
+
+        <!-- Click hint -->
+        <div class="absolute bg-black/50 bottom-2 opacity-60 px-2 py-1 right-2 rounded text-xs">
+          Click to move RF center
+        </div>
+      </div>
+
+      <!-- Stats Panel -->
+      @if (rfInfo) {
+        <div class="gap-4 grid grid-cols-2 text-sm">
+          <div class="border p-3 rounded-lg text-center">
+            <div class="font-bold text-2xl text-blue-500">{{ rfInfo.theoreticalRF }}</div>
+            <div class="opacity-60 text-xs">Theoretical RF</div>
+          </div>
+          <div class="border p-3 rounded-lg text-center">
+            <div class="font-bold text-2xl text-violet-500">~{{ rfInfo.effectiveRF }}</div>
+            <div class="opacity-60 text-xs">Effective RF</div>
+          </div>
+          <div class="border p-3 rounded-lg text-center">
+            <div class="font-bold text-2xl">{{ rfInfo.totalStride }}</div>
+            <div class="opacity-60 text-xs">Total Stride</div>
+          </div>
+          <div class="border p-3 rounded-lg text-center">
+            <div class="font-bold text-2xl">{{ rfInfo.finalOutputSize }}</div>
+            <div class="opacity-60 text-xs">Output Size</div>
+          </div>
+        </div>
+      }
+
+      <!-- Validation Error -->
+      @if (!isConfigValid() && layers.length > 0) {
+        <div class="border border-red-500 p-3 rounded-lg text-red-500 text-sm">
+          <mat-icon class="align-middle mr-1" style="font-size: 16px;">error</mat-icon>
+          {{ getValidationError() }}
+        </div>
+      }
+    </div>
+  </ng-container>
+
+  <!-- RIGHT DRAWER: Theory -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="max-w-80 p-4">
+      <h3 class="font-bold mb-4 text-lg">Receptive Field</h3>
+
+      <div class="space-y-4 text-sm">
+        <div>
+          <h4 class="font-semibold">Theoretical RF</h4>
+          <p class="mt-1 opacity-80">
+            The total area in the input that can mathematically influence a single output neuron.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Effective RF</h4>
+          <p class="mt-1 opacity-80">
+            In practice, central pixels contribute more than edge pixels (Gaussian distribution). 
+            Typically ~70% of theoretical RF.
+          </p>
+        </div>
+
+        <hr class="opacity-20" />
+
+        <div>
+          <h4 class="font-semibold">RF Formula</h4>
+          <div class="border font-mono mt-2 opacity-80 p-2 rounded text-xs">
+            <p>RF(n) = RF(n-1) + (k_eff - 1) × j(n-1)</p>
+            <p>j(n) = j(n-1) × s(n)</p>
+            <p class="mt-2 opacity-60">
+              k_eff = effective kernel<br>
+              s = stride<br>
+              j = jump (cumulative stride)
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Why Stride Matters</h4>
+          <p class="mt-1 opacity-80">
+            Stride increases the <em>jump</em> (j), which is the cumulative stride from input to current layer. 
+            A larger jump means subsequent layers add more to the RF.
+          </p>
+          <p class="mt-2 opacity-80">
+            Example: With j=2, a 3×3 kernel adds (3-1)×2 = 4 to RF instead of 2.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Key Insights</h4>
+          <ul class="list-disc list-inside mt-2 opacity-80 space-y-1">
+            <li>Deeper networks → larger RF</li>
+            <li>Stride > 1 → faster RF growth</li>
+            <li>Dilation → larger RF without more params</li>
+            <li>Pooling → efficient RF expansion</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Why It Matters</h4>
+          <p class="mt-1 opacity-80">
+            The RF determines what context each output neuron "sees". 
+            For tasks like segmentation, the RF should cover relevant context 
+            (e.g., entire object, not just edges).
+          </p>
+        </div>
+
+        <hr class="opacity-20" />
+
+        <div>
+          <h4 class="font-semibold">Network Summary</h4>
+          @if (layers.length > 0 && rfInfo) {
+            <div class="border font-mono mt-2 p-2 rounded text-xs">
+              <p>Input: {{ inputSize }}×{{ inputSize }} (RF=1, j=1)</p>
+              @for (layer of layers; track layer.id; let i = $index) {
+                <p>
+                  → {{ getLayerName(layer.type) }}: {{ getOutputSizeAtLayer(i) }}×{{ getOutputSizeAtLayer(i) }}
+                  <span class="opacity-70">(RF={{ getRFAtLayer(i) }}, j={{ getJumpAtLayer(i) }})</span>
+                </p>
+              }
+            </div>
+            <p class="mt-2 opacity-60 text-xs">
+              j = cumulative stride (jump). Higher j means each subsequent layer adds more to the RF.
+            </p>
+          } @else {
+            <p class="mt-2 opacity-50 text-xs">Add layers to see summary</p>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>

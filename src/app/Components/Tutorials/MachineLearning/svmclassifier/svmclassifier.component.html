@@ -1,0 +1,259 @@
+<app-tutorial-template
+  [rightDrawer]="true"
+  [leftDrawer]="true"
+  [tutorial]="false"
+>
+  <!-- LEFT DRAWER -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-2">
+      
+      <!-- Class Selection -->
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-sm">Draw Class</label>
+        <mat-button-toggle-group
+          [(ngModel)]="classChoice"
+          class="w-full"
+        >
+          <mat-button-toggle
+            [value]="SVMClasses.Positive"
+            [class.!bg-blue-600]="classChoice === SVMClasses.Positive"
+            [class.!text-white]="classChoice === SVMClasses.Positive"
+            class="flex-1"
+          >
+            <span class="font-bold">+1</span> Positive
+          </mat-button-toggle>
+
+          <mat-button-toggle
+            [value]="SVMClasses.Negative"
+            [class.!bg-amber-600]="classChoice === SVMClasses.Negative"
+            [class.!text-white]="classChoice === SVMClasses.Negative"
+            class="flex-1"
+          >
+            <span class="font-bold">−1</span> Negative
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <!-- Kernel Configuration -->
+      <mat-expansion-panel class="border-indigo-500 border-t-4 shadow-lg" expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="font-bold text-xs tracking-widest uppercase">
+            Kernel Configuration
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="flex flex-col gap-4 py-3">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Kernel</mat-label>
+            <mat-select [(ngModel)]="kernelChoice" (selectionChange)="retrainModel()">
+              <mat-option value="linear">Linear</mat-option>
+              <mat-option value="rbf">RBF (Gaussian)</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          @if (kernelChoice === 'rbf') {
+            <div class="flex flex-col">
+              <div class="flex justify-between mb-1">
+                <label class="font-medium text-sm">Gamma (γ)</label>
+                <span class="font-bold px-2 py-0.5 rounded text-xs">
+                  {{ gamma.toFixed(4) }}
+                </span>
+              </div>
+              <mat-slider min="0.0001" max="0.05" step="0.0005" class="w-full">
+                <input matSliderThumb [(ngModel)]="gamma" (ngModelChange)="retrainModel()" />
+              </mat-slider>
+              <p class="mt-1 opacity-60 text-xs">Higher γ → more complex boundaries</p>
+            </div>
+          }
+
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="font-medium text-sm">Regularization (C)</label>
+              <span class="font-bold px-2 py-0.5 rounded text-xs">
+                {{ C.toFixed(2) }}
+              </span>
+            </div>
+            <mat-slider min="-2" max="3" step="0.1" [displayWith]="displayC" class="w-full">
+  <input matSliderThumb 
+         [(ngModel)]="cExponent" 
+         (ngModelChange)="retrainModel()" />
+</mat-slider>
+            <p class="mt-1 opacity-60 text-xs">Higher C → harder margin</p>
+          </div>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Visualization Options -->
+      <mat-expansion-panel class="border-t-4 border-teal-500 shadow-lg">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="font-bold text-xs tracking-widest uppercase">
+            Display
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="flex flex-col gap-3 py-3">
+          <mat-checkbox [(ngModel)]="showDecisionRegions" (ngModelChange)="retrainModel()" color="primary">
+            Decision regions
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="showMargin" (ngModelChange)="retrainModel()" color="primary">
+            Margin boundaries (f = ±1)
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="showSupportVectors" (ngModelChange)="retrainModel()" color="primary">
+            Support vectors
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="showViolations" (ngModelChange)="retrainModel()" color="primary">
+            Margin violations
+          </mat-checkbox>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Statistics -->
+      @if (points.length > 0) {
+        <div class="p-4 rounded-lg shadow">
+          <h4 class="font-bold mb-3 text-sm">Statistics</h4>
+          
+          <div class="gap-2 grid grid-cols-2 text-sm">
+            <div class="flex gap-2 items-center">
+              <div class="bg-blue-500 h-3 rounded-full w-3"></div>
+              <span>Positive:</span>
+              <span class="font-bold">{{ positiveCount }}</span>
+            </div>
+            <div class="flex gap-2 items-center">
+              <div class="bg-amber-500 h-3 rounded-full w-3"></div>
+              <span>Negative:</span>
+              <span class="font-bold">{{ negativeCount }}</span>
+            </div>
+          </div>
+
+          @if (svmResult) {
+            <hr class="my-3 opacity-20" />
+            <div class="gap-2 grid grid-cols-1 text-sm">
+              <div class="flex gap-2 items-center">
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px;">support</mat-icon>
+                <span>Support Vectors:</span>
+                <span class="font-bold">{{ supportVectorCount }}</span>
+              </div>
+              <div class="flex gap-2 items-center">
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px;">warning</mat-icon>
+                <span>Violations:</span>
+                <span class="font-bold">{{ violationCount }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <button mat-flat-button color="warn" (click)="clearPoints()" class="mt-2 w-full">
+        <mat-icon>delete_sweep</mat-icon> Clear
+      </button>
+
+      @if (!hasEnoughData) {
+        <div class="border p-3 rounded-lg">
+          <p class="text-sm">
+            <mat-icon class="align-middle mr-1" style="font-size: 14px; width: 14px; height: 14px;">info</mat-icon>
+            Draw at least 2 points of each class.
+          </p>
+        </div>
+      }
+    </div>
+  </ng-container>
+
+  <!-- CENTER: Canvas -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="relative" [style.width.px]="size" [style.height.px]="size">
+      <canvas
+        #svmCanvas
+        [width]="size"
+        [height]="size"
+        class="bg-slate-800 block border cursor-crosshair rounded"
+        (mousemove)="draw($event)"
+        (mousedown)="startDraw()"
+        (mouseup)="stopDraw()"
+        (mouseleave)="stopDraw()"
+        (click)="onClick($event)"
+      ></canvas>
+
+      <!-- Training indicator -->
+      @if (isTraining) {
+        <div class="absolute flex inset-0 items-center justify-center opacity-80 rounded">
+          <div class="flex gap-2 items-center">
+            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <span class="text-sm">Training...</span>
+          </div>
+        </div>
+      }
+
+      <!-- Legend -->
+      <div class="absolute bottom-2 left-2 opacity-90 p-2 rounded shadow text-xs">
+        <div class="flex flex-col gap-1">
+          <div class="flex gap-2 items-center">
+            <div class="bg-slate-800 h-0.5 rounded w-4"></div>
+            <span>Decision boundary</span>
+          </div>
+          @if (showMargin) {
+            <div class="flex gap-2 items-center">
+              <div class="border-b-2 border-blue-400 border-dashed w-4"></div>
+              <span>Margins (f = ±1)</span>
+            </div>
+          }
+          @if (showSupportVectors) {
+            <div class="flex gap-2 items-center">
+              <div class="border-2 border-dashed border-slate-400 h-3 rounded-full w-3"></div>
+              <span>Support vector</span>
+            </div>
+          }
+          @if (showViolations) {
+            <div class="flex gap-2 items-center">
+              <div class="border-2 border-red-400 h-3 rounded-full w-3"></div>
+              <span>Margin violation</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- RIGHT DRAWER: Theory -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="max-w-80 p-4">
+      <h3 class="font-bold mb-4 text-lg">SVM Theory</h3>
+      
+      <div class="space-y-4 text-sm">
+        <div>
+          <h4 class="font-semibold">Decision Function</h4>
+          <p class="font-mono mt-1 opacity-80 p-2 rounded text-xs">
+            f(x) = Σ αᵢyᵢK(xᵢ,x) + b
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Support Vectors</h4>
+          <p>Points with αᵢ > 0. They lie on or within the margin.</p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Margin Violation</h4>
+          <p>When yᵢf(xᵢ) < 1, the point is inside the margin or misclassified.</p>
+        </div>
+
+        <hr class="opacity-20" />
+
+        <div>
+          <h4 class="font-semibold">Kernels</h4>
+          <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
+            <li><strong>Linear:</strong> K(x,z) = x·z</li>
+            <li><strong>RBF:</strong> K(x,z) = exp(-γ||x-z||²)</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Parameter C</h4>
+          <p>Trade-off between margin size and training errors. High C = hard margin.</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>

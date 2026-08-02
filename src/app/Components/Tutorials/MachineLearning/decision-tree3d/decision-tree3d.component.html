@@ -1,0 +1,263 @@
+<app-tutorial-template [rightDrawer]="true" [leftDrawer]="true" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">
+    Decision Trees in 3D Space
+  </ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small>
+      <i>
+        Visualize how decision trees partition feature space using axis-aligned splits.
+        Explore 4-class classification with different data configurations.
+      </i>
+    </small>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Tree Parameters</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="mb-4">
+        <label class="text-sm">Maximum Depth: {{ maxDepth }}</label>
+        <mat-slider class="w-full" [min]="1" [max]="6" [step]="1">
+          <input matSliderThumb [(ngModel)]="maxDepth" (input)="onParameterChange()">
+        </mat-slider>
+      </div>
+      
+      <div class="mb-4">
+        <label class="text-sm">Min Samples per Leaf: {{ minSamplesLeaf }}</label>
+        <mat-slider class="w-full" [min]="1" [max]="20" [step]="1">
+          <input matSliderThumb [(ngModel)]="minSamplesLeaf" (input)="onParameterChange()">
+        </mat-slider>
+      </div>
+
+      <h4 class="font-semibold mb-2 mt-4">Loss Function</h4>
+      <mat-button-toggle-group [(ngModel)]="lossFunction" (change)="onParameterChange()" class="w-full">
+        <mat-button-toggle value="gini" class="flex-1">Gini Index</mat-button-toggle>
+        <mat-button-toggle value="entropy" class="flex-1">Cross-Entropy</mat-button-toggle>
+      </mat-button-toggle-group>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>📊 Tree Metrics</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Accuracy:</span>
+          <span class="font-bold font-mono" 
+                [ngClass]="accuracy > 90 ? 'text-green-600' : accuracy > 70 ? 'text-yellow-600' : 'text-red-600'">
+            {{ formatNumber(accuracy, 1) }}%
+          </span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Total Nodes:</span>
+          <span class="font-mono">{{ totalNodes }}</span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Leaf Nodes:</span>
+          <span class="font-mono">{{ leafNodes }}</span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span class="text-sm">Partitions:</span>
+          <span class="font-mono">{{ partitions.length }}</span>
+        </div>
+      </div>
+
+      <div class="mt-4 p-3 rounded text-sm"
+           [ngClass]="accuracy >= 95 ? 'bg-green-100 text-green-800' : 
+                      accuracy >= 80 ? 'bg-yellow-100 text-yellow-800' : 
+                      'bg-red-100 text-red-800'">
+        @if (accuracy >= 95) {
+          ✅ Excellent separation! Tree fits data well.
+        } @else if (accuracy >= 80) {
+          👍 Good fit. Try increasing depth for better accuracy.
+        } @else {
+          🎯 Classes overlap significantly. This is a hard problem!
+        }
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Visualization Options</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <mat-checkbox [(ngModel)]="showPartitions" (change)="onVisualizationChange()" class="block mb-2">
+        Show Partition Boxes
+      </mat-checkbox>
+      
+      <mat-checkbox [(ngModel)]="showSplitPlanes" (change)="onVisualizationChange()" class="block mb-2">
+        Show Split Planes
+      </mat-checkbox>
+      
+      <div class="mt-4" *ngIf="showSplitPlanes">
+        <label class="text-sm">Plane Opacity: {{ formatNumber(partitionOpacity, 2) }}</label>
+        <mat-slider class="w-full" [min]="0.05" [max]="0.5" [step]="0.05">
+          <input matSliderThumb [(ngModel)]="partitionOpacity" (input)="onVisualizationChange()">
+        </mat-slider>
+      </div>
+      
+      <div class="mt-4 text-xs">
+        <p><span class="bg-red-400 h-3 inline-block mr-1 w-3"></span> X-axis splits</p>
+        <p><span class="bg-cyan-400 h-3 inline-block mr-1 w-3"></span> Y-axis splits</p>
+        <p><span class="bg-yellow-400 h-3 inline-block mr-1 w-3"></span> Z-axis splits</p>
+      </div>
+    </mat-expansion-panel>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col items-center w-full">
+      <div class="gap-4 grid grid-cols-1 lg:grid-cols-2 w-full">
+        <!-- 3D Scatter Plot -->
+        <div class="w-full">
+          <h3 class="font-semibold mb-2 text-center">3D Feature Space & Partitions</h3>
+          <div
+            echarts
+            [options]="option3D"
+            class="aspect-square graph"
+            (chartInit)="onChart3DInit($event)"
+          ></div>
+          <div class="flex flex-wrap gap-3 justify-center mt-2 text-xs">
+            @for (i of [0, 1, 2, 3]; track i) {
+              <span class="flex gap-1 items-center">
+                <span class="h-3 rounded-full w-3" [style.backgroundColor]="classColors[i]"></span>
+                {{ classNames[i] }}
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- Tree Structure -->
+        <div class="w-full">
+          <h3 class="font-semibold mb-2 text-center">Decision Tree Structure</h3>
+          <div
+            echarts
+            [options]="optionTree"
+            class="aspect-square graph"
+            (chartInit)="onChartTreeInit($event)"
+          ></div>
+          <div class="mt-2 text-center text-xs">
+            Hover over nodes to see details. Leaf colors indicate predicted class.
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerRight]">
+    <mat-expansion-panel class="mb-4" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Data Configuration</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <h4 class="font-semibold mb-2">Data Preset</h4>
+      <mat-button-toggle-group [(ngModel)]="dataPreset" (change)="onDataPresetChange()" class="flex-wrap w-full">
+        <mat-button-toggle value="separated" class="flex-1">Separated</mat-button-toggle>
+        <mat-button-toggle value="overlapping" class="flex-1">Overlapping</mat-button-toggle>
+        <mat-button-toggle value="xor" class="flex-1">XOR-like</mat-button-toggle>
+      </mat-button-toggle-group>
+      
+      <div class="mt-4 text-gray-600 text-sm">
+        @switch (dataPreset) {
+          @case ('separated') {
+            <p>📗 <strong>Well-separated:</strong> Classes at opposite corners of a cube. Easy to classify with few splits.</p>
+          }
+          @case ('overlapping') {
+            <p>📙 <strong>Overlapping:</strong> Classes near the center with significant overlap. Hard to separate perfectly.</p>
+          }
+          @case ('xor') {
+            <p>📕 <strong>XOR-like:</strong> Diagonal pattern requiring multiple splits. Tests tree's ability to handle non-linear boundaries.</p>
+          }
+        }
+      </div>
+
+      <h4 class="font-semibold mb-2 mt-4">Data Parameters</h4>
+      <app-labelled-sliders
+        [(value)]="nSamplesPerClass"
+        [min]="20"
+        [max]="100"
+        [step]="10"
+        title="Samples per Class"
+        (valueChange)="generateData()"
+      ></app-labelled-sliders>
+      
+      <app-labelled-sliders
+        [(value)]="clusterSpread"
+        [min]="0.3"
+        [max]="2.0"
+        [step]="0.1"
+        title="Cluster Spread (σ)"
+        (valueChange)="generateData()"
+      ></app-labelled-sliders>
+
+      <button 
+        mat-raised-button 
+        class="mt-4 w-full" 
+        color="primary" 
+        (click)="generateData()">
+        Regenerate Data
+      </button>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Split Details</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="max-h-64 overflow-y-auto space-y-2 text-sm">
+        @if (splitPlanes.length === 0) {
+          <p class="italic">No splits (single leaf node)</p>
+        }
+        @for (plane of splitPlanes; track $index; let i = $index) {
+          <div class="border-l-4 p-2 rounded"
+               [style.borderLeftColor]="['#ff6b6b', '#4ecdc4', '#ffe66d'][plane.axis]">
+            <div class="font-mono">
+              Split {{ i + 1 }}: {{ getAxisName(plane.axis) }} ≤ {{ formatNumber(plane.value) }}
+            </div>
+            <div class="text-xs">Depth: {{ plane.depth }}</div>
+          </div>
+        }
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel class="mb-4" [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>💡 Theory</mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="space-y-3 text-sm">
+        <p>
+          <strong>Decision trees</strong> recursively partition the feature space 
+          using axis-aligned splits (thresholds on single features).
+        </p>
+        
+        <div class="p-3 rounded">
+          <p class="font-semibold mb-1">Gini Index:</p>
+          <span class="font-serif italic">G = 1 - Σ p²ᵢ</span>
+          <p class="mt-1 text-gray-600 text-xs">Measures impurity. G=0 means pure node.</p>
+        </div>
+        
+        <div class="p-3 rounded">
+          <p class="font-semibold mb-1">Cross-Entropy:</p>
+          <span class="font-serif italic">H = -Σ pᵢ log₂(pᵢ)</span>
+          <p class="mt-1 text-gray-600 text-xs">Information-theoretic impurity measure.</p>
+        </div>
+        
+        <p>
+          At each node, the algorithm finds the split that <strong>maximizes 
+          information gain</strong> (reduces impurity the most).
+        </p>
+        
+        <p class="text-gray-600 text-xs">
+          <strong>Note:</strong> Decision trees create rectangular partitions, 
+          which may not align well with the true class boundaries in complex datasets.
+        </p>
+      </div>
+    </mat-expansion-panel>
+  </ng-container>
+</app-tutorial-template>

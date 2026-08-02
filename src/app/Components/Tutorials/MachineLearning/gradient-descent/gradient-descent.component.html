@@ -27,7 +27,7 @@
             <mat-button-toggle-group
               [(ngModel)]="datasetType"
               (change)="resetDataset()"
-              class="w-full justify-stretch"
+              class="justify-stretch w-full"
             >
               <mat-button-toggle value="circular" class="flex-1">
                 Circular
@@ -146,7 +146,7 @@
               mat-raised-button
               class="w-full"
               color="primary"
-              (click)="trainer.optimizer.reset_momentums()"
+              (click)="trainer.optimizer.reset()"
             >
               Reset momentums
             </button>
@@ -157,7 +157,7 @@
   </ng-container>
   <ng-container ngProjectAs="[centerContent]">
     <div class="flex gap-2 items-center">
-      <div class="w-1/2 m-4">
+      <div class="m-4 w-1/2">
         <h2>Context</h2>
         <p>
           In this setup, each datapoint lies in a 2D space. The color of the
@@ -207,13 +207,13 @@
           </mat-expansion-panel>
         </mat-accordion>
       </div>
-      <div class="flex flex-col items-center gap-4">
+      <div class="flex flex-col gap-4 items-center">
         <span class="italic">
           Left click: Add a red point, Shift+Left Click: Add a blue point,
           Ctrl+Click: remove a point.</span
         >
 
-        <div class="relative canvasContainer w-full">
+        <div class="canvasContainer relative w-full">
           <ng-container *ngFor="let point of dataset.data; index as i">
             <div
               class="absolute datapoint"
@@ -226,20 +226,20 @@
             [width]="this.gridResolution"
             [height]="this.gridResolution"
             (click)="addPoint($event)"
-            class="w-full aspect-square absolute"
+            class="absolute aspect-square w-full"
           >
           </canvas>
         </div>
         <span class="font-semibold"
           >Probability of belonging to the blue class</span
         >
-        <div class="w-full flex flex-row gap-1 items-center">
+        <div class="flex flex-row gap-1 items-center w-full">
           p=0
           <canvas
             #legendHeatmap
             [width]="this.gridResolution"
             [height]="'1px'"
-            class="w-full h-[32px]"
+            class="h-[32px] w-full"
           >
           </canvas>
           p=1.0
@@ -255,6 +255,6 @@
   </ng-container>
 
   <ng-container ngProjectAs="[drawerRight]">
-    <div echarts [options]="this.lossOptions" class="w-80 aspect-square"></div>
+    <div echarts [options]="this.lossOptions" class="aspect-square w-80"></div>
   </ng-container>
 </app-tutorial-template>

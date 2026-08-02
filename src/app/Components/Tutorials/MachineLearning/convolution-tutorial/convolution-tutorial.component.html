@@ -1,0 +1,291 @@
+<app-tutorial-template
+  [rightDrawer]="true"
+  [leftDrawer]="true"
+  [tutorial]="false"
+>
+  <!-- LEFT DRAWER: Controls -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-2">
+
+      <!-- Playback Controls -->
+      <div class="flex flex-col gap-2">
+        <div class="flex gap-2">
+          <button mat-icon-button (click)="resetToStart()" [disabled]="currentStep === 0">
+            <mat-icon>first_page</mat-icon>
+          </button>
+          <button mat-icon-button (click)="prevStep()" [disabled]="currentStep === 0">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button 
+            mat-flat-button 
+            [color]="isPlaying ? 'warn' : 'primary'"
+            (click)="toggleAnimation()"
+            class="flex-1"
+            [disabled]="totalSteps === 0"
+          >
+            <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+            {{ isPlaying ? 'Pause' : 'Play' }}
+          </button>
+          <button mat-icon-button (click)="nextStep()" [disabled]="totalSteps === 0">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+          <button mat-icon-button (click)="goToEnd()" [disabled]="currentStep === totalSteps - 1">
+            <mat-icon>last_page</mat-icon>
+          </button>
+        </div>
+
+        <!-- Progress -->
+        <div class="flex items-center justify-between text-sm">
+          <span>Step: <strong>{{ currentStep + 1 }}</strong> / {{ totalSteps }}</span>
+          <span>Position: <strong>{{ currentPosition }}</strong></span>
+        </div>
+      </div>
+
+      <!-- Parameters -->
+      <mat-expansion-panel class="shadow-lg" expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="font-bold text-xs tracking-widest uppercase">
+            Convolution Parameters
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="flex flex-col gap-4 py-3">
+          <!-- Input Size -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="font-medium text-sm">Input Size</label>
+              <span class="font-bold font-mono text-xs">{{ inputSize }} × {{ inputSize }}</span>
+            </div>
+            <mat-slider min="3" max="12" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="inputSize" (ngModelChange)="onParameterChange()" />
+            </mat-slider>
+          </div>
+
+          <!-- Kernel Size -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="font-medium text-sm">Kernel Size</label>
+              <span class="font-bold font-mono text-xs">{{ kernelSize }} × {{ kernelSize }}</span>
+            </div>
+            <mat-slider min="1" max="7" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="kernelSize" (ngModelChange)="onParameterChange()" />
+            </mat-slider>
+          </div>
+
+          <!-- Stride -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="font-medium text-sm">Stride</label>
+              <span class="font-bold font-mono text-xs">{{ stride }}</span>
+            </div>
+            <mat-slider min="1" max="4" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="stride" (ngModelChange)="onParameterChange()" />
+            </mat-slider>
+          </div>
+
+          <!-- Padding -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="font-medium text-sm">Padding</label>
+              <span class="font-bold font-mono text-xs">{{ padding }}</span>
+            </div>
+            <mat-slider min="0" max="4" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="padding" (ngModelChange)="onParameterChange()" />
+            </mat-slider>
+          </div>
+
+          <!-- Dilation -->
+          <div class="flex flex-col">
+            <div class="flex justify-between mb-1">
+              <label class="font-medium text-sm">Dilation</label>
+              <span class="font-bold font-mono text-xs">{{ dilation }}</span>
+            </div>
+            <mat-slider min="1" max="4" step="1" class="w-full">
+              <input matSliderThumb [(ngModel)]="dilation" (ngModelChange)="onParameterChange()" />
+            </mat-slider>
+          </div>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- Animation Speed -->
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-sm">Animation Speed</label>
+          <span class="font-bold text-xs">{{ animationSpeed }}ms</span>
+        </div>
+        <mat-slider min="100" max="1000" step="50" class="w-full">
+          <input matSliderThumb [(ngModel)]="animationSpeed" />
+        </mat-slider>
+      </div>
+
+      <!-- Output Size Info -->
+      <div class="border p-3 rounded-lg">
+        <h4 class="font-bold mb-2 text-sm">Output Size</h4>
+        <div class="break-all font-mono mb-2 opacity-80 text-xs">
+          {{ outputSizeFormula }}
+        </div>
+        <div class="font-mono text-sm">
+          = {{ outputSizeCalculation }}
+        </div>
+        @if (outputSize === 0) {
+          <div class="mt-2 text-red-500 text-xs">
+            ⚠️ Invalid configuration: kernel larger than padded input
+          </div>
+        }
+      </div>
+
+      <!-- Legend -->
+      <div class="border p-3 rounded-lg">
+        <h4 class="font-bold mb-2 text-sm">Legend</h4>
+        <div class="flex flex-col gap-2 text-xs">
+          <div class="flex gap-2 items-center">
+            <div class="border-2 border-dashed h-4 opacity-50 rounded w-4"></div>
+            <span>Padding (zeros)</span>
+          </div>
+          <div class="flex gap-2 items-center">
+            <div class="bg-violet-500 h-4 rounded w-4"></div>
+            <span>Kernel sample points</span>
+          </div>
+          <div class="flex gap-2 items-center">
+            <div class="bg-blue-300 h-4 opacity-50 rounded w-4"></div>
+            <span>Dilation gaps (skipped)</span>
+          </div>
+          <div class="flex gap-2 items-center">
+            <div class="bg-blue-500 h-4 rounded w-4"></div>
+            <span>Current output cell</span>
+          </div>
+          <div class="flex gap-2 items-center">
+            <div class="bg-green-500 h-4 rounded w-4"></div>
+            <span>Computed output cells</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- CENTER: Visualization -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="flex flex-col gap-8 items-center">
+      
+      <!-- Input Grid -->
+      <div class="flex flex-col items-center">
+        <h3 class="font-bold mb-2 text-sm">Input ({{ paddedSize }}×{{ paddedSize }} with padding)</h3>
+        <div 
+          class="border gap-1 grid p-2 rounded-lg"
+          [style.grid-template-columns]="'repeat(' + paddedSize + ', 1fr)'"
+        >
+          @for (row of inputGrid; track $index) {
+            @for (cell of row; track cell.col) {
+              <div 
+                [class]="getInputCellClass(cell)"
+                class="duration-200 flex font-mono h-8 items-center justify-center rounded text-xs transition-all w-8"
+              >
+                @if (!cell.isPadding) {
+                  <span class="opacity-40">·</span>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="flex gap-2 items-center opacity-60">
+        <mat-icon>arrow_downward</mat-icon>
+        <span class="text-sm">Convolution</span>
+        <mat-icon>arrow_downward</mat-icon>
+      </div>
+
+      <!-- Output Grid -->
+      <div class="flex flex-col items-center">
+        <h3 class="font-bold mb-2 text-sm">Output ({{ outputSize }}×{{ outputSize }})</h3>
+        @if (outputSize > 0) {
+          <div 
+            class="border gap-1 grid p-2 rounded-lg"
+            [style.grid-template-columns]="'repeat(' + outputSize + ', 1fr)'"
+          >
+            @for (row of outputGrid; track $index) {
+              @for (cell of row; track cell.col) {
+                <div 
+                  [class]="getOutputCellClass(cell)"
+                  class="duration-200 flex font-mono h-8 items-center justify-center rounded text-xs transition-all w-8"
+                >
+                  @if (cell.isComputed || cell.isActive) {
+                    <span class="font-bold text-white">✓</span>
+                  }
+                </div>
+              }
+            }
+          </div>
+        } @else {
+          <div class="border border-dashed opacity-50 p-8 rounded-lg text-sm">
+            No valid output
+          </div>
+        }
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- RIGHT DRAWER: Theory -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="max-w-80 p-4">
+      <h3 class="font-bold mb-4 text-lg">Convolution Basics</h3>
+
+      <div class="space-y-4 text-sm">
+        <div>
+          <h4 class="font-semibold">Kernel Size</h4>
+          <p class="mt-1 opacity-80">
+            The dimensions of the filter window. Common sizes: 3×3, 5×5, 7×7.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Stride</h4>
+          <p class="mt-1 opacity-80">
+            Step size when sliding the kernel. Stride > 1 reduces output size.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Padding</h4>
+          <p class="mt-1 opacity-80">
+            Zeros added around input. "Same" padding preserves spatial dimensions.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Dilation</h4>
+          <p class="mt-1 opacity-80">
+            Spacing between kernel elements. Dilation > 1 increases receptive field without adding parameters.
+          </p>
+        </div>
+
+        <hr class="opacity-20" />
+
+        <div>
+          <h4 class="font-semibold">Output Size Formula</h4>
+          <div class="font-mono mt-2 opacity-80 p-2 rounded text-xs">
+            <p>O = ⌊(I + 2P - D(K-1) - 1) / S⌋ + 1</p>
+            <p class="mt-2 opacity-60">
+              I = input size<br>
+              K = kernel size<br>
+              S = stride<br>
+              P = padding<br>
+              D = dilation
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold">Effective Kernel Size</h4>
+          <p class="mt-1 opacity-80">
+            With dilation d, effective size = d(k-1) + 1
+          </p>
+          <p class="font-mono mt-1 text-xs">
+            Current: {{ effectiveKernelSize }}×{{ effectiveKernelSize }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>

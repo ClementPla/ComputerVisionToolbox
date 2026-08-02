@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Point2D } from '../../../../utils/geometry';
-import { sample_randn_2D } from '../../../../utils/sampling';
+import { sampleGaussian2D } from '../../../../utils/sampling';
 import { clamp } from '../../../../utils/math';
 import { EChartsOption, SeriesOption } from 'echarts';
 
@@ -176,23 +176,23 @@ export class WeightsLossComponent implements OnInit {
 
   distribute_points() {
     if (this.lin_separability) {
-      this.ptClass1 = sample_randn_2D(
+      this.ptClass1 = sampleGaussian2D(
         this.nPoints,
         { x: 5, y: -5 },
         { x: 4, y: 4 }
       );
-      this.ptClass2 = sample_randn_2D(
+      this.ptClass2 = sampleGaussian2D(
         this.nPoints,
         { x: -5, y: 5 },
         { x: 4, y: 4 }
       );
     } else {
-      this.ptClass1 = sample_randn_2D(
+      this.ptClass1 = sampleGaussian2D(
         this.nPoints,
         { x: 0, y: 0 },
         { x: 1, y: 1 }
       );
-      this.ptClass2 = sample_randn_2D(
+      this.ptClass2 = sampleGaussian2D(
         this.nPoints,
         { x: 0, y: 0 },
         { x: 0.1, y: 0.1 }

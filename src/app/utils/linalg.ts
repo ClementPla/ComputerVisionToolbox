@@ -6,9 +6,6 @@ import * as math from 'mathjs';
 type Matrix = number[][];
 type Vector = number[];
 
-export function SVD(matrix: number[][]) {
-  // TODO
-}
 
 export function MMt_solution(matrix: number[][]) {
   let R = matrix.length;
@@ -19,7 +16,7 @@ export function MMt_solution(matrix: number[][]) {
 
   // SVD algorithm
   let B = matmul(matrix, transpose(matrix));
-  let eigen = eigenvectors2D(B);
+  let eigen = eigenDecomposition2x2(B);
   let U = eigen.vectors;
 
   // Singular values
@@ -36,7 +33,7 @@ export interface Eigen {
   values: number[];
   vectors: number[][];
 }
-export function eigenvectors2D(matrix: number[][]): Eigen {
+export function eigenDecomposition2x2(matrix: number[][]): Eigen {
   // Always 2x2 matrix
   // Always return the ordered eigenvalues and eigenvectors
 
@@ -76,6 +73,83 @@ export function eigenvectors2D(matrix: number[][]): Eigen {
   }
 }
 
+export function matVecMul(matrix: number[][], vec: number[]): number[] {
+  return matrix.map(row => row.reduce((sum, val, i) => sum + val * vec[i], 0));
+}
+
+/**
+ * Cholesky decomposition of a positive-definite matrix
+ * Returns lower triangular matrix L such that A = L * L^T
+ */
+export function choleskyDecomposition(matrix: number[][]): number[][] {
+  const n = matrix.length;
+  const L: number[][] = Array(n).fill(null).map(() => Array(n).fill(0));
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let sum = 0;
+      for (let k = 0; k < j; k++) {
+        sum += L[i][k] * L[j][k];
+      }
+      if (i === j) {
+        L[i][j] = Math.sqrt(Math.max(0.0001, matrix[i][i] - sum));
+      } else {
+        L[i][j] = (matrix[i][j] - sum) / L[j][j];
+      }
+    }
+  }
+  return L;
+}
+export function cholesky2x2(matrix: number[][]): number[][] {
+  const L: number[][] = [[0, 0], [0, 0]];
+  L[0][0] = Math.sqrt(Math.max(0.0001, matrix[0][0]));
+  L[1][0] = matrix[1][0] / L[0][0];
+  L[1][1] = Math.sqrt(Math.max(0.0001, matrix[1][1] - L[1][0] * L[1][0]));
+  return L;
+}
+
+/**
+ * Compute eigenvalues and eigenvectors of a 3x3 symmetric matrix
+ * Using power iteration for simplicity (good enough for visualization)
+ */
+export function eigenDecomposition3x3(matrix: number[][]): { values: number[], vectors: number[][] } {
+  const vectors: number[][] = [];
+  const values: number[] = [];
+  let A = matrix.map(row => [...row]);
+
+  for (let i = 0; i < 3; i++) {
+    // Power iteration
+    let v = [Math.random(), Math.random(), Math.random()];
+    let norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0));
+    v = v.map(x => x / norm);
+
+    for (let iter = 0; iter < 100; iter++) {
+      const Av = matVecMul(A, v);
+      norm = Math.sqrt(Av.reduce((s, x) => s + x * x, 0));
+      if (norm > 0.0001) v = Av.map(x => x / norm);
+    }
+
+    const Av = matVecMul(A, v);
+    const eigenvalue = v.reduce((s, x, j) => s + x * Av[j], 0);
+    
+    values.push(eigenvalue);
+    vectors.push(v);
+
+    // Deflate matrix
+    for (let j = 0; j < 3; j++) {
+      for (let k = 0; k < 3; k++) {
+        A[j][k] -= eigenvalue * v[j] * v[k];
+      }
+    }
+  }
+
+  // Sort by eigenvalue descending
+  const indices = [0, 1, 2].sort((a, b) => values[b] - values[a]);
+  return {
+    values: indices.map(i => values[i]),
+    vectors: indices.map(i => vectors[i])
+  };
+}
 export function PCA2D(data: number[][]) {
   // PCA algorithm
   let N = data.length;
@@ -238,6 +312,7 @@ export function polyfit(x: number[], y: number[], degree: number): Vector {
   const coefficients = solveLinearSystem(X, B);
   return coefficients;
 }
+
 export function polyfit_ridge(
   x: Vector,
   y: Vector,
@@ -268,6 +343,7 @@ export function polyfit_ridge(
   const w = matmul(inverted, phiTt);
   return w.map((row) => row[0]);
 }
+
 export function polyfit_gradientDescent(
   x: number[],
   y: number[],

@@ -1,0 +1,241 @@
+<app-tutorial-template [rightDrawer]="true">
+  <!-- Left Drawer: Controls -->
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4">
+      <!-- Tab Selection -->
+      <span class="font-semibold">Method</span>
+      <mat-button-toggle-group
+        [value]="currentTab"
+        (change)="setTab($event.value)"
+        class="w-full"
+      >
+        <mat-button-toggle value="gmm" class="flex-1">GMM</mat-button-toggle>
+        <mat-button-toggle value="kde" class="flex-1">KDE</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-divider></mat-divider>
+
+      <!-- Dimension Selection -->
+      <span class="font-semibold">Dimension</span>
+      <mat-button-toggle-group
+        [value]="currentDimension"
+        (change)="setDimension($event.value)"
+        class="w-full"
+      >
+        <mat-button-toggle value="1d" class="flex-1">1D</mat-button-toggle>
+        <mat-button-toggle value="2d" class="flex-1">2D</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-divider></mat-divider>
+
+      <!-- GMM: Number of components -->
+      <ng-container *ngIf="currentTab === 'gmm'">
+        <span class="font-semibold">Components: {{ numComponents }}</span>
+        <mat-slider
+          [min]="1"
+          [max]="maxComponents"
+          [step]="1"
+          discrete
+          class="w-full"
+        >
+          <input matSliderThumb
+                 [value]="numComponents"
+                 (valueChange)="onNumComponentsChange($event)"/>
+        </mat-slider>
+        <div class="component-legend">
+          <div class="legend-item" *ngFor="let comp of gmmComponents; let i = index">
+            <div class="legend-dot" [style.background]="comp.color"></div>
+            <span>Component {{ i + 1 }}</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- KDE: Bandwidth -->
+      <ng-container *ngIf="currentTab === 'kde'">
+        <span class="font-semibold">Bandwidth h: {{ bandwidth.toFixed(2) }}</span>
+        <mat-slider
+          [min]="minBandwidth"
+          [max]="maxBandwidth"
+          [step]="0.05"
+          class="w-full"
+        >
+          <input matSliderThumb
+                 [value]="bandwidth"
+                 (valueChange)="onBandwidthChange($event)"/>
+        </mat-slider>
+        <div class="bandwidth-hints">
+          <span class="hint-label">Small h</span>
+          <span class="hint-desc">→ spiky, overfitting</span>
+        </div>
+        <div class="bandwidth-hints">
+          <span class="hint-label">Large h</span>
+          <span class="hint-desc">→ smooth, oversmoothing</span>
+        </div>
+      </ng-container>
+
+      <mat-divider></mat-divider>
+
+      <button mat-stroked-button (click)="regenerateData()">
+        <mat-icon>refresh</mat-icon>
+        Regenerate Data
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Center Content -->
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="content-container">
+
+      <!-- Title -->
+      <h2 class="section-title">
+        {{ currentTab === 'gmm' ? 'Gaussian Mixture Model' : 'Kernel Density Estimation' }}
+        <span class="dim-badge">{{ currentDimension.toUpperCase() }}</span>
+      </h2>
+
+      <!-- Canvas for visualization -->
+      <div class="canvas-container">
+        <canvas #canvas1d 
+                *ngIf="currentDimension === '1d'"
+                [width]="canvasWidth" 
+                [height]="canvasHeight1D"
+                class="density-canvas"></canvas>
+        <canvas #canvas2d 
+                *ngIf="currentDimension === '2d'"
+                [width]="canvasWidth" 
+                [height]="canvasHeight2D"
+                class="density-canvas"></canvas>
+      </div>
+
+      <!-- Explanation panels -->
+      <div class="info-grid">
+        <!-- GMM explanation -->
+        <ng-container *ngIf="currentTab === 'gmm'">
+          <div class="info-box">
+            <h4>📊 Model</h4>
+            <p>A weighted sum of K Gaussian distributions. Each component has its own mean μ, variance σ², and weight π.</p>
+          </div>
+          <div class="info-box">
+            <h4>🎯 Parameters</h4>
+            <p>K = {{ numComponents }} components. Weights sum to 1. Dashed lines show individual components.</p>
+          </div>
+          <div class="info-box">
+            <h4>📈 Training</h4>
+            <p>Typically fitted using the EM algorithm (Expectation-Maximization) to find optimal parameters.</p>
+          </div>
+        </ng-container>
+
+        <!-- KDE explanation -->
+        <ng-container *ngIf="currentTab === 'kde'">
+          <div class="info-box">
+            <h4>📊 Method</h4>
+            <p>Places a kernel (Gaussian) at each data point and sums them. Non-parametric — no assumption about the underlying distribution.</p>
+          </div>
+          <div class="info-box">
+            <h4>🎚️ Bandwidth</h4>
+            <p>h = {{ bandwidth.toFixed(2) }} controls smoothing. The only hyperparameter to tune. Critical for good estimation.</p>
+          </div>
+          <div class="info-box">
+            <h4>📐 Bias-Variance</h4>
+            <p>Small h → low bias, high variance. Large h → high bias, low variance. Optimal h balances both.</p>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Formula panel -->
+      <div class="formula-panel">
+        <ng-container *ngIf="currentTab === 'gmm'">
+          <div class="formula-title">GMM Density</div>
+          <div class="formula-main">
+            p(x) = <span class="sum">∑</span><sup>K</sup><sub style="margin-left:-6px">k=1</sub> 
+            π<sub>k</sub> · 𝒩(x | μ<sub>k</sub>, σ<sub>k</sub>²)
+          </div>
+          <div class="formula-note">
+            where π<sub>k</sub> are mixing weights with ∑π<sub>k</sub> = 1
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="currentTab === 'kde'">
+          <div class="formula-title">KDE Density</div>
+          <div class="formula-main">
+            p̂(x) = <span class="frac"><span class="num">1</span><span class="denom">n·h</span></span>
+            <span class="sum">∑</span><sup>n</sup><sub style="margin-left:-4px">i=1</sub>
+            K<span class="paren">(</span><span class="frac"><span class="num">x − x<sub>i</sub></span><span class="denom">h</span></span><span class="paren">)</span>
+          </div>
+          <div class="formula-note">
+            where K is the kernel function (here Gaussian) and h is the bandwidth
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- 2D specific info -->
+      <div class="explanation-panel" *ngIf="currentDimension === '2d'">
+        <p>
+          <strong>2D visualization:</strong> The heatmap shows density values. Contour lines indicate regions of equal density.
+          <ng-container *ngIf="currentTab === 'gmm'">
+            Colored circles mark component centers, dashed circles show 1σ regions.
+          </ng-container>
+          <ng-container *ngIf="currentTab === 'kde'">
+            Each data point contributes a 2D Gaussian kernel to the estimate.
+          </ng-container>
+        </p>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- Right Drawer: Quick Reference -->
+  <ng-container ngProjectAs="[drawerRight]">
+    <div class="flex flex-col gap-4">
+      <h3 class="font-semibold text-lg">Quick Reference</h3>
+
+      <div class="info-card">
+        <h4>Density Estimation</h4>
+        <p>Estimate the probability distribution p(x) from observed samples.</p>
+        <p class="info-note">Goal: Approximate the true underlying distribution</p>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="info-card" *ngIf="currentTab === 'gmm'">
+        <h4>GMM Properties</h4>
+        <ul>
+          <li><strong>Parametric:</strong> Assumes Gaussian components</li>
+          <li><strong>Generative:</strong> Can sample new data</li>
+          <li><strong>Clustering:</strong> Soft cluster assignments</li>
+        </ul>
+      </div>
+
+      <div class="info-card" *ngIf="currentTab === 'kde'">
+        <h4>KDE Properties</h4>
+        <ul>
+          <li><strong>Non-parametric:</strong> No distribution assumption</li>
+          <li><strong>Consistent:</strong> Converges to true density</li>
+          <li><strong>Flexible:</strong> Can model any shape</li>
+        </ul>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="info-card">
+        <h4>Common Kernels</h4>
+        <ul>
+          <li><strong>Gaussian:</strong> Smooth, unbounded</li>
+          <li><strong>Epanechnikov:</strong> Optimal MSE</li>
+          <li><strong>Uniform:</strong> Box kernel</li>
+        </ul>
+        <p class="info-note">This demo uses Gaussian kernel</p>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="info-card">
+        <h4>Bandwidth Selection</h4>
+        <ul>
+          <li><strong>Silverman's rule:</strong> h ≈ 1.06σn<sup>−1/5</sup></li>
+          <li><strong>Cross-validation:</strong> Minimize error</li>
+          <li><strong>Plug-in:</strong> Estimate optimal h</li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</app-tutorial-template>

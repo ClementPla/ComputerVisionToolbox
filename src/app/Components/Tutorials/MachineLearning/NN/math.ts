@@ -1,110 +1,79 @@
-import { Tensor, Slice } from './tensor';
+import { Tensor } from './tensor';
 
+/**
+ * Argmax along the last dimension
+ * Input: [B, C]
+ * Output: [B] with indices of max values
+ */
 export function argmax(input: Tensor): Tensor {
-  let B = input.shape[0];
-  let C = input.shape[1];
-  let output = new Tensor([B, 1]);
+  const B = input.shape[0];
+  const C = input.shape[1];
+  const output = new Tensor([B]);
+
   for (let i = 0; i < B; i++) {
-    let max = -Infinity;
-    let max_index = 0;
+    let maxVal = -Infinity;
+    let maxIdx = 0;
+
     for (let j = 0; j < C; j++) {
-      if (input.data[i * C + j] > max) {
-        max = input.data[i * C + j];
-        max_index = j;
+      const val = input.data[i * C + j];
+      if (val > maxVal) {
+        maxVal = val;
+        maxIdx = j;
       }
     }
-    output.data[i] = max_index;
+
+    output.data[i] = maxIdx;
   }
+
   return output;
 }
 
+/**
+ * Matrix multiplication: A @ B + bias
+ * A: [M, K]
+ * B: [K, N]
+ * bias: [N] (optional)
+ * Output: [M, N]
+ */
 export function matmul(
   inputA: Tensor,
   inputB: Tensor,
   bias: Tensor | undefined
 ): Tensor {
-  let A = inputA.shape[0];
-  let B = inputA.shape[1];
-  if (B !== inputB.shape[0]) {
+  const M = inputA.shape[0];
+  const K = inputA.shape[1];
+
+  if (K !== inputB.shape[0]) {
     throw new Error(
-      'Matrix dimensions do not match, got ' + B + ' and ' + inputB.shape[0]
+      `Matrix dimensions do not match: [${inputA.shape}] @ [${inputB.shape}]`
     );
   }
-  let C = inputB.shape[1];
-  let output = new Tensor([A, C]);
-  for (let i = 0; i < A; i++) {
-    // ROW
-    for (let j = 0; j < C; j++) {
-      // COL
+
+  const N = inputB.shape[1];
+  const output = new Tensor([M, N]);
+
+  for (let i = 0; i < M; i++) {
+    for (let j = 0; j < N; j++) {
       let sum = 0;
-      for (let k = 0; k < B; k++) {
-        sum += inputA.data[i * B + k] * inputB.data[k * C + j];
+      for (let k = 0; k < K; k++) {
+        sum += inputA.data[i * K + k] * inputB.data[k * N + j];
       }
       if (bias !== undefined) {
         sum += bias.data[j];
       }
-      output.data[i * C + j] = sum;
+      output.data[i * N + j] = sum;
     }
   }
+
   return output;
 }
 
-export function strassen_matmul(inputA: Tensor, inputB: Tensor): Tensor {
-  let A = inputA.shape[0];
-  let B = inputA.shape[1];
-  if (B !== inputB.shape[0]) {
-    throw new Error(
-      'Matrix dimensions do not match, got ' + B + ' and ' + inputB.shape[0]
-    );
-  }
-  let C = inputB.shape[1];
-  let output = new Tensor([A, C]);
-
-  // Base case for recursion
-  if (A <= 2 || B <= 2 || C <= 2) {
-    return matmul(inputA, inputB, undefined);
-  }
-
-  // Split matrices into quadrants
-  let midA = Math.floor(A / 2);
-  let midB = Math.floor(B / 2);
-  let midC = Math.floor(C / 2);
-  let A11 = inputA.slice([new Slice(0, 0, midA), new Slice(1, 0, midB)]);
-  let A12 = inputA.slice([new Slice(0, 0, midA), new Slice(1, midB, B)]);
-  let A21 = inputA.slice([new Slice(0, midA, A), new Slice(1, 0, midB)]);
-  let A22 = inputA.slice([new Slice(0, midA, A), new Slice(1, midB, B)]);
-  let B11 = inputB.slice([new Slice(0, 0, midB), new Slice(1, 0, midC)]);
-  let B12 = inputB.slice([new Slice(0, 0, midB), new Slice(1, midC, C)]);
-  let B21 = inputB.slice([new Slice(0, midB, B), new Slice(1, 0, midC)]);
-  let B22 = inputB.slice([new Slice(0, midB, B), new Slice(1, midC, C)]);
-
-  // Compute the 7 products using Strassen's formulas
-  let M1 = strassen_matmul(A11.add(A22), B11.add(B22));
-  let M2 = strassen_matmul(A21.add(A22), B11);
-  let M3 = strassen_matmul(A11, B12.sub(B22));
-  let M4 = strassen_matmul(A22, B21.sub(B11));
-  let M5 = strassen_matmul(A11.add(A12), B22);
-  let M6 = strassen_matmul(A21.sub(A11), B11.add(B12));
-  let M7 = strassen_matmul(A12.sub(A22), B21.add(B22));
-
-  // Combine the 7 products into the final output
-  let C11 = M1.add(M4).sub(M5).add(M7);
-  let C12 = M3.add(M5);
-  let C21 = M2.add(M4);
-  let C22 = M1.sub(M2).add(M3).add(M6);
-
-  // Place the quadrants into the output matrix
-  for (let i = 0; i < midA; i++) {
-    for (let j = 0; j < midC; j++) {
-      output.data[i * C + j] = C11.data[i * midC + j];
-      output.data[i * C + j + midC] = C12.data[i * midC + j];
-      output.data[(i + midA) * C + j] = C21.data[i * midC + j];
-      output.data[(i + midA) * C + j + midC] = C22.data[i * midC + j];
-    }
-  }
-  return output;
-}
-
+/**
+ * 2D Convolution
+ * input: [C, H, W]
+ * weights: [F, C, HH, WW]
+ * Output: [F, H_out, W_out]
+ */
 export function conv2D(
   input: Tensor,
   weights: Tensor,
@@ -112,45 +81,162 @@ export function conv2D(
   stride: number = 1,
   padding: number = 0
 ): Tensor {
-  let [C, H, W] = input.shape;
-  let [F, _, HH, WW] = weights.shape;
-  let H_out = Math.floor((H + 2 * padding - HH) / stride + 1);
-  let W_out = Math.floor((W + 2 * padding - WW) / stride + 1);
-  let output = new Tensor([C, H_out, W_out]);
-  for (let c = 0; c < C; c++) {
+  const [C, H, W] = input.shape;
+  const [F, _, HH, WW] = weights.shape;
+
+  const H_out = Math.floor((H + 2 * padding - HH) / stride + 1);
+  const W_out = Math.floor((W + 2 * padding - WW) / stride + 1);
+
+  const output = new Tensor([F, H_out, W_out]);
+
+  for (let f = 0; f < F; f++) {
     for (let h = 0; h < H_out; h++) {
       for (let w = 0; w < W_out; w++) {
         let sum = 0;
-        for (let f = 0; f < F; f++) {
+
+        for (let c = 0; c < C; c++) {
           for (let hh = 0; hh < HH; hh++) {
             for (let ww = 0; ww < WW; ww++) {
-              let i = h * stride + hh;
-              let j = w * stride + ww;
-              if (i >= 0 && i < H && j >= 0 && j < W) {
+              const hi = h * stride + hh - padding;
+              const wi = w * stride + ww - padding;
+
+              if (hi >= 0 && hi < H && wi >= 0 && wi < W) {
                 sum +=
-                  input.data[c * H * W + i * W + j] *
-                  weights.data[f * HH * WW + hh * WW + ww];
+                  input.data[c * H * W + hi * W + wi] *
+                  weights.data[f * C * HH * WW + c * HH * WW + hh * WW + ww];
               }
             }
           }
         }
+
         if (bias !== undefined) {
-          sum += bias.data[c];
+          sum += bias.data[f];
         }
-        output.data[c * H_out * W_out + h * W_out + w] = sum;
+
+        output.data[f * H_out * W_out + h * W_out + w] = sum;
       }
     }
   }
+
   return output;
 }
 
-export function clip_grad(tensor: Tensor, min: number, max: number) {
+/**
+ * Clip gradients to prevent explosion
+ */
+export function clip_grad(tensor: Tensor, min: number, max: number): Tensor {
   for (let i = 0; i < tensor.grad.length; i++) {
-    if (tensor.grad[i] < min) {
-      tensor.grad[i] = min;
-    } else if (tensor.grad[i] > max) {
-      tensor.grad[i] = max;
-    }
+    tensor.grad[i] = Math.max(min, Math.min(max, tensor.grad[i]));
   }
   return tensor;
+}
+
+/**
+ * Clip gradients by global norm
+ * If ||grad|| > maxNorm, scale down to maxNorm
+ */
+export function clip_grad_norm(tensors: Tensor[], maxNorm: number): number {
+  // Compute total norm
+  let totalNormSq = 0;
+  for (const tensor of tensors) {
+    for (let i = 0; i < tensor.grad.length; i++) {
+      totalNormSq += tensor.grad[i] * tensor.grad[i];
+    }
+  }
+  const totalNorm = Math.sqrt(totalNormSq);
+
+  // Scale if necessary
+  if (totalNorm > maxNorm) {
+    const scale = maxNorm / totalNorm;
+    for (const tensor of tensors) {
+      for (let i = 0; i < tensor.grad.length; i++) {
+        tensor.grad[i] *= scale;
+      }
+    }
+  }
+
+  return totalNorm;
+}
+
+/**
+ * One-hot encoding
+ * indices: [B] with class indices
+ * numClasses: number of classes
+ * Output: [B, numClasses]
+ */
+export function oneHot(indices: Tensor, numClasses: number): Tensor {
+  const B = indices.shape[0];
+  const output = new Tensor([B, numClasses]);
+  output.data.fill(0);
+
+  for (let i = 0; i < B; i++) {
+    const idx = indices.data[i];
+    if (idx >= 0 && idx < numClasses) {
+      output.data[i * numClasses + idx] = 1;
+    }
+  }
+
+  return output;
+}
+
+/**
+ * Compute accuracy between predictions and targets
+ */
+export function accuracy(predictions: Tensor, targets: Tensor): number {
+  const preds = argmax(predictions);
+  const B = targets.shape[0];
+  let correct = 0;
+
+  for (let i = 0; i < B; i++) {
+    if (preds.data[i] === targets.data[i]) {
+      correct++;
+    }
+  }
+
+  return correct / B;
+}
+
+/**
+ * Random shuffle of array (in-place)
+ */
+export function shuffle<T>(array: T[]): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+/**
+ * Generate random integers in range [min, max)
+ */
+export function randint(min: number, max: number, size: number): number[] {
+  const result = new Array(size);
+  for (let i = 0; i < size; i++) {
+    result[i] = Math.floor(Math.random() * (max - min)) + min;
+  }
+  return result;
+}
+
+/**
+ * Generate random floats from normal distribution
+ * Using Box-Muller transform
+ */
+export function randn(size: number, mean: number = 0, std: number = 1): number[] {
+  const result = new Array(size);
+
+  for (let i = 0; i < size; i += 2) {
+    const u1 = Math.random();
+    const u2 = Math.random();
+
+    const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+
+    result[i] = z0 * std + mean;
+    if (i + 1 < size) {
+      result[i + 1] = z1 * std + mean;
+    }
+  }
+
+  return result;
 }

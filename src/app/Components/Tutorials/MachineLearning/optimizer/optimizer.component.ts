@@ -3,12 +3,16 @@ import {
   ChangeDetectorRef,
   Component,
   OnInit,
+  OnDestroy,
+  NgZone,
 } from '@angular/core';
 import { TutorialClass } from '../../../Toolbox/tutorial-parents/tutorial';
 
-import { ECharts, EChartsOption, EChartsType } from 'echarts';
+import { ECharts, EChartsOption } from 'echarts';
 import { ToyModel } from './toy_model';
 import { Adam, Optimizer, RMSProp, SGD } from '../NN/optim';
+
+type OptimizerType = 'sgd' | 'adam' | 'rmsprop';
 
 @Component({
   selector: 'app-optimizer',
@@ -18,34 +22,43 @@ import { Adam, Optimizer, RMSProp, SGD } from '../NN/optim';
 })
 export class OptimizerComponent
   extends TutorialClass
-  implements OnInit, AfterViewInit
+  implements OnInit, AfterViewInit, OnDestroy
 {
+  // Configuration
   max_steps = 100;
   simu_speed = 50;
   max_history = 25;
   step_size = 0.02;
-  current_step = 0;
-  initial_xy = [0.5, 0.0];
   min = -1;
   max = 1;
-  noisyGradient: boolean = false;
-  isTraining: boolean = false;
-  trainer: any;
-  lr: number = 0.01;
-  wc: number = 0.1;
-  echartInstance: ECharts;
-  echartLossPlotInstance: ECharts;
-  _isUpdating = false;
 
-  optimizerType = 'sgd';
+  // State
+  current_step = 0;
+  initial_xy = [0.5, 0.0];
+  noisyGradient = false;
+  isTraining = false;
+  private isDestroyed = false;
 
-  history: number[][] = [];
+  // Optimizer settings
+  optimizerType: OptimizerType = 'sgd';
+  lr = 0.01;
+  wc = 0.1;
 
+  // Model & Optimizer
   model: ToyModel = new ToyModel();
   optim: Optimizer;
 
+  // Visualization
+  history: number[][] = [];
+  private echartInstance: ECharts | null = null;
+  private echartLossPlotInstance: ECharts | null = null;
+  private chartsReady = false;
+
+  // Training loop
+  private trainerId: number | null = null;
+
+  // ECharts options
   option: EChartsOption = {
-    // backgroundColor: '#fff',
     grid: {},
     animation: false,
     visualMap: {
@@ -57,87 +70,45 @@ export class OptimizerComponent
       inRange: {
         symbolSize: [0.5, 15],
         color: [
-          '#313695',
-          '#4575b4',
-          '#74add1',
-          '#abd9e9',
-          '#abd9e9',
-          '#abd9e9',
-          '#fee090',
-          '#fdae61',
-          '#f46d43',
-          '#d73027',
-          '#a50026',
+          '#313695', '#4575b4', '#74add1', '#abd9e9', '#abd9e9',
+          '#abd9e9', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026',
         ],
-        // colorAlpha: [0.25, 1.0]
       },
     },
-    xAxis3D: {
-      type: 'value',
-      min: this.min,
-      max: this.max,
-    },
-    yAxis3D: {
-      type: 'value',
-      min: this.min,
-      max: this.max,
-    },
-    zAxis3D: {
-      type: 'value',
-      show: false,
-      min: -1,
-      max: 1,
-    },
+    xAxis3D: { type: 'value', min: this.min, max: this.max },
+    yAxis3D: { type: 'value', min: this.min, max: this.max },
+    zAxis3D: { type: 'value', show: false, min: -1, max: 1 },
     grid3D: {
       show: true,
-      postEffect: {
-        enable: false,
-      },
+      postEffect: { enable: false },
     },
   };
 
   lossPlot: EChartsOption = {
-    xAxis: {
-      type: 'value',
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [
-      {
-        type: 'line',
-        data: [],
-      },
-    ],
+    xAxis: { type: 'value' },
+    yAxis: { type: 'value' },
+    series: [{ type: 'line', data: [] }],
   };
+
   data: any = {
     series: [
       {
         type: 'line3D',
         data: this.history,
-        // color: 'black',
         visualMap: true,
-        lineStyle: {
-          width: 2,
-          border: 'black',
-        },
+        lineStyle: { width: 2, border: 'black' },
       },
       {
         type: 'scatter3D',
         zlevel: 10,
-        data: [this.model.currentXYZ()],
+        data: [],
         symbol: 'circle',
         symbolSize: 10,
-        itemStyle: {
-          color: 'black',
-          opacity: 0.5,
-        },
+        itemStyle: { color: 'black', opacity: 0.5 },
       },
       {
         type: 'surface',
-        wireframe: {
-          show: false,
-        },
+        wireframe: { show: false },
         dataShape: [
           Math.round((this.max - this.min) / this.step_size),
           Math.round((this.max - this.min) / this.step_size),
@@ -145,169 +116,302 @@ export class OptimizerComponent
       },
     ],
   };
-  constructor(private cdr: ChangeDetectorRef) {
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {
     super();
     this.model.layer1.pos.data = [...this.initial_xy];
-    this.changeOptimizer();
+    this.initializeOptimizer();
   }
 
   ngOnInit(): void {}
+
   ngAfterViewInit(): void {}
 
-  onChartInit(ec: any) {
+  ngOnDestroy(): void {
+    this.isDestroyed = true;
+    this.stopTraining();
+    this.disposeCharts();
+  }
+
+  // ==================== Optimizer ====================
+
+  private initializeOptimizer(): void {
+    switch (this.optimizerType) {
+      case 'adam':
+        this.optim = new Adam(this.model, this.lr, this.wc);
+        break;
+      case 'rmsprop':
+        this.optim = new RMSProp(this.model, this.lr, this.wc);
+        break;
+      case 'sgd':
+      default:
+        this.optim = new SGD(this.model, this.lr, this.wc);
+        break;
+    }
+    this.optim.reset();
+  }
+
+  changeOptimizer(): void {
+    const wasTraining = this.isTraining;
+    this.stopTraining();
+
+    this.initializeOptimizer();
+
+    if (wasTraining) {
+      this.startTraining();
+    }
+  }
+
+  changeLearningRate(value: number): void {
+    this.lr = value;
+    if (this.optim) {
+      this.optim.lr = this.lr;
+    }
+  }
+
+  changeWeightDecay(value: number): void {
+    this.wc = value;
+    if (this.optim) {
+      this.optim.weight_decay = this.wc;
+    }
+  }
+
+  // ==================== Charts ====================
+
+  private disposeCharts(): void {
+    this.chartsReady = false;
+
+    if (this.echartInstance) {
+      try {
+        if (!this.echartInstance.isDisposed()) {
+          this.echartInstance.dispose();
+        }
+      } catch (e) {
+        // Ignore - context may be lost
+      }
+      this.echartInstance = null;
+    }
+
+    if (this.echartLossPlotInstance) {
+      try {
+        if (!this.echartLossPlotInstance.isDisposed()) {
+          this.echartLossPlotInstance.dispose();
+        }
+      } catch (e) {
+        // Ignore
+      }
+      this.echartLossPlotInstance = null;
+    }
+  }
+
+  private canUpdateCharts(): boolean {
+    if (this.isDestroyed || !this.chartsReady) return false;
+    if (!this.echartInstance) return false;
+    
+    try {
+      return !this.echartInstance.isDisposed();
+    } catch {
+      return false;
+    }
+  }
+
+  onChartInit(ec: any): void {
+    if (this.isDestroyed) return;
+
     this.echartInstance = ec;
-    let start = this.min;
-    let stop = this.max;
-    let step = this.step_size;
-    let data: number[][] = [];
-    for (let i = start; i < stop; i += step) {
-      for (let j = start; j < stop; j += step) {
-        data.push([i, j, this.model.equation(i, j)]);
+
+    // Generate surface data
+    const surfaceData: number[][] = [];
+    for (let i = this.min; i < this.max; i += this.step_size) {
+      for (let j = this.min; j < this.max; j += this.step_size) {
+        surfaceData.push([i, j, this.model.equation(i, j)]);
       }
     }
-    this.data.series[2].data = data;
+    this.data.series[2].data = surfaceData;
 
+    // Wait for next frame to ensure chart is ready
     requestAnimationFrame(() => {
-      this.updateOption();
+      if (!this.isDestroyed) {
+        this.checkChartsReady();
+      }
     });
   }
-  onLossChartInit(ec: any) {
+
+  onLossChartInit(ec: any): void {
+    if (this.isDestroyed) return;
     this.echartLossPlotInstance = ec;
+    this.checkChartsReady();
   }
 
-  onChartClick(event: any) {
-    if (this.isTraining) {
-      this.pauseTraining();
-    }
-
-    if (event.seriesType === 'surface') {
-      let x = event.value[0];
-      let y = event.value[1];
-
-      this.initial_xy = [x, y];
-      this.resetToInitialPoint();
-    }
-    if (this.isTraining) {
-      this.startTraining();
+  private checkChartsReady(): void {
+    if (this.echartInstance && this.echartLossPlotInstance && !this.isDestroyed) {
+      this.chartsReady = true;
+      this.updateVisualization();
     }
   }
-  changeLearningRate(event: any) {
-    if (this.isTraining) {
-      this.pauseTraining();
-    }
-    this.lr = event;
-    this.optim = new SGD(this.model, this.lr, this.wc);
-    if (this.isTraining) {
+
+  onChartClick(event: any): void {
+    if (event.seriesType !== 'surface') return;
+
+    const wasTraining = this.isTraining;
+    this.stopTraining();
+
+    this.initial_xy = [event.value[0], event.value[1]];
+    this.resetToInitialPoint();
+
+    if (wasTraining) {
       this.startTraining();
     }
   }
 
-  changeOptimizer() {
+  // ==================== Training ====================
+
+  switchTraining(): void {
     if (this.isTraining) {
-      this.pauseTraining();
-    }
-    if (this.optimizerType === 'sgd') {
-      this.optim = new SGD(this.model, this.lr, this.wc);
-    } else if (this.optimizerType === 'Adam') {
-      this.optim = new Adam(this.model, this.lr, this.wc);
+      this.stopTraining();
     } else {
-      this.optim = new RMSProp(this.model, this.lr, this.wc);
-    }
-    console.log(this.optim);
-    this.optim.reset_momentums();
-    if (this.isTraining) {
       this.startTraining();
     }
   }
 
-  switchTraining() {
-    this.isTraining = !this.isTraining;
-
-    if (this.isTraining) {
-      this.startTraining();
-    } else {
-      clearInterval(this.trainer);
+  private stopTraining(): void {
+    this.isTraining = false;
+    if (this.trainerId !== null) {
+      clearInterval(this.trainerId);
+      this.trainerId = null;
     }
   }
 
-  pauseTraining() {
-    clearInterval(this.trainer);
+  private startTraining(): void {
+    if (this.isDestroyed) return;
+
+    this.isTraining = true;
+
+    // Run outside Angular zone for performance
+    this.ngZone.runOutsideAngular(() => {
+      this.trainerId = window.setInterval(() => {
+        if (this.isDestroyed || !this.isTraining) {
+          this.stopTraining();
+          return;
+        }
+        this.runTrainingStep();
+      }, this.simu_speed);
+    });
   }
 
-  startTraining() {
-    this.trainer = setInterval(() => {
-      this.runTraining();
-    }, this.simu_speed);
-  }
-
-  runTraining() {
-    if (!this.isTraining) {
-      clearInterval(this.trainer);
+  private runTrainingStep(): void {
+    if (this.current_step >= this.max_steps) {
+      this.ngZone.run(() => this.resetToInitialPoint());
       return;
     }
 
-    this.step();
+    // Gradient computation
+    this.model.backward();
+
+    if (this.noisyGradient) {
+      this.model.noisify_gradient(5.0);
+    }
+
+    // Optimizer step
+    this.optim.step();
+    this.model.bound_check(this.min, this.max);
+
+    // Record history
+    this.history.push(this.model.currentXYZ(0.05));
+    this.current_step++;
+
+    // Update visualization in Angular zone
+    this.ngZone.run(() => this.updateVisualization());
   }
 
-  step() {
+  step(): void {
+    if (this.isDestroyed) return;
+
     if (this.current_step >= this.max_steps) {
       this.resetToInitialPoint();
       return;
     }
 
     this.model.backward();
+
     if (this.noisyGradient) {
       this.model.noisify_gradient(5.0);
     }
+
     this.optim.step();
     this.model.bound_check(this.min, this.max);
 
     this.history.push(this.model.currentXYZ(0.05));
+    this.current_step++;
 
-    this.current_step += 1;
-    this.updateOption();
+    this.updateVisualization();
   }
 
-  resetToInitialPoint() {
+  resetToInitialPoint(): void {
     this.model.layer1.pos.data = [...this.initial_xy];
-    this.optim.reset_momentums();
+    this.optim.reset();
     this.current_step = 0;
     this.history = [];
-    this.updateOption();
+    this.updateVisualization();
   }
 
-  updateOption() {
-    this.data.series[1].data = [this.model.currentXYZ(0.05)];
+  // ==================== Visualization ====================
 
-    let _history = [];
-    for (
-      let i = this.history.length - this.max_history;
-      i < this.history.length;
-      i++
-    ) {
-      _history.push(this.history[i]);
+  private updateVisualization(): void {
+    if (!this.canUpdateCharts()) return;
+
+    try {
+      // Current position
+      this.data.series[1].data = [this.model.currentXYZ(0.05)];
+
+      // Recent history (last max_history points)
+      const startIdx = Math.max(0, this.history.length - this.max_history);
+      this.data.series[0].data = this.history.slice(startIdx);
+
+      // Update 3D chart
+      this.echartInstance!.setOption(
+        { series: [this.data.series[0], this.data.series[1]] },
+        { notMerge: false, lazyUpdate: true, silent: true }
+      );
+
+      // Update loss plot
+      this.updateLossPlot();
+    } catch (error) {
+      // Skip this frame on error
+      console.warn('Visualization update error:', error);
     }
-    this.data.series[0].data = _history;
+  }
 
-    const series = {
-      series: [this.data.series[0], this.data.series[1]],
-    };
+  private updateLossPlot(): void {
+    if (!this.echartLossPlotInstance) return;
 
-    let _lossData: number[][] = [];
-    this.history.forEach((value, index) => {
-      _lossData.push([index, value[2]]);
-    });
-    this.echartInstance.setOption(series, {
-      notMerge: false,
-      lazyUpdate: true,
-      silent: true,
-    });
-    this.echartLossPlotInstance.setOption({
-      series: [
-        {
-          data: _lossData,
-        },
-      ],
-    });
+    try {
+      if (this.echartLossPlotInstance.isDisposed()) return;
+
+      const lossData = this.history.map((val, idx) => [idx, val[2]]);
+      this.echartLossPlotInstance.setOption({
+        series: [{ data: lossData }],
+      });
+    } catch {
+      // Ignore
+    }
+  }
+
+  // ==================== Settings ====================
+
+  changeSimulationSpeed(value: number): void {
+    this.simu_speed = value;
+
+    if (this.isTraining) {
+      this.stopTraining();
+      this.startTraining();
+    }
+  }
+
+  toggleNoisyGradient(): void {
+    this.noisyGradient = !this.noisyGradient;
   }
 }

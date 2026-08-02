@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+// Canvas container
+#canvasContainer {
+  canvas {
+    display: block;
+  }
+}
+
+// Material overrides
+::ng-deep {
+  .mat-button-toggle-group {
+    border-radius: 8px;
+    overflow: hidden;
+    
+    .mat-button-toggle {
+      .mat-button-toggle-label-content {
+        line-height: 36px;
+        padding: 0 12px;
+        font-size: 13px;
+      }
+    }
+  }
+
+  .mat-expansion-panel {
+    border-radius: 8px !important;
+  }
+
+  .mat-mdc-slider {
+    width: 100%;
+  }
+}
+
+// Info panel styling
+.border-l-4 {
+  padding-left: 12px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  ::ng-deep .mat-button-toggle-label-content {
+    padding: 0 8px;
+    font-size: 11px;
+  }
+}
