@@ -1,12 +1,19 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { sampleGaussian2D } from 'src/app/utils/sampling';
-import { LDAClassifier } from './models/LDA';
-import { QDAClassifier } from './models/QDA';
-import { AbstractModel } from './models/model';
-import { LogisticRegression, LRMode } from './models/logisticRegression';
+import { Matrix } from 'src/app/lib/numpy';
+import {
+  Classifier,
+  Transformer,
+  LinearDiscriminantAnalysis,
+  QuadraticDiscriminantAnalysis,
+  LogisticRegression,
+  PolynomialFeatures,
+  RBFSampler,
+} from 'src/app/lib/ml';
 
 // --- Types for Preprocessing ---
 export type PreprocessMode = 'None' | 'Polynomial' | 'RBF-Random' | 'RBF-KMeans';
+export type LRMode = 'OVO' | 'OVA' | 'Softmax';
 
 export interface PreprocessConfig {
   mode: PreprocessMode;
@@ -32,7 +39,7 @@ export enum Model {
 })
 export class LinearClassifierComponent {
   @ViewChild('linearClassifier', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
-  
+
   // State
   classChoice: Classes = Classes.c1;
   modelChoice: Model = Model.LDA;
@@ -69,11 +76,11 @@ export class LinearClassifierComponent {
     const y = event.clientY - rect.top;
 
     const points = sampleGaussian2D(2, { x, y }, [[10, 0], [0, 10]]);
-    
+
     points.forEach(p => {
       this.dataset.points.push({ x: p.x, y: p.y, class: this.classChoice });
     });
-    
+
     this.updateDecisionBoundaries();
   }
 
@@ -84,30 +91,65 @@ export class LinearClassifierComponent {
     const ctx = canvasEl.getContext('2d');
     if (!ctx) return;
 
-    // 1. Instantiate and TRAIN the model first
-    const model = this.getModel();
-    model.train(this.dataset.points, this.prepConfig);
-    
-    // 2. Clear canvas and draw background
-    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-    const step = 6; // Resolution (higher = better performance)
+    // 1. Build the (normalized) training matrix and labels.
+    const scale = canvasEl.width;
+    const X = Matrix.fromRows(this.dataset.points.map(p => [p.x / scale, p.y / scale]));
+    const y = this.dataset.points.map(p => p.class as number);
 
-    for (let x = 0; x < canvasEl.width; x += step) {
-      for (let y = 0; y < canvasEl.height; y += step) {
-        const predictedClass = model.predict(x, y, this.prepConfig);
-        ctx.fillStyle = this.getLightColor(predictedClass);
-        ctx.fillRect(x, y, step, step);
+    // 2. Fit preprocessing, then the classifier, in the transformed space.
+    const transformer = this.buildTransformer(scale).fit(X);
+    const model = this.buildClassifier().fit(transformer.transform(X), y);
+    if (model.classes.length === 0) return;
+
+    // 3. Predict the whole decision grid in one batch, then paint it.
+    const step = 6;
+    const coords: number[][] = [];
+    for (let px = 0; px < canvasEl.width; px += step) {
+      for (let py = 0; py < canvasEl.height; py += step) {
+        coords.push([px / scale, py / scale]);
+      }
+    }
+    const grid = transformer.transform(Matrix.fromRows(coords));
+    const predictions = model.predict(grid);
+
+    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    let idx = 0;
+    for (let px = 0; px < canvasEl.width; px += step) {
+      for (let py = 0; py < canvasEl.height; py += step) {
+        ctx.fillStyle = this.getLightColor(predictions[idx++] as Classes);
+        ctx.fillRect(px, py, step, step);
       }
     }
   }
 
-  getModel(): AbstractModel {
-    switch(this.modelChoice) {
-      case Model.LDA: return new LDAClassifier();
-      case Model.QDA: return new QDAClassifier();
-      case Model.LogisticRegression: 
-        return new LogisticRegression(this.lrMode, this.nIterations, this.weightDecay, this.learningRate);
-      default: return new LDAClassifier();
+  /** Feature preprocessing pipeline for the current config (in normalized units). */
+  private buildTransformer(scale: number): Transformer {
+    switch (this.prepConfig.mode) {
+      case 'Polynomial':
+        return new PolynomialFeatures(this.prepConfig.degree);
+      case 'RBF-Random':
+        return new RBFSampler(this.prepConfig.dimensions, this.prepConfig.sigma / scale, 'random');
+      case 'RBF-KMeans':
+        return new RBFSampler(this.prepConfig.dimensions, this.prepConfig.sigma / scale, 'kmeans');
+      default:
+        return new PolynomialFeatures(1); // [1, x, y] — plain linear features
+    }
+  }
+
+  private buildClassifier(): Classifier {
+    switch (this.modelChoice) {
+      case Model.QDA:
+        return new QuadraticDiscriminantAnalysis();
+      case Model.LogisticRegression:
+        return new LogisticRegression(
+          this.lrMode === 'Softmax' ? 'softmax' : 'ova',
+          this.nIterations,
+          this.weightDecay,
+          this.learningRate
+        );
+      case Model.LDA:
+      default:
+        return new LinearDiscriminantAnalysis();
     }
   }
 

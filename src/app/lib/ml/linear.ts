@@ -5,7 +5,7 @@
  * and the inline 2×2 Bayesian posterior that lived in the components.
  */
 import { Matrix, solve, inv, vec } from '../numpy';
-import { Regressor } from './base';
+import { Classifier, Regressor, uniqueSorted } from './base';
 
 /** Solve the (optionally ridge-regularized) normal equations DᵀD w = Dᵀy. */
 function solveNormalEquations(D: Matrix, y: number[], alpha: number): number[] {
@@ -190,6 +190,88 @@ export class BayesianLinearRegression {
   /** Posterior predictive mean at design rows of Φ. */
   predict(Phi: Matrix): number[] {
     return Phi.matvec(this.mean);
+  }
+}
+
+export type LogisticMode = 'softmax' | 'ova';
+
+/**
+ * Multinomial (softmax) or one-vs-all logistic regression, trained by
+ * stochastic gradient descent with L2 weight decay. No intercept is added
+ * here — include a bias column via preprocessing if you want one. Replaces the
+ * component-coupled LogisticRegression model.
+ */
+export class LogisticRegression implements Classifier {
+  classes: number[] = [];
+  private weights: number[][] = []; // one weight vector per class
+
+  constructor(
+    public mode: LogisticMode = 'softmax',
+    public nIterations = 200,
+    public weightDecay = 0.01,
+    public learningRate = 0.1
+  ) {}
+
+  fit(X: Matrix, y: number[] = []): this {
+    this.classes = uniqueSorted(y);
+    const data = X.toArray();
+    const d = X.cols;
+    this.weights =
+      this.mode === 'softmax'
+        ? this.trainSoftmax(data, y, d)
+        : this.trainOneVsAll(data, y, d);
+    return this;
+  }
+
+  private trainSoftmax(data: number[][], y: number[], d: number): number[][] {
+    const K = this.classes.length;
+    const W = this.classes.map(() => vec.zeros(d));
+    for (let iter = 0; iter < this.nIterations; iter++) {
+      for (let i = 0; i < data.length; i++) {
+        const x = data[i];
+        const logits = W.map((w) => vec.dot(w, x));
+        const maxLogit = Math.max(...logits);
+        const exps = logits.map((l) => Math.exp(l - maxLogit));
+        const sum = exps.reduce((a, b) => a + b, 0);
+        const probs = exps.map((e) => e / sum);
+        for (let k = 0; k < K; k++) {
+          const target = y[i] === this.classes[k] ? 1 : 0;
+          const error = probs[k] - target;
+          for (let j = 0; j < d; j++) {
+            W[k][j] -= this.learningRate * (error * x[j] + this.weightDecay * W[k][j]);
+          }
+        }
+      }
+    }
+    return W;
+  }
+
+  private trainOneVsAll(data: number[][], y: number[], d: number): number[][] {
+    return this.classes.map((c) => {
+      const w = vec.zeros(d);
+      for (let iter = 0; iter < this.nIterations; iter++) {
+        for (let i = 0; i < data.length; i++) {
+          const x = data[i];
+          const target = y[i] === c ? 1 : 0;
+          const pred = 1 / (1 + Math.exp(-vec.dot(w, x)));
+          const error = pred - target;
+          for (let j = 0; j < d; j++) {
+            w[j] -= this.learningRate * (error * x[j] + this.weightDecay * w[j]);
+          }
+        }
+      }
+      return w;
+    });
+  }
+
+  decisionFunction(X: Matrix): Matrix {
+    return Matrix.fromRows(X.toArray().map((x) => this.weights.map((w) => vec.dot(w, x))));
+  }
+
+  predict(X: Matrix): number[] {
+    return this.decisionFunction(X)
+      .toArray()
+      .map((scores) => this.classes[vec.argmax(scores)]);
   }
 }
 

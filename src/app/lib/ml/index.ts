@@ -13,6 +13,16 @@ export {
   LinearRegression,
   PolynomialRegression,
   BayesianLinearRegression,
+  LogisticRegression,
 } from './linear';
+export type { LogisticMode } from './linear';
 export { PCA } from './decomposition';
-export { FisherDiscriminant } from './discriminant';
+export {
+  FisherDiscriminant,
+  LinearDiscriminantAnalysis,
+  QuadraticDiscriminantAnalysis,
+} from './discriminant';
+export { KMeans } from './cluster';
+export { PolynomialFeatures, RBFSampler } from './preprocessing';
+export { SVMClassifier } from './svm';
+export type { SVMConfig, SVMDatapoint, SVMResult, SVMKernel } from './svm';

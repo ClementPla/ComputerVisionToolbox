@@ -5,7 +5,7 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import { SVMClassifier, SVMDatapoint, SVMResult, SVMKernel } from './model';
+import { SVMClassifier, SVMDatapoint, SVMResult, SVMKernel } from 'src/app/lib/ml';
 
 export enum SVMClasses {
   Positive = 1,
