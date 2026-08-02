@@ -1,3 +1,4 @@
+import 'echarts-gl';
 import { Component, OnInit } from '@angular/core';
 import { Point2D } from '../../../../utils/geometry';
 import { sampleGaussian2D } from '../../../../utils/sampling';

@@ -1,3 +1,4 @@
+import 'echarts-gl';
 import {
   AfterViewInit,
   Component,

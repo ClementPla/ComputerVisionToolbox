@@ -1,4 +1,3 @@
-import 'echarts-gl';
 import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { NgxOpenCVModule, OpenCVConfig } from 'ngx-opencv';

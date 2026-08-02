@@ -1,3 +1,4 @@
+import 'echarts-gl';
 import { Component } from '@angular/core';
 import { color, ECharts, EChartsOption } from 'echarts';
 import { Matrix } from 'src/app/lib/numpy';

@@ -1,3 +1,4 @@
+import 'echarts-gl';
 import { AfterViewInit, Component } from '@angular/core';
 import { TutorialClass } from 'src/app/Components/Toolbox/tutorial-parents/tutorial';
 import { color, ECharts } from 'echarts';
