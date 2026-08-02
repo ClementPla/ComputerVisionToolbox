@@ -1,6 +1,12 @@
 /**
- * K-Means Clustering Algorithm with step-by-step execution
+ * K-Means Clustering — step-by-step execution for the interactive tutorial.
+ *
+ * This module owns the *animation* layer (E-step / M-step / centroid
+ * interpolation with target positions). The batch algorithm used elsewhere in
+ * the app lives in `lib/ml` (KMeans); both share the same Euclidean metric
+ * from `lib/numpy` (`vec.distance`).
  */
+import { vec } from '../../../../lib/numpy';
 
 export interface Point2D {
   x: number;
@@ -235,10 +241,10 @@ export function snapCentroidsToTarget(centroids: Centroid[]): void {
 }
 
 /**
- * Euclidean distance
+ * Euclidean distance (single metric source: numpy vec.distance).
  */
 export function distance(a: Point2D, b: Point2D): number {
-  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+  return vec.distance([a.x, a.y], [b.x, b.y]);
 }
 
 /**
