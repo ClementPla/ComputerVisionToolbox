@@ -11,8 +11,10 @@ import { Classifier, uniqueSorted } from './base';
 
 export class GaussianNaiveBayes implements Classifier {
   classes: number[] = [];
-  private means: number[][] = []; // [K][d]
-  private vars: number[][] = []; // [K][d]
+  /** Per-class feature means, `[K][d]` (aligned with `classes`). */
+  means: number[][] = [];
+  /** Per-class feature variances, `[K][d]`. */
+  variances: number[][] = [];
   private logPriors: number[] = [];
 
   constructor(public varSmoothing = 1e-9) {}
@@ -23,16 +25,21 @@ export class GaussianNaiveBayes implements Classifier {
     const epsilon = this.varSmoothing * Math.max(...featureVariance(X, 0), 0);
 
     this.means = [];
-    this.vars = [];
+    this.variances = [];
     this.logPriors = [];
     for (const c of this.classes) {
       const rows = X.toArray().filter((_, i) => y[i] === c);
       const Xc = Matrix.fromRows(rows);
       this.means.push(mean(Xc, 0));
-      this.vars.push(featureVariance(Xc, 0).map((v) => v + epsilon));
+      this.variances.push(featureVariance(Xc, 0).map((v) => v + epsilon));
       this.logPriors.push(Math.log(rows.length / n));
     }
     return this;
+  }
+
+  /** Class priors P(class), aligned with `classes`. */
+  priors(): number[] {
+    return this.logPriors.map(Math.exp);
   }
 
   /** Unnormalized log-posterior per class for each row of X. */
@@ -59,7 +66,7 @@ export class GaussianNaiveBayes implements Classifier {
     return this.classes.map((_, k) => {
       let logLik = this.logPriors[k];
       for (let f = 0; f < x.length; f++) {
-        const v = this.vars[k][f];
+        const v = this.variances[k][f];
         const diff = x[f] - this.means[k][f];
         logLik += -0.5 * Math.log(2 * Math.PI * v) - (diff * diff) / (2 * v);
       }

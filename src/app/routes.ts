@@ -178,6 +178,13 @@ export const routeConfig: Routes = [
       ),
   },
   {
+    path: 'naiveBayes',
+    loadComponent: () =>
+      import('./Components/Tutorials/MachineLearning/naive-bayes/naive-bayes.component').then(
+        (m) => m.NaiveBayesComponent
+      ),
+  },
+  {
     path: 'randomForest',
     loadComponent: () =>
       import('./Components/Tutorials/MachineLearning/random-forest/random-forest.component').then(

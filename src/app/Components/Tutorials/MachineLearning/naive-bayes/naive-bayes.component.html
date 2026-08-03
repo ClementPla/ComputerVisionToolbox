@@ -1,0 +1,122 @@
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">Gaussian Naive Bayes</ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small><i>A generative classifier: model each class, then ask which one most likely produced the point.</i></small>
+  </ng-container>
+
+  <ng-container ngProjectAs="[tutorialContent]">
+    <div class="space-y-3 text-sm">
+      <p>
+        Bayes' rule says the probability a point belongs to a class is
+        proportional to how likely that class is to <em>generate</em> it:
+      </p>
+      <div class="p-2 rounded text-center">
+        <span class="font-serif italic">P(class | x, y) ∝ P(class) · p(x | class) · p(y | class)</span>
+      </div>
+      <p>
+        The <strong>“naive”</strong> part is that last step: it assumes the
+        features are independent, so the 2D likelihood is just the
+        <em>product</em> of a bell curve along x and a bell curve along y. That
+        is why each class's ellipse is <strong>axis-aligned</strong> — no tilt.
+      </p>
+      <p>
+        <strong>Drag the ✚ marker.</strong> The panel shows each class's prior,
+        its two per-axis likelihoods <span class="font-serif italic">L<sub>x</sub></span>,
+        <span class="font-serif italic">L<sub>y</sub></span>, and the resulting
+        posterior. Watch a far-away axis dominate: one tiny likelihood is enough
+        to rule a class out.
+      </p>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[drawerLeft]">
+    <div class="flex flex-col gap-4 max-w-96 p-4">
+      <div class="border rounded p-3">
+        <div class="font-medium mb-2 text-slate-600 text-sm">Posterior at ✚</div>
+        @if (breakdown.length) {
+          @for (r of breakdown; track r.cls) {
+            <div class="mb-2">
+              <div class="flex items-center justify-between text-sm">
+                <span class="flex gap-2 items-center">
+                  <span class="h-3 rounded-full w-3" [style.background]="r.color"></span>
+                  {{ r.cls === Classes.c1 ? 'Blue' : 'Red' }}
+                </span>
+                <span class="font-bold">{{ (r.posterior * 100).toFixed(1) }}%</span>
+              </div>
+              <div class="bg-slate-100 h-2 rounded">
+                <div class="h-2 rounded" [style.width.%]="r.posterior * 100" [style.background]="r.color"></div>
+              </div>
+              <div class="flex justify-between text-gray-400 text-xs mt-0.5">
+                <span>prior {{ r.prior.toFixed(2) }}</span>
+                <span>Lₓ {{ r.lx.toExponential(1) }}</span>
+                <span>L_y {{ r.ly.toExponential(1) }}</span>
+              </div>
+            </div>
+          }
+          <hr class="my-1" />
+          <div class="flex items-center justify-between text-sm">
+            <span>Prediction</span>
+            <span class="font-bold" [style.color]="colors[predicted]">{{ predicted === Classes.c1 ? 'Blue' : 'Red' }}</span>
+          </div>
+        } @else {
+          <p class="text-gray-400 text-xs">Add points of both classes to fit the model.</p>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-slate-600 text-sm">Add points as</label>
+        <mat-button-toggle-group [(ngModel)]="classChoice">
+          <mat-button-toggle [value]="Classes.c1" class="flex-1">Blue</mat-button-toggle>
+          <mat-button-toggle [value]="Classes.c2" class="flex-1">Red</mat-button-toggle>
+        </mat-button-toggle-group>
+        <p class="text-gray-400 text-xs">Click empty space to drop a training point.</p>
+      </div>
+
+      <div class="flex gap-2">
+        <button mat-flat-button color="primary" (click)="reset()" class="flex-1">New data</button>
+        <button mat-stroked-button (click)="clear()" class="flex-1">
+          <mat-icon>delete_sweep</mat-icon> Clear
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container ngProjectAs="[centerContent]">
+    <div class="relative" [style.width.px]="size" [style.height.px]="size">
+      <canvas #regionCanvas [width]="size" [height]="size" class="absolute bg-slate-50 border border-gray-200 left-0 top-0"></canvas>
+
+      <svg
+        [attr.width]="size"
+        [attr.height]="size"
+        class="absolute left-0 top-0"
+        (mousemove)="onMouseMove($event)"
+        (mouseup)="onMouseUp()"
+        (mouseleave)="onMouseUp()"
+      >
+        <rect x="0" y="0" [attr.width]="size" [attr.height]="size" fill="transparent" style="cursor: crosshair" (click)="addPoint($event)" />
+
+        <!-- per-class Gaussian ellipses (1σ, 2σ) — axis-aligned = naive independence -->
+        @for (e of ellipses; track $index) {
+          <ellipse [attr.cx]="e.cx" [attr.cy]="e.cy" [attr.rx]="e.rx" [attr.ry]="e.ry"
+                   fill="none" [attr.stroke]="e.color" stroke-width="1.5" opacity="0.5" />
+        }
+
+        <!-- training points -->
+        @for (p of points; track p) {
+          <circle [attr.cx]="p.x" [attr.cy]="p.y" r="5" [attr.fill]="colors[p.class]" stroke="white" stroke-width="1.5" />
+        }
+
+        <!-- query crosshair guides (show the x and y being evaluated) -->
+        <line [attr.x1]="query.x" y1="0" [attr.x2]="query.x" [attr.y2]="size" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 4" />
+        <line x1="0" [attr.y1]="query.y" [attr.x2]="size" [attr.y2]="query.y" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 4" />
+
+        <!-- draggable query marker, coloured by the prediction -->
+        <g (mousedown)="startDragQuery($event)" style="cursor: grab">
+          <circle [attr.cx]="query.x" [attr.cy]="query.y" r="12" [attr.fill]="colors[predicted]" fill-opacity="0.35" [attr.stroke]="colors[predicted]" stroke-width="2.5" />
+          <line [attr.x1]="query.x - 6" [attr.y1]="query.y" [attr.x2]="query.x + 6" [attr.y2]="query.y" stroke="#111827" stroke-width="1.5" />
+          <line [attr.x1]="query.x" [attr.y1]="query.y - 6" [attr.x2]="query.x" [attr.y2]="query.y + 6" stroke="#111827" stroke-width="1.5" />
+        </g>
+      </svg>
+    </div>
+  </ng-container>
+</app-tutorial-template>

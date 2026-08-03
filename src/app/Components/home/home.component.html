@@ -173,10 +173,19 @@
 
     <a routerLink="/knn">
       <app-home-card
-        title="Nearest Neighbors & Naive Bayes"
+        title="k-Nearest Neighbors"
         imgURL="assets/images/home-cards/linearModel.png"
       >
-        Draw points and compare how k-Nearest Neighbors and Gaussian Naive Bayes carve up the feature space into decision regions.
+        Drag a query point and watch which nearest neighbours it consults and how they vote — the classifier with no training step.
+      </app-home-card>
+    </a>
+
+    <a routerLink="/naiveBayes">
+      <app-home-card
+        title="Gaussian Naive Bayes"
+        imgURL="assets/images/home-cards/Gaussian.png"
+      >
+        See each class as a pair of bell curves and watch prior × likelihoods combine into the posterior as you move a query point.
       </app-home-card>
     </a>
 
