@@ -1,0 +1,1 @@
+import{ua as e}from"./chunk-VADTLP42.js";var t=class r{leftDrawer=!0;rightDrawer=!0;static \u0275fac=function(a){return new(a||r)};static \u0275dir=e({type:r,inputs:{leftDrawer:"leftDrawer",rightDrawer:"rightDrawer"},standalone:!1})};export{t as a};

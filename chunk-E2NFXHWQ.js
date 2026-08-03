@@ -1,0 +1,1 @@
+import{J as t}from"./chunk-VADTLP42.js";var o=class e{showImagePreset=!1;constructor(){}toggleImagePreset(){this.showImagePreset=!this.showImagePreset}static \u0275fac=function(r){return new(r||e)};static \u0275prov=t({token:e,factory:e.\u0275fac,providedIn:"root"})};export{o as a};
