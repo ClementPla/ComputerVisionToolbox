@@ -44,6 +44,10 @@ export class TSNEComponent implements OnInit, OnDestroy {
   private chart3D: any = null;
   private chart2D: any = null;
   private frame = 0;
+  // Pace the optimization by wall-clock time so the embedding forms gradually
+  // (~40 steps/s ⇒ a 500-iteration run takes ~12s), independent of refresh rate.
+  private readonly stepIntervalMs = 24;
+  private lastStepTime = 0;
 
   option3D: EChartsOption = {};
   option2D: EChartsOption = {};
@@ -121,6 +125,7 @@ export class TSNEComponent implements OnInit, OnDestroy {
     );
     this.iter = 0;
     this.running = true;
+    this.lastStepTime = 0;
     this.animate();
   }
 
@@ -136,11 +141,15 @@ export class TSNEComponent implements OnInit, OnDestroy {
 
   private animate = (): void => {
     if (!this.running || !this.tsne) return;
-    for (let s = 0; s < 5 && this.iter < this.nIter; s++) {
+    // Advance at most one step per elapsed interval, so the layout evolves at a
+    // watchable pace rather than snapping to the final result in a few frames.
+    const now = performance.now();
+    if (now - this.lastStepTime >= this.stepIntervalMs && this.iter < this.nIter) {
       this.tsne.step();
       this.iter++;
+      this.lastStepTime = now;
+      this.render2D();
     }
-    this.render2D();
     if (this.iter < this.nIter) {
       this.frame = requestAnimationFrame(this.animate);
     } else {
