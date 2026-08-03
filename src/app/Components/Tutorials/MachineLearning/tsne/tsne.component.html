@@ -1,12 +1,41 @@
-<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="false">
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">t-SNE</ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small><i>Flatten high-dimensional data to 2D while keeping neighbours together.</i></small>
+  </ng-container>
+
+  <ng-container ngProjectAs="[tutorialContent]">
+    <div class="space-y-3 text-sm">
+      <p>
+        t-SNE turns the <strong>neighbourhoods</strong> of a high-dimensional
+        dataset into a 2D map. For every pair of points it defines an affinity
+        <span class="font-serif italic">p<sub>ij</sub></span> (high for near
+        points, ~0 for far ones), then arranges the 2D points so their
+        affinities <span class="font-serif italic">q<sub>ij</sub></span> match —
+        by minimising the mismatch
+        <span class="font-serif italic">KL(p ‖ q)</span> with gradient descent.
+      </p>
+      <p>
+        <strong>Hover a point</strong> in the 2D map: its true neighbours from
+        the original 3D space light up in <em>both</em> views, with springs
+        drawn in 2D. If t-SNE worked, those springs are short — neighbours in 3D
+        landed next to each other in 2D.
+      </p>
+      <p>
+        <strong>Perplexity</strong> is roughly “how many neighbours each point
+        pays attention to.” Small values preserve tight local clumps; large
+        values keep more global structure. Re-run to compare.
+      </p>
+      <p class="text-xs text-amber-700">
+        Caveat: in a t-SNE map the <em>sizes</em> of clusters and the
+        <em>gaps</em> between them are not meaningful — only who-is-next-to-whom
+        is. It is also stochastic, so each run differs.
+      </p>
+    </div>
+  </ng-container>
+
   <ng-container ngProjectAs="[drawerLeft]">
     <div class="flex flex-col gap-4 max-w-96 p-4">
-      <p class="text-gray-500 text-xs">
-        t-SNE embeds high-dimensional points into 2D so that neighbours stay
-        neighbours. These are {{ nClusters }} Gaussian blobs living in
-        {{ dims }} dimensions — press Run and watch them separate.
-      </p>
-
       <div class="flex flex-col">
         <div class="flex justify-between mb-1">
           <label class="font-medium text-slate-600 text-sm">Perplexity</label>
@@ -28,17 +57,19 @@
       </div>
 
       <div class="flex gap-2">
-        <button mat-flat-button color="primary" (click)="run()" [disabled]="running" class="flex-1">
-          Run
-        </button>
+        <button mat-flat-button color="primary" (click)="run()" [disabled]="running" class="flex-1">Run</button>
         <button mat-stroked-button (click)="reset()" class="flex-1">New data</button>
       </div>
 
       <p class="text-gray-400 text-xs">Iteration: {{ iter }} / {{ nIter }}</p>
+      <p class="text-gray-500 text-xs">💡 After running, hover a point in the 2D map to check its neighbourhood.</p>
     </div>
   </ng-container>
 
   <ng-container ngProjectAs="[centerContent]">
-    <div echarts [options]="option" (chartInit)="onChartInit($event)" class="block h-[560px] w-[560px]"></div>
+    <div class="flex flex-wrap gap-4 p-2">
+      <div echarts [options]="option3D" (chartInit)="onChart3DInit($event)" class="block h-[420px] w-[420px]"></div>
+      <div echarts [options]="option2D" (chartInit)="onChart2DInit($event)" class="block h-[420px] w-[420px]"></div>
+    </div>
   </ng-container>
 </app-tutorial-template>
