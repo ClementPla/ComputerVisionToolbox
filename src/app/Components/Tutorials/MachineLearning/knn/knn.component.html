@@ -1,83 +1,127 @@
-<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="false">
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">k-Nearest Neighbors</ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small><i>A classifier with no training step — it just remembers the data and asks the neighbours.</i></small>
+  </ng-container>
+
+  <ng-container ngProjectAs="[tutorialContent]">
+    <div class="space-y-3 text-sm">
+      <p>
+        To label a new point <strong>✚</strong>, k-NN finds the
+        <strong>k</strong> closest training points and takes a
+        <strong>majority vote</strong>. There is no model to fit — the data
+        <em>is</em> the model.
+      </p>
+      <div class="p-2 rounded text-center">
+        <span class="font-serif italic">ŷ(✚) = majority class among the k nearest points</span>
+      </div>
+      <p>
+        <strong>Drag the ✚ marker</strong> around the plane. The lines show
+        exactly which neighbours it is consulting, the dashed circle is the
+        distance to the k-th neighbour, and the marker takes the colour of the
+        winning vote. Move it across the boundary and watch the vote flip.
+      </p>
+      <p>
+        <strong>The role of k:</strong> small k follows every local wiggle
+        (low bias, high variance — a jagged boundary); large k averages over a
+        wide neighbourhood (smoother, but it can wash out real structure).
+        Slide k and watch the shaded regions change.
+      </p>
+    </div>
+  </ng-container>
+
   <ng-container ngProjectAs="[drawerLeft]">
     <div class="flex flex-col gap-4 max-w-96 p-4">
-      <div class="flex flex-col gap-2">
-        <label class="font-medium text-slate-600 text-sm">Model</label>
-        <mat-button-toggle-group
-          name="ModelChoice"
-          aria-label="Model Choice"
-          [(ngModel)]="modelChoice"
-          (ngModelChange)="retrain()"
-        >
-          <mat-button-toggle [value]="Model.KNN" class="flex-1">k-NN</mat-button-toggle>
-          <mat-button-toggle [value]="Model.NaiveBayes" class="flex-1">Naive Bayes</mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
-
-      @if (modelChoice === Model.KNN) {
-        <div class="flex flex-col">
-          <div class="flex justify-between mb-1">
-            <label class="font-medium text-slate-600 text-sm">Neighbours (k)</label>
-            <span class="bg-indigo-100 font-bold px-2 py-0.5 rounded text-indigo-700 text-xs">{{ k }}</span>
-          </div>
-          <mat-slider min="1" max="25" step="1" discrete>
-            <input matSliderThumb [(ngModel)]="k" (ngModelChange)="retrain()" />
-          </mat-slider>
+      <div class="flex flex-col">
+        <div class="flex justify-between mb-1">
+          <label class="font-medium text-slate-600 text-sm">Neighbours (k)</label>
+          <span class="bg-slate-200 font-bold px-2 py-0.5 rounded text-slate-700 text-xs">{{ k }}</span>
         </div>
-      }
-
-      <div class="flex flex-col gap-2">
-        <label class="font-medium text-slate-600 text-sm">Draw class</label>
-        <mat-button-toggle-group
-          name="ClassChoice"
-          aria-label="Class Choice"
-          [(ngModel)]="classChoice"
-        >
-          <mat-button-toggle [value]="Classes.c1" [class.!bg-blue-600]="classChoice === Classes.c1">Class 1</mat-button-toggle>
-          <mat-button-toggle [value]="Classes.c2" [class.!bg-green-600]="classChoice === Classes.c2">Class 2</mat-button-toggle>
-          <mat-button-toggle [value]="Classes.c3" [class.!bg-red-600]="classChoice === Classes.c3">Class 3</mat-button-toggle>
-        </mat-button-toggle-group>
+        <mat-slider min="1" max="15" step="1" discrete>
+          <input matSliderThumb [(ngModel)]="k" (ngModelChange)="onKChange()" />
+        </mat-slider>
       </div>
 
-      <p class="text-gray-500 text-xs">
-        Click and drag on the canvas to scatter points of the selected class. The
-        background shows the decision region each model predicts.
-      </p>
+      <!-- Live vote read-out: the heart of the explanation. -->
+      <div class="border rounded p-3">
+        <div class="font-medium mb-2 text-slate-600 text-sm">The vote at ✚</div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="flex gap-2 items-center">
+            <span class="h-3 rounded-full w-3" [style.background]="colors[Classes.c1]"></span> Blue
+          </span>
+          <span class="font-bold">{{ votes[Classes.c1] }}</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="flex gap-2 items-center">
+            <span class="h-3 rounded-full w-3" [style.background]="colors[Classes.c2]"></span> Red
+          </span>
+          <span class="font-bold">{{ votes[Classes.c2] }}</span>
+        </div>
+        <hr class="my-2" />
+        <div class="flex items-center justify-between text-sm">
+          <span>Prediction</span>
+          <span class="font-bold" [style.color]="colors[predicted]">
+            {{ predicted === Classes.c1 ? 'Blue' : 'Red' }}
+          </span>
+        </div>
+      </div>
 
-      <button mat-flat-button color="warn" (click)="clearPoints()" class="w-full">
-        <mat-icon>delete_sweep</mat-icon> Clear Dataset
-      </button>
+      <div class="flex flex-col gap-2">
+        <label class="font-medium text-slate-600 text-sm">Add points as</label>
+        <mat-button-toggle-group [(ngModel)]="classChoice">
+          <mat-button-toggle [value]="Classes.c1" class="flex-1">Blue</mat-button-toggle>
+          <mat-button-toggle [value]="Classes.c2" class="flex-1">Red</mat-button-toggle>
+        </mat-button-toggle-group>
+        <p class="text-gray-400 text-xs">Click empty space to drop a training point.</p>
+      </div>
+
+      <div class="flex gap-2">
+        <button mat-flat-button color="primary" (click)="reset()" class="flex-1">New data</button>
+        <button mat-stroked-button (click)="clear()" class="flex-1">
+          <mat-icon>delete_sweep</mat-icon> Clear
+        </button>
+      </div>
     </div>
   </ng-container>
 
   <ng-container ngProjectAs="[centerContent]">
-    <div class="h-[512px] relative w-[512px]">
-      <canvas
-        #knnCanvas
-        width="512"
-        height="512"
-        class="bg-slate-50 block border border-gray-200"
-        (mousemove)="draw($event)"
-        (mousedown)="startDraw()"
-        (mouseup)="stopDraw()"
-      ></canvas>
+    <div class="relative" [style.width.px]="size" [style.height.px]="size">
+      <canvas #regionCanvas [width]="size" [height]="size" class="absolute bg-slate-50 border border-gray-200 left-0 top-0"></canvas>
 
       <svg
-        width="512"
-        height="512"
-        viewBox="0 0 512 512"
-        class="absolute left-0 pointer-events-none top-0"
+        [attr.width]="size"
+        [attr.height]="size"
+        class="absolute left-0 top-0"
+        (mousemove)="onMouseMove($event)"
+        (mouseup)="onMouseUp()"
+        (mouseleave)="onMouseUp()"
       >
-        @for (point of dataset.points; track point.x + "-" + point.y) {
-          <circle
-            [attr.cx]="point.x"
-            [attr.cy]="point.y"
-            r="5"
-            [attr.fill]="
-              point.class === Classes.c1 ? 'blue' : point.class === Classes.c2 ? 'green' : 'red'
-            "
-          ></circle>
+        <rect x="0" y="0" [attr.width]="size" [attr.height]="size" fill="transparent" style="cursor: crosshair" (click)="addPoint($event)" />
+
+        <!-- circle enclosing the k neighbours -->
+        <circle [attr.cx]="query.x" [attr.cy]="query.y" [attr.r]="neighborRadius" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4" />
+
+        <!-- lines from ✚ to each of its k neighbours -->
+        @for (n of neighbors; track n.point) {
+          <line [attr.x1]="query.x" [attr.y1]="query.y" [attr.x2]="n.point.x" [attr.y2]="n.point.y" [attr.stroke]="colors[n.point.class]" stroke-width="1.5" opacity="0.55" />
         }
+
+        <!-- training points -->
+        @for (p of points; track p) {
+          <circle [attr.cx]="p.x" [attr.cy]="p.y" r="6" [attr.fill]="colors[p.class]" stroke="white" stroke-width="1.5" />
+        }
+
+        <!-- highlight the chosen neighbours -->
+        @for (n of neighbors; track n.point) {
+          <circle [attr.cx]="n.point.x" [attr.cy]="n.point.y" r="9.5" fill="none" [attr.stroke]="colors[n.point.class]" stroke-width="2" />
+        }
+
+        <!-- draggable query marker, coloured by the current prediction -->
+        <g (mousedown)="startDragQuery($event)" style="cursor: grab">
+          <circle [attr.cx]="query.x" [attr.cy]="query.y" r="13" [attr.fill]="colors[predicted]" fill-opacity="0.35" [attr.stroke]="colors[predicted]" stroke-width="2.5" />
+          <line [attr.x1]="query.x - 6" [attr.y1]="query.y" [attr.x2]="query.x + 6" [attr.y2]="query.y" stroke="#111827" stroke-width="1.5" />
+          <line [attr.x1]="query.x" [attr.y1]="query.y - 6" [attr.x2]="query.x" [attr.y2]="query.y + 6" stroke="#111827" stroke-width="1.5" />
+        </g>
       </svg>
     </div>
   </ng-container>

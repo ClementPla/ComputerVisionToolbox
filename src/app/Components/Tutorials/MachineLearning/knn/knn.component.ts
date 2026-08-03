@@ -1,22 +1,16 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { sampleGaussian2D } from 'src/app/utils/sampling';
 import { Matrix } from 'src/app/lib/numpy';
-import {
-  Classifier,
-  KNeighborsClassifier,
-  GaussianNaiveBayes,
-} from 'src/app/lib/ml';
+import { KNeighborsClassifier } from 'src/app/lib/ml';
 import { TutorialTemplateComponent } from '../../../Toolbox/tutorial-template/tutorial-template.component';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatSlider, MatSliderThumb } from '@angular/material/slider';
 
-export enum Classes { c1 = 1, c2 = 2, c3 = 3 }
-export interface Datapoint { x: number; y: number; class: Classes; }
-export interface Dataset { points: Datapoint[]; }
-export enum Model { KNN = 'k-NN', NaiveBayes = 'Naive Bayes' }
+export enum Classes { c1 = 1, c2 = 2 }
+interface Point { x: number; y: number; class: Classes }
+interface Neighbor { point: Point; dist: number }
 
 @Component({
   selector: 'app-knn',
@@ -33,84 +27,139 @@ export enum Model { KNN = 'k-NN', NaiveBayes = 'Naive Bayes' }
     MatSliderThumb,
   ],
 })
-export class KNNComponent {
-  @ViewChild('knnCanvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
+export class KNNComponent implements OnInit {
+  @ViewChild('regionCanvas', { static: true }) regionCanvas!: ElementRef<HTMLCanvasElement>;
 
-  classChoice: Classes = Classes.c1;
-  modelChoice: Model = Model.KNN;
-  dataset: Dataset = { points: [] };
-  isDrawing = false;
+  readonly size = 460;
+  readonly colors: Record<number, string> = { [Classes.c1]: '#3b82f6', [Classes.c2]: '#ef4444' };
 
   k = 5;
+  classChoice: Classes = Classes.c1;
+  points: Point[] = [];
+  query = { x: 230, y: 230 };
+  private dragging = false;
 
-  // Enums for the template.
   get Classes() { return Classes; }
-  get Model() { return Model; }
 
-  startDraw() { this.isDrawing = true; }
-  stopDraw() { this.isDrawing = false; }
-
-  draw(event: MouseEvent) {
-    if (!this.isDrawing) return;
-    const rect = this.canvas.nativeElement.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    const points = sampleGaussian2D(2, { x, y }, [[10, 0], [0, 10]]);
-    points.forEach((p) => this.dataset.points.push({ x: p.x, y: p.y, class: this.classChoice }));
-    this.updateDecisionBoundaries();
+  ngOnInit(): void {
+    this.seed();
+    this.updateRegions();
   }
 
-  retrain() { this.updateDecisionBoundaries(); }
+  // --- Mechanism the tutorial is about: the query's k nearest neighbours ---
 
-  updateDecisionBoundaries() {
-    if (this.dataset.points.length < 1) return;
-    const canvasEl = this.canvas.nativeElement;
-    const ctx = canvasEl.getContext('2d');
+  get neighbors(): Neighbor[] {
+    return this.points
+      .map((p) => ({ point: p, dist: Math.hypot(p.x - this.query.x, p.y - this.query.y) }))
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, Math.min(this.k, this.points.length));
+  }
+
+  /** Votes per class among the current neighbours. */
+  get votes(): Record<number, number> {
+    const tally: Record<number, number> = { [Classes.c1]: 0, [Classes.c2]: 0 };
+    for (const n of this.neighbors) tally[n.point.class]++;
+    return tally;
+  }
+
+  get predicted(): Classes {
+    return this.votes[Classes.c1] >= this.votes[Classes.c2] ? Classes.c1 : Classes.c2;
+  }
+
+  /** Radius of the circle enclosing exactly the k nearest neighbours. */
+  get neighborRadius(): number {
+    const ns = this.neighbors;
+    return ns.length ? ns[ns.length - 1].dist : 0;
+  }
+
+  // --- Interaction -------------------------------------------------------
+
+  startDragQuery(event: MouseEvent): void {
+    event.stopPropagation();
+    this.dragging = true;
+  }
+
+  onMouseMove(event: MouseEvent): void {
+    if (!this.dragging) return;
+    const p = this.toLocal(event);
+    this.query = { x: clamp(p.x, 0, this.size), y: clamp(p.y, 0, this.size) };
+  }
+
+  onMouseUp(): void {
+    this.dragging = false;
+  }
+
+  /** Click on empty space to add a training point of the selected class. */
+  addPoint(event: MouseEvent): void {
+    const p = this.toLocal(event);
+    this.points.push({ x: p.x, y: p.y, class: this.classChoice });
+    this.updateRegions();
+  }
+
+  clear(): void {
+    this.points = [];
+    this.updateRegions();
+  }
+
+  reset(): void {
+    this.seed();
+    this.updateRegions();
+  }
+
+  onKChange(): void {
+    this.updateRegions();
+  }
+
+  // --- Background decision regions (the "global" view of the same vote) ---
+
+  private updateRegions(): void {
+    const ctx = this.regionCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
+    ctx.clearRect(0, 0, this.size, this.size);
+    if (this.points.length === 0) return;
 
-    // Train on normalized coordinates so distances are scale-consistent.
-    const scale = canvasEl.width;
-    const X = Matrix.fromRows(this.dataset.points.map((p) => [p.x / scale, p.y / scale]));
-    const y = this.dataset.points.map((p) => p.class as number);
-    const model = this.buildClassifier().fit(X, y);
-    if (model.classes.length === 0) return;
+    const model = new KNeighborsClassifier(this.k).fit(
+      Matrix.fromRows(this.points.map((p) => [p.x, p.y])),
+      this.points.map((p) => p.class as number)
+    );
 
-    // Batch-predict the decision grid, then paint it.
-    const step = 6;
+    const step = 8;
     const coords: number[][] = [];
-    for (let px = 0; px < canvasEl.width; px += step) {
-      for (let py = 0; py < canvasEl.height; py += step) coords.push([px / scale, py / scale]);
+    for (let x = 0; x < this.size; x += step) {
+      for (let y = 0; y < this.size; y += step) coords.push([x, y]);
     }
-    const predictions = model.predict(Matrix.fromRows(coords));
-
-    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-    let idx = 0;
-    for (let px = 0; px < canvasEl.width; px += step) {
-      for (let py = 0; py < canvasEl.height; py += step) {
-        ctx.fillStyle = this.getLightColor(predictions[idx++] as Classes);
-        ctx.fillRect(px, py, step, step);
+    const preds = model.predict(Matrix.fromRows(coords));
+    let i = 0;
+    for (let x = 0; x < this.size; x += step) {
+      for (let y = 0; y < this.size; y += step) {
+        ctx.fillStyle = preds[i++] === Classes.c1 ? 'rgba(59,130,246,0.10)' : 'rgba(239,68,68,0.10)';
+        ctx.fillRect(x, y, step, step);
       }
     }
   }
 
-  private buildClassifier(): Classifier {
-    return this.modelChoice === Model.NaiveBayes
-      ? new GaussianNaiveBayes()
-      : new KNeighborsClassifier(this.k);
+  private toLocal(event: MouseEvent): { x: number; y: number } {
+    const rect = (event.currentTarget as SVGElement).getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   }
 
-  clearPoints() {
-    this.dataset.points = [];
-    const ctx = this.canvas.nativeElement.getContext('2d');
-    ctx?.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
-  }
-
-  private getLightColor(c: Classes): string {
-    const colors: Record<number, string> = {
-      [Classes.c1]: 'rgba(59, 130, 246, 0.25)',
-      [Classes.c2]: 'rgba(34, 197, 94, 0.25)',
-      [Classes.c3]: 'rgba(239, 68, 68, 0.25)',
+  private seed(): void {
+    this.points = [];
+    const blob = (cx: number, cy: number, cls: Classes) => {
+      for (let i = 0; i < 8; i++) {
+        this.points.push({
+          x: cx + (Math.random() - 0.5) * 120,
+          y: cy + (Math.random() - 0.5) * 120,
+          class: cls,
+        });
+      }
     };
-    return colors[c] || 'transparent';
+    blob(150, 160, Classes.c1);
+    blob(320, 300, Classes.c2);
+    this.query = { x: 230, y: 230 };
   }
+}
+
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, v));
 }
