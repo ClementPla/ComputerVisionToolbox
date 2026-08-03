@@ -1,26 +1,36 @@
-<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="false">
+<app-tutorial-template [rightDrawer]="false" [leftDrawer]="true" [tutorial]="true">
+  <ng-container ngProjectAs="[tutorialTitle]">Canny Edge Detection</ng-container>
+  <ng-container ngProjectAs="[tutorialDescription]">
+    <small><i>The classic five-stage pipeline that turns an image into clean, thin, connected edges.</i></small>
+  </ng-container>
+
+  <ng-container ngProjectAs="[tutorialContent]">
+    <div class="space-y-2 text-sm">
+      <p>Canny finds edges in five steps — click each thumbnail to enlarge it:</p>
+      <ol class="list-decimal ml-5 space-y-1">
+        <li><strong>Blur</strong> with a Gaussian to suppress noise (σ controls how much).</li>
+        <li><strong>Gradient</strong> via Sobel — bright where intensity changes fastest.</li>
+        <li><strong>Thin</strong> by non-maximum suppression: keep only ridge tops, so edges become 1px wide.</li>
+        <li><strong>Hysteresis</strong>: pixels above the <em>high</em> threshold are
+          <span class="font-bold">strong</span> (white); pixels above the
+          <em>low</em> threshold survive only if connected to a strong one
+          (<span style="color:#22c55e" class="font-bold">green</span>) —
+          otherwise they're dropped (<span style="color:#b91c1c" class="font-bold">red</span>).</li>
+        <li><strong>Edges</strong>: the final map (strong + kept-weak).</li>
+      </ol>
+      <p class="text-xs">
+        Two thresholds beat one: a single threshold either breaks real edges or
+        lets noise through. Hysteresis keeps faint edge <em>continuations</em>
+        while rejecting isolated noise.
+      </p>
+    </div>
+  </ng-container>
+
   <ng-container ngProjectAs="[drawerLeft]">
-    <div class="flex flex-col gap-4 max-w-96 p-4">
-      <div class="flex flex-col gap-2">
-        <label class="font-medium text-slate-600 text-sm">Image</label>
-        <mat-button-toggle-group [(ngModel)]="image" (ngModelChange)="loadImage()">
-          @for (p of presets; track p) {
-            <mat-button-toggle [value]="p">{{ p.split('.')[0] }}</mat-button-toggle>
-          }
-        </mat-button-toggle-group>
-      </div>
+    <div class="flex flex-col gap-4 max-w-96 p-2">
+      <app-image-presets (presetEvent)="onImageSelected($event)"></app-image-presets>
 
-      <div class="flex flex-col gap-2">
-        <label class="font-medium text-slate-600 text-sm">Show stage</label>
-        <mat-button-toggle-group [(ngModel)]="stage" (ngModelChange)="recompute()">
-          <mat-button-toggle value="blurred">Blur</mat-button-toggle>
-          <mat-button-toggle value="magnitude">Gradient</mat-button-toggle>
-          <mat-button-toggle value="suppressed">Thinned</mat-button-toggle>
-          <mat-button-toggle value="edges">Edges</mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
-
-      <div class="flex flex-col">
+      <div class="flex flex-col px-2">
         <div class="flex justify-between mb-1">
           <label class="font-medium text-slate-600 text-sm">Blur σ</label>
           <span class="bg-sky-100 font-bold px-2 py-0.5 rounded text-sky-700 text-xs">{{ sigma }}</span>
@@ -30,44 +40,55 @@
         </mat-slider>
       </div>
 
-      <div class="flex flex-col">
+      <div class="flex flex-col px-2">
         <div class="flex justify-between mb-1">
           <label class="font-medium text-slate-600 text-sm">Low threshold</label>
-          <span class="bg-amber-100 font-bold px-2 py-0.5 rounded text-amber-700 text-xs">{{ lowThreshold }}</span>
+          <span class="bg-amber-100 font-bold px-2 py-0.5 rounded text-amber-700 text-xs">{{ low }}</span>
         </div>
         <mat-slider min="0" max="100" step="1" discrete>
-          <input matSliderThumb [(ngModel)]="lowThreshold" (ngModelChange)="recompute()" />
+          <input matSliderThumb [(ngModel)]="low" (ngModelChange)="recompute()" />
         </mat-slider>
       </div>
 
-      <div class="flex flex-col">
+      <div class="flex flex-col px-2">
         <div class="flex justify-between mb-1">
           <label class="font-medium text-slate-600 text-sm">High threshold</label>
-          <span class="bg-red-100 font-bold px-2 py-0.5 rounded text-red-700 text-xs">{{ highThreshold }}</span>
+          <span class="bg-red-100 font-bold px-2 py-0.5 rounded text-red-700 text-xs">{{ high }}</span>
         </div>
         <mat-slider min="0" max="150" step="1" discrete>
-          <input matSliderThumb [(ngModel)]="highThreshold" (ngModelChange)="recompute()" />
+          <input matSliderThumb [(ngModel)]="high" (ngModelChange)="recompute()" />
         </mat-slider>
       </div>
-
-      <p class="text-gray-500 text-xs">
-        Canny: blur → Sobel gradient → non-maximum suppression (thinning) →
-        double-threshold hysteresis. Strong edges (≥ high) seed the map; weak
-        edges (≥ low) survive only if connected to a strong one.
-      </p>
     </div>
   </ng-container>
 
   <ng-container ngProjectAs="[centerContent]">
-    <div class="flex flex-wrap gap-4 p-4">
-      <figure class="m-0">
-        <figcaption class="mb-1 text-slate-600 text-sm">Original</figcaption>
-        <canvas #original class="border border-gray-200"></canvas>
-      </figure>
-      <figure class="m-0">
-        <figcaption class="mb-1 text-slate-600 text-sm capitalize">{{ stage }}</figcaption>
-        <canvas #result class="border border-gray-200 bg-black"></canvas>
-      </figure>
+    <div class="flex flex-col gap-4 p-3">
+      <div class="flex flex-wrap gap-4 items-start">
+        <figure class="m-0">
+          <figcaption class="mb-1 text-slate-600 text-sm">Original</figcaption>
+          <canvas #original class="border border-gray-200"></canvas>
+        </figure>
+        <figure class="m-0">
+          <figcaption class="mb-1 text-slate-600 text-sm capitalize">{{ stage }}</figcaption>
+          <canvas #result class="bg-black border border-gray-200"></canvas>
+        </figure>
+      </div>
+
+      <!-- Pipeline strip: every stage at once; click to enlarge in the result view -->
+      <div>
+        <div class="mb-1 text-slate-500 text-xs">Pipeline (click a stage)</div>
+        <div class="flex flex-wrap gap-3">
+          @for (st of stages; track st.key) {
+            <figure class="cursor-pointer m-0 text-center" (click)="selectStage(st.key)">
+              <canvas #thumb class="bg-black border-2 rounded"
+                      [class.border-indigo-500]="stage === st.key"
+                      [class.border-gray-200]="stage !== st.key"></canvas>
+              <figcaption class="mt-0.5 text-slate-600 text-xs">{{ st.label }}</figcaption>
+            </figure>
+          }
+        </div>
+      </div>
     </div>
   </ng-container>
 </app-tutorial-template>
