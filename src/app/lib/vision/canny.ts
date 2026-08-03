@@ -23,7 +23,15 @@ export interface CannyResult {
   magnitude: Float64Array; // normalized to 0..255
   suppressed: Float64Array; // after non-max suppression, 0..255
   edges: Uint8ClampedArray; // final binary edge map, values 0 or 255
+  /** Per-pixel hysteresis class: 0 none · 1 weak-dropped · 2 weak-kept · 3 strong. */
+  hysteresisClasses: Uint8Array;
 }
+
+/** Hysteresis class labels. */
+export const HYST_NONE = 0;
+export const HYST_WEAK_DROPPED = 1;
+export const HYST_WEAK_KEPT = 2;
+export const HYST_STRONG = 3;
 
 /** Luminance grayscale from RGBA pixel data. */
 export function toGrayscale(rgba: Uint8ClampedArray, width: number, height: number): Float64Array {
@@ -215,7 +223,16 @@ export function cannyFromGray(
   const suppressed = nonMaximumSuppression(normMag, direction, width, height);
   const edges = hysteresis(suppressed, width, height, low, high);
 
-  return { width, height, grayscale: gray, blurred, magnitude: normMag, suppressed, edges };
+  // Classify each pixel for the hysteresis visualization (reconstructed from
+  // the thresholds + which weak pixels survived linking).
+  const hysteresisClasses = new Uint8Array(width * height);
+  for (let i = 0; i < suppressed.length; i++) {
+    if (suppressed[i] >= high) hysteresisClasses[i] = HYST_STRONG;
+    else if (suppressed[i] >= low) hysteresisClasses[i] = edges[i] === 255 ? HYST_WEAK_KEPT : HYST_WEAK_DROPPED;
+    else hysteresisClasses[i] = HYST_NONE;
+  }
+
+  return { width, height, grayscale: gray, blurred, magnitude: normMag, suppressed, edges, hysteresisClasses };
 }
 
 /** Convenience: run Canny directly on canvas RGBA data. */

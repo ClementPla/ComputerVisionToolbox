@@ -68,8 +68,8 @@
 
   <ng-container ngProjectAs="[centerContent]">
     <div class="flex flex-wrap gap-4 p-2">
-      <div echarts [options]="option3D" (chartInit)="onChart3DInit($event)" class="block h-[420px] w-[420px]"></div>
-      <div echarts [options]="option2D" (chartInit)="onChart2DInit($event)" class="block h-[420px] w-[420px]"></div>
+      <div echarts [options]="option3D" (chartInit)="onChart3DInit($event)" style="width: 420px; height: 420px; display: block;"></div>
+      <div echarts [options]="option2D" (chartInit)="onChart2DInit($event)" style="width: 420px; height: 420px; display: block;"></div>
     </div>
   </ng-container>
 </app-tutorial-template>

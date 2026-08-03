@@ -10,6 +10,7 @@ import { MatButton } from '@angular/material/button';
 import { MatSlider, MatSliderThumb } from '@angular/material/slider';
 
 const CLUSTER_COLORS = ['#5470c6', '#91cc75', '#ee6666', '#fac858', '#73c0de'];
+const MAX_CLUSTERS = 5;
 const K_NEIGHBORS = 6;
 
 @Component({
@@ -44,10 +45,6 @@ export class TSNEComponent implements OnInit, OnDestroy {
   private chart3D: any = null;
   private chart2D: any = null;
   private frame = 0;
-  // Pace the optimization by wall-clock time so the embedding forms gradually
-  // (~40 steps/s ⇒ a 500-iteration run takes ~12s), independent of refresh rate.
-  private readonly stepIntervalMs = 24;
-  private lastStepTime = 0;
 
   option3D: EChartsOption = {};
   option2D: EChartsOption = {};
@@ -63,6 +60,9 @@ export class TSNEComponent implements OnInit, OnDestroy {
   onChart3DInit(ec: any): void {
     this.chart3D = ec;
     this.render3D();
+    // The chart can initialize before its flex container has a laid-out size;
+    // resize once layout settles so it isn't stuck rendering at 0×0.
+    setTimeout(() => ec.resize(), 60);
   }
 
   onChart2DInit(ec: any): void {
@@ -81,6 +81,7 @@ export class TSNEComponent implements OnInit, OnDestroy {
       this.render2D();
     });
     this.render2D();
+    setTimeout(() => ec.resize(), 60);
   }
 
   // --- Data ---------------------------------------------------------------
@@ -125,7 +126,6 @@ export class TSNEComponent implements OnInit, OnDestroy {
     );
     this.iter = 0;
     this.running = true;
-    this.lastStepTime = 0;
     this.animate();
   }
 
@@ -141,15 +141,13 @@ export class TSNEComponent implements OnInit, OnDestroy {
 
   private animate = (): void => {
     if (!this.running || !this.tsne) return;
-    // Advance at most one step per elapsed interval, so the layout evolves at a
-    // watchable pace rather than snapping to the final result in a few frames.
-    const now = performance.now();
-    if (now - this.lastStepTime >= this.stepIntervalMs && this.iter < this.nIter) {
+    // A couple of steps per frame: with chart animation off, every frame draws
+    // the points at their current positions, so you see them slide apart.
+    if (this.iter < this.nIter) {
       this.tsne.step();
       this.iter++;
-      this.lastStepTime = now;
-      this.render2D();
     }
+    this.render2D();
     if (this.iter < this.nIter) {
       this.frame = requestAnimationFrame(this.animate);
     } else {
@@ -159,94 +157,81 @@ export class TSNEComponent implements OnInit, OnDestroy {
 
   // --- Rendering ----------------------------------------------------------
 
+  // Both charts render through their bound [options] input with a *fixed*
+  // series structure (empty data for inactive clusters / overlays). This drives
+  // rendering via the ngx-echarts directive lifecycle — which sizes the chart
+  // correctly on first paint — and lets merge-updates move points in place.
+
   private render3D(): void {
-    if (!this.chart3D) return;
     const dim = this.focus == null ? 0.9 : 0.25;
     const series: any[] = [];
-    for (let c = 0; c < this.nClusters; c++) {
+    for (let c = 0; c < MAX_CLUSTERS; c++) {
       series.push({
         type: 'scatter3D',
         name: `Cluster ${c + 1}`,
         symbolSize: 7,
+        animation: false,
         itemStyle: { color: CLUSTER_COLORS[c % CLUSTER_COLORS.length], opacity: dim },
-        data: this.source.filter((_, i) => this.labels[i] === c),
+        data: c < this.nClusters ? this.source.filter((_, i) => this.labels[i] === c) : [],
       });
     }
-    if (this.focus != null) {
-      series.push({
-        type: 'scatter3D',
-        symbolSize: 10,
-        itemStyle: { color: '#111827', opacity: 0.9 },
-        data: this.neighbors[this.focus].map((j) => this.source[j]),
-      });
-      series.push({
-        type: 'scatter3D',
-        symbolSize: 16,
-        itemStyle: { color: '#111827' },
-        data: [this.source[this.focus]],
-      });
-    }
-    this.chart3D.setOption(
-      {
-        title: { text: 'Original data (3D)', left: 'center', textStyle: { fontSize: 13 } },
-        tooltip: { show: false },
-        xAxis3D: {}, yAxis3D: {}, zAxis3D: {},
-        grid3D: { boxWidth: 90, boxHeight: 90, boxDepth: 90, viewControl: { distance: 190 } },
-        series,
-      },
-      { notMerge: true, lazyUpdate: true }
-    );
+    series.push({
+      type: 'scatter3D', symbolSize: 10, animation: false,
+      itemStyle: { color: '#111827', opacity: 0.9 },
+      data: this.focus != null ? this.neighbors[this.focus].map((j) => this.source[j]) : [],
+    });
+    series.push({
+      type: 'scatter3D', symbolSize: 16, animation: false, itemStyle: { color: '#111827' },
+      data: this.focus != null ? [this.source[this.focus]] : [],
+    });
+
+    this.option3D = {
+      animation: false,
+      title: { text: 'Original data (3D)', left: 'center', textStyle: { fontSize: 13 } },
+      tooltip: { show: false },
+      xAxis3D: {}, yAxis3D: {}, zAxis3D: {},
+      grid3D: { boxWidth: 90, boxHeight: 90, boxDepth: 90, viewControl: { distance: 190 } },
+      series,
+    };
   }
 
   private render2D(): void {
-    if (!this.chart2D) return;
     const coords = this.tsne ? this.tsne.embedding.toArray() : this.source.map(() => [0, 0]);
-
+    const f = this.focus != null ? coords[this.focus] : null;
     const series: any[] = [];
-    for (let c = 0; c < this.nClusters; c++) {
+    for (let c = 0; c < MAX_CLUSTERS; c++) {
       series.push({
         type: 'scatter',
         name: `Cluster ${c + 1}`,
         symbolSize: 9,
         itemStyle: { color: CLUSTER_COLORS[c % CLUSTER_COLORS.length], opacity: this.focus == null ? 0.85 : 0.35 },
-        data: coords
-          .map((p, i) => ({ value: p, gidx: i }))
-          .filter((_, i) => this.labels[i] === c),
+        data: c < this.nClusters
+          ? coords.map((p, i) => ({ value: p, gidx: i })).filter((_, i) => this.labels[i] === c)
+          : [],
       });
     }
-
     // "Springs": lines from the focused point to its true high-D neighbours.
-    if (this.focus != null) {
-      const f = coords[this.focus];
-      series.push({
-        type: 'lines',
-        coordinateSystem: 'cartesian2d',
-        silent: true,
-        lineStyle: { color: '#111827', opacity: 0.55, width: 1.5 },
-        data: this.neighbors[this.focus].map((j) => ({ coords: [f, coords[j]] })),
-      });
-      series.push({
-        type: 'scatter',
-        symbolSize: 16,
-        itemStyle: { color: '#111827' },
-        data: [{ value: f, gidx: this.focus }],
-      });
-    }
+    series.push({
+      type: 'lines', coordinateSystem: 'cartesian2d', silent: true,
+      lineStyle: { color: '#111827', opacity: 0.55, width: 1.5 },
+      data: f ? this.neighbors[this.focus!].map((j) => ({ coords: [f, coords[j]] })) : [],
+    });
+    series.push({
+      type: 'scatter', symbolSize: 16, itemStyle: { color: '#111827' },
+      data: f ? [{ value: f, gidx: this.focus }] : [],
+    });
 
-    this.chart2D.setOption(
-      {
-        title: {
-          text: `t-SNE embedding (2D) — iteration ${this.iter}`,
-          left: 'center',
-          textStyle: { fontSize: 13 },
-        },
-        tooltip: { show: false },
-        xAxis: { scale: true, axisLabel: { show: false }, splitLine: { show: false } },
-        yAxis: { scale: true, axisLabel: { show: false }, splitLine: { show: false } },
-        series,
+    this.option2D = {
+      animation: false,
+      title: {
+        text: `t-SNE embedding (2D) — iteration ${this.iter}`,
+        left: 'center', textStyle: { fontSize: 13 },
       },
-      { notMerge: true, lazyUpdate: true }
-    );
+      tooltip: { show: false },
+      xAxis: { scale: true, axisLabel: { show: false }, splitLine: { show: false } },
+      yAxis: { scale: true, axisLabel: { show: false }, splitLine: { show: false } },
+      series,
+    };
   }
 
   private randn(): number {
